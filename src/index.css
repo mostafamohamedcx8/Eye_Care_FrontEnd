@@ -1,13 +1,286 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.topbar {
+  border-bottom: 1px solid #e8eee4;
+  background-color: #fff;
+  font-size: 0.9rem;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.site-text-info {
+  display: inline-flex;
+  align-items: center;
+  color: #a1aaa7;
+  font-weight: 500;
+}
+
+.site-text-info:hover {
+  color: #007bff;
+}
+
+.icon-color {
+  color: #3399cc !important;
+}
+
+/* يخلي العناصر تستجيب لحجم الشاشة */
+@media (max-width: 576px) {
+  .topbar .d-flex {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .topbar .text-muted {
+    display: none;
+  }
+}
+
+.button-color {
+  color: #007bff;
+}
+
+.hero-section {
+  background: url("E:\cv\eyecare\eyecare\public\Untitled.jpeg") center/cover
+    no-repeat;
+  height: 80vh;
+  position: relative;
+}
+
+.overlay {
+  background-color: rgba(255, 255, 255, 0.6); /* تأثير ضبابي خفيف */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.hero-content {
+  max-width: 700px;
+  margin: auto;
+}
+
+.hero-logo {
+  width: 100px;
+  margin-bottom: 20px;
+}
+
+.hero-subtitle {
+  letter-spacing: 3px;
+  color: #005fa3;
+  font-weight: 500;
+}
+
+.hero-title {
+  font-size: 48px;
+  color: #003366;
+  font-weight: bold;
+  margin: 20px 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hero-button {
+  background-color: #3ba0d5;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-weight: bold;
+  color: white;
+}
+
+.welcome-section {
+  padding: 0px 0;
+  background-color: #ffffff;
+}
+
+.welcome-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.welcome-text {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.7;
+  margin-bottom: 30px;
+}
+
+.welcome-button {
+  background-color: #3ba0d5;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.welcome-image {
+  max-width: 100%;
+  height: auto;
+}
+.app-promotion-section {
+  background-color: #1e90ff;
+  background-image: url("E:\cv\eyecare\eyecare\public\banner-pattern.svg"); /* بإمكانك استبدال هذا بباترن طبي أو صورة SVG */
+  padding: 0px 0;
+  color: white;
+}
+
+.phone-image {
+  width: 100%;
+  max-width: 300px;
+}
+
+.store-buttons {
+  margin-top: 20px;
+}
+
+.store-badge {
+  height: 60px;
+  margin: 10px;
+  transition: transform 0.2s;
+}
+
+.store-badge:hover {
+  transform: scale(1.05);
+}
+
+.footer {
+  background-color: #1f3b35;
+  color: white;
+  padding: 50px 0;
+  margin-top: 0;
+}
+
+.footer h5 {
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.footer ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer ul li {
+  margin-bottom: 10px;
+}
+
+.footer ul li a {
+  color: #ccc;
+  text-decoration: none;
+}
+
+.footer ul li a:hover {
+  color: white;
+}
+
+.social-icons a {
+  display: inline-block;
+  margin-right: 10px;
+  background-color: #263a34;
+  padding: 10px;
+  border-radius: 50%;
+  color: white;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.social-icons a:hover {
+  background-color: #00aaff;
+}
+
+.about-hero {
+  position: relative;
+  height: 300px;
+  background-image: url("E:\cv\eyecare\eyecare\public\Untitled.jpeg"); /* حط صورة الخلفية هنا */
+  background-size: cover;
+  background-position: center;
+}
+
+.overlay {
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.breadcrumb {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.breadcrumb-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.active {
+  font-weight: bold;
+  color: #333;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: bold;
+  color: #004d80;
+}
+
+.content {
+  padding: 30px 15px;
+  max-width: 800px;
+  margin: auto;
+  text-align: center;
+}
+
+.content h2 {
+  font-size: 28px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+
+.content p {
+  font-size: 18px;
+  color: #333;
+  line-height: 1.8;
+}
+
+.about-content {
+  background-color: #f9f9f9;
+  padding: 60px 20px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #002e5b;
+}
+
+.section-paragraph {
+  font-size: 18px;
+  color: #444;
+  line-height: 1.8;
+  max-width: 900px;
+}
+
+.separator {
+  margin: 0 8px !important;
+}
+
+.exam-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: contain;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+}
+.image-wrapper {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 400px;
 }
