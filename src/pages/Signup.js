@@ -4,27 +4,23 @@ import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
 import React from "react";
 import { Button, Container, Form, Row, Col } from "react-bootstrap";
-
-const germanStates = [
-  "Baden-Württemberg",
-  "Bavaria",
-  "Berlin",
-  "Brandenburg",
-  "Bremen",
-  "Hamburg",
-  "Hesse",
-  "Lower Saxony",
-  "Mecklenburg-Vorpommern",
-  "North Rhine-Westphalia",
-  "Rhineland-Palatinate",
-  "Saarland",
-  "Saxony",
-  "Saxony-Anhalt",
-  "Schleswig-Holstein",
-  "Thuringia",
-];
+import { useEffect, useState } from "react";
+import { State, City } from "country-state-city";
 
 const SignupSection = () => {
+  const [states, setStates] = useState([]);
+  const [selectedState, setSelectedState] = useState("");
+  const [cities, setCities] = useState([]);
+  useEffect(() => {
+    const germanStates = State.getStatesOfCountry("DE"); // DE = Germany
+    setStates(germanStates);
+  }, []);
+  useEffect(() => {
+    if (selectedState) {
+      const foundCities = City.getCitiesOfState("DE", selectedState);
+      setCities(foundCities);
+    }
+  }, [selectedState]);
   return (
     <>
       {/* Hero Section */}
@@ -153,10 +149,24 @@ const SignupSection = () => {
           {/* العنوان */}
           <Form.Group className="mb-3">
             <Form.Label>State</Form.Label>
-            <Form.Select name="state">
+            <Form.Select
+              name="state"
+              onChange={(e) => setSelectedState(e.target.value)}
+            >
               <option>Select German State</option>
-              {germanStates.map((state, i) => (
-                <option key={i}>{state}</option>
+              {states.map((state) => (
+                <option key={state.isoCode} value={state.isoCode}>
+                  {state.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>City</Form.Label>
+            <Form.Select name="city">
+              <option>Select City</option>
+              {cities.map((city, i) => (
+                <option key={i}>{city.name}</option>
               ))}
             </Form.Select>
           </Form.Group>
@@ -165,7 +175,7 @@ const SignupSection = () => {
             <Form.Label>Full Address</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter your address (street, city...)"
+              placeholder="Enter your address (street..)"
               name="fullAddress"
             />
           </Form.Group>

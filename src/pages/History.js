@@ -7,6 +7,7 @@ import { Row } from "react-bootstrap";
 import NavBarProfile from "./../component/NavBarProfile";
 import ExaminationHistory from "../component/ExaminationHistory";
 import Pagination from "../component/pagination";
+import PatientCards from "../component/ExaminationDetails";
 
 const HistorySection = () => {
   return (
@@ -33,6 +34,7 @@ const History = () => {
       <NavBarProfile />
       <HistorySection />
       <ExaminationHistory />
+      <PatientCards />
       <Pagination />
       <Footer />
     </div>

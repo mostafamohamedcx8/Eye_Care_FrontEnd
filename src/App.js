@@ -8,8 +8,10 @@ import ResetPassword from "./pages/Resetpassword";
 import OtpCode from "./pages/OTP";
 import Newpassword from "./pages/NewPassword";
 import History from "./pages/History";
-import DetailsExam from "./pages/DetailsExam";
 import Verificationcode from "./pages/verificationCode";
+import ExaminationReport from "./pages/ExaminationReport";
+import DoctorCard from "./pages/DoctorPage";
+import ProfilePage from "./pages/ProfilePage";
 function App() {
   return (
     <div className="App">
@@ -24,8 +26,10 @@ function App() {
           <Route path="/OtpCode" element={<OtpCode />} />
           <Route path="/NewPassword" element={<Newpassword />} />
           <Route path="/History" element={<History />} />
-          <Route path="/Details" element={<DetailsExam />} />
           <Route path="/Verificationcode" element={<Verificationcode />} />
+          <Route path="/ExaminationReport" element={<ExaminationReport />} />
+          <Route path="/DoctorCard" element={<DoctorCard />} />
+          <Route path="/ProfilePage" element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>
     </div>

@@ -1,146 +1,68 @@
-import React, { useRef } from "react";
-import { useParams } from "react-router-dom";
-import { Container, Image, Card, Button, Table } from "react-bootstrap";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import React from "react";
+import { ListGroup, Button, Container } from "react-bootstrap";
 
-// بيانات فحص وهمية
-const dummyData = [
+const patientsData = [
   {
-    id: 1,
-    imageUrl: "https://via.placeholder.com/600x400?text=Eye+Image+1",
-    date: "2025-04-10",
-    age: 34,
+    name: "Ahmed Hassan",
     gender: "Male",
-    position: "Right Eye - Top View",
-    symptoms: "Redness, Blurry Vision",
-    otherDiseases: "Diabetes",
+    ethnicity: "Arab",
+    examDate: "18/4/2025",
+    birthDate: "1990-05-14",
+    ID: "4534352253",
   },
   {
-    id: 2,
-    imageUrl:
-      "https://webeye.ophth.uiowa.edu/eyeforum/atlas/pages/normal-fundus-child/normal-child-fundus.jpg",
-    date: "2025-04-11",
-    age: 28,
+    name: "Fatma Ali",
     gender: "Female",
-    position: "Left Eye - Side View",
-    symptoms: "Dryness, Irritation",
-    otherDiseases: "None",
+    ethnicity: "Arab",
+    examDate: "19/4/2025",
+    birthDate: "1988-11-22",
+    ID: "4534344553",
+  },
+  {
+    name: "Omar Youssef",
+    gender: "Male",
+    ethnicity: "Arab",
+    examDate: "17/4/2025",
+    birthDate: "1992-03-09",
+    ID: "4534125456",
   },
 ];
 
-// الأمراض والتشخيص
-const diseases = [
-  { name: "Diabetic Retinopathy", probability: "75%" },
-  { name: "Drusense", probability: "60%" },
-  { name: "Increase Cup Disk", probability: "45%" },
-];
-
-const ExaminationDetails = () => {
-  const { id } = useParams();
-  const exam = dummyData[1]; // يمكنك تغييره لاحقاً حسب id
-  const reportRef = useRef(); // مرجع الكارت كله
-
-  // تنزيل التقرير كـ PDF
-  const handleDownload = () => {
-    const input = reportRef.current;
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("examination-report.pdf");
-    });
-  };
-
-  if (!exam) {
-    return (
-      <Container className="my-5 text-center">
-        <h4 className="text-danger">Examination not found.</h4>
-      </Container>
-    );
-  }
-
+const PatientList = () => {
   return (
-    <Container className="my-5">
-      <h2 className="mb-4 text-center">Examination Details</h2>
-
-      {/* الكارت بالكامل داخل ref */}
-      <div ref={reportRef}>
-        <Card className="shadow-sm">
-          <Card.Body>
-            <div className="d-flex flex-column flex-md-row">
-              {/* البيانات النصية */}
-              <div className="me-md-4">
-                <p>
-                  <strong>Date:</strong> {exam.date}
-                </p>
-                <p>
-                  <strong>Age:</strong> {exam.age}
-                </p>
-                <p>
-                  <strong>Gender:</strong> {exam.gender}
-                </p>
-                <p>
-                  <strong>Image Position:</strong> {exam.position}
-                </p>
-                <p>
-                  <strong>Symptoms:</strong> {exam.symptoms}
-                </p>
-                <p>
-                  <strong>Other Diseases:</strong> {exam.otherDiseases}
-                </p>
+    <Container>
+      <ListGroup>
+        {patientsData.map((patient, index) => (
+          <ListGroup.Item
+            key={index}
+            className="d-flex justify-content-between align-items-start"
+          >
+            <div>
+              <div>
+                <strong>{patient.name}</strong>
               </div>
-
-              {/* الصورة */}
-              <div className="image-wrapper mb-3 mb-md-0 ms-auto">
-                <Image
-                  src={exam.imageUrl}
-                  alt="Eye photo"
-                  className="exam-image"
-                  fluid
-                />
+              <div>
+                <small>
+                  Gender: {patient.gender} | Ethnicity: {patient.ethnicity}
+                </small>
+              </div>
+              <div>
+                <small>
+                  DOB: {patient.birthDate} | ExamDate: {patient.examDate}
+                </small>
+              </div>
+              <div>
+                <small>patient ID: {patient.ID}</small>
               </div>
             </div>
-
-            {/* جدول الأمراض */}
-            <h4 className="mt-4">Diagnosis Summary</h4>
-            <Table striped bordered hover className="mt-3 text-center">
-              <thead>
-                <tr>
-                  <th>Disease</th>
-                  <th>Probability (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {diseases.map((d, index) => (
-                  <tr key={index}>
-                    <td>{d.name}</td>
-                    <td>{d.probability}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-
-            <div className="text-center mt-4">
-              <Button className="welcome-button" href="/Examination">
-                ⬅ Back to Another Examination
-              </Button>
-            </div>
-          </Card.Body>
-        </Card>
-      </div>
-
-      {/* زر تحميل التقرير */}
-      <div className="text-center mt-4">
-        <Button variant="success" onClick={handleDownload}>
-          ⬇ Download Report
-        </Button>
-      </div>
+            <Button size="sm" variant="primary">
+              View Report
+            </Button>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
     </Container>
   );
 };
 
-export default ExaminationDetails;
+export default PatientList;

@@ -31,7 +31,9 @@ const NavBarProfile = () => {
               id="user-nav-dropdown"
               align="end"
             >
-              <NavDropdown.Item href="/profile">Your Profile</NavDropdown.Item>
+              <NavDropdown.Item href="/ProfilePage">
+                Your Profile
+              </NavDropdown.Item>
               <NavDropdown.Item href="mailto:yasminashraf048@gmail.com">
                 Contact Us
               </NavDropdown.Item>
