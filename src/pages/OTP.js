@@ -1,11 +1,50 @@
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
-import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
-import React from "react";
-import { Button, Container, Form, Row, Card } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { verifyPassword } from "../Redux/actions/Useraction";
+import notify from "../Hook/useNotification";
+import { Button, Container, Form, Row, Card, Spinner } from "react-bootstrap";
 
 const OTPSection = () => {
+  const dispatch = useDispatch();
+  const Navigate = useNavigate();
+  const [resetCode, setResetCode] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [ispress, setispress] = useState(false);
+  const HandelSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setispress(true);
+    await dispatch(
+      verifyPassword({
+        resetCode,
+      })
+    );
+    setLoading(false);
+    setispress(false);
+  };
+
+  const res = useSelector((state) => state.alluser.verfiyPassword);
+  console.log(res);
+  useEffect(() => {
+    if (loading === false) {
+      if (res) {
+        if (res.message === "Reset code verified successfully") {
+          notify("Reset code verified successfully", "success");
+          setTimeout(() => {
+            Navigate("/NewPassword");
+          }, 1000);
+        } else if (res.data.message === "Invalid or expired reset code") {
+          notify("Invalid or expired reset code", "error");
+        }
+        setLoading(true);
+      }
+    }
+  }, [loading]);
+
   return (
     <>
       {/* Hero Section */}
@@ -42,20 +81,36 @@ const OTPSection = () => {
                   type="text"
                   maxLength="6"
                   placeholder="Enter verification code"
+                  value={resetCode}
+                  onChange={(e) => setResetCode(e.target.value)}
                 />
               </Form.Group>
 
               <div className="d-flex justify-content-end gap-2">
-                <Button href="/Login" variant="secondary">
+                <Button
+                  href="/Login"
+                  className="w-100 mb-2"
+                  variant="secondary"
+                >
                   Cancel
                 </Button>
-                <Button href="/NewPassword" variant="primary" type="submit">
+                <Button
+                  className="w-100 mb-2 welcome-button"
+                  onClick={HandelSubmit}
+                >
                   Verify
                 </Button>
               </div>
             </Form>
           </Card.Body>
         </Card>
+        {ispress ? (
+          loading ? (
+            <Spinner animation="border" variant="primary" />
+          ) : (
+            <h4> done </h4>
+          )
+        ) : null}
       </Container>
     </>
   );

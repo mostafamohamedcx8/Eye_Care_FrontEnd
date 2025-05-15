@@ -1,11 +1,54 @@
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../component/Footer";
-import React from "react";
-import { Button, Container, Form, Row, Card } from "react-bootstrap";
-
+import React, { useState, useEffect } from "react";
+import { Button, Container, Form, Row, Card, Spinner } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { ForgetPassword } from "../Redux/actions/Useraction";
+import { validateForgetPassword } from "../Validations/validateSignupForm";
+import notify from "../Hook/useNotification";
 const ResetSection = () => {
+  const dispatch = useDispatch();
+  const Navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [ispress, setispress] = useState(false);
+  const HandelSubmit = async (e) => {
+    e.preventDefault();
+
+    const isValid = validateForgetPassword({ email });
+    if (!isValid) return;
+    localStorage.setItem("user-email", email);
+    setLoading(true);
+    setispress(true);
+    await dispatch(
+      ForgetPassword({
+        email,
+      })
+    );
+    setLoading(false);
+    setispress(false);
+  };
+
+  const res = useSelector((state) => state.alluser.forgetPassword);
+  console.log(res);
+  useEffect(() => {
+    if (loading === false) {
+      if (res) {
+        if (res.message === "Check your email for further instructions") {
+          notify("Check your Email for Reset Code", "success");
+          setTimeout(() => {
+            Navigate("/OtpCode");
+          }, 1000);
+        } else if (res.data.message === "No user found with this email") {
+          notify("No user with this email", "error");
+        }
+        setLoading(true);
+      }
+    }
+  }, [loading]);
+
   return (
     <>
       {/* Hero Section */}
@@ -38,20 +81,39 @@ const ResetSection = () => {
 
             <Form>
               <Form.Group className="mb-3">
-                <Form.Control type="email" placeholder="Email address" />
+                <Form.Control
+                  type="email"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </Form.Group>
 
               <div className="d-flex justify-content-end gap-2">
-                <Button href="/Login" variant="secondary">
+                <Button
+                  href="/Login"
+                  className="w-100 mb-2"
+                  variant="secondary"
+                >
                   Cancel
                 </Button>
-                <Button href="/OtpCode" variant="primary" type="submit">
-                  Search
+                <Button
+                  className="w-100 mb-2 welcome-button"
+                  onClick={HandelSubmit}
+                >
+                  Searchs
                 </Button>
               </div>
             </Form>
           </Card.Body>
         </Card>
+        {ispress ? (
+          loading ? (
+            <Spinner animation="border" variant="primary" />
+          ) : (
+            <h4> done </h4>
+          )
+        ) : null}
       </Container>
     </>
   );

@@ -7,30 +7,97 @@ import Examination from "./pages/Examination";
 import ResetPassword from "./pages/Resetpassword";
 import OtpCode from "./pages/OTP";
 import Newpassword from "./pages/NewPassword";
-import History from "./pages/History";
-import Verificationcode from "./pages/verificationCode";
 import ExaminationReport from "./pages/ExaminationReport";
 import DoctorCard from "./pages/DoctorPage";
+import DoctorDetailes from "./pages/DoctorDetailes";
 import ProfilePage from "./pages/ProfilePage";
+import PatientPage from "../src/pages/PatientPage";
+import { ToastContainer } from "react-toastify";
+import VerifyEmail from "./pages/VerifyEmail";
+import PatientTableUI from "./pages/AllPatient";
+import ReportsList from "./pages/ReportsList";
+import "react-toastify/dist/ReactToastify.css";
+import { Navigate } from "react-router-dom";
+
+function ProtectedRoute({ children }) {
+  return localStorage.getItem("token") ? children : <Navigate to="/" />;
+}
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/Login" element={<Login />} />
           <Route path="/Signup" element={<Signup />} />
-          <Route path="/Examination" element={<Examination />} />
           <Route path="/ResetPassword" element={<ResetPassword />} />
           <Route path="/OtpCode" element={<OtpCode />} />
           <Route path="/NewPassword" element={<Newpassword />} />
-          <Route path="/History" element={<History />} />
-          <Route path="/Verificationcode" element={<Verificationcode />} />
-          <Route path="/ExaminationReport" element={<ExaminationReport />} />
-          <Route path="/DoctorCard" element={<DoctorCard />} />
-          <Route path="/ProfilePage" element={<ProfilePage />} />
+          <Route
+            path="/PatientPage"
+            element={
+              <ProtectedRoute>
+                <PatientPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ExaminationReport/:id"
+            element={
+              <ProtectedRoute>
+                <ExaminationReport />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              localStorage.getItem("token") ? <PatientTableUI /> : <Home />
+            }
+          />
+          <Route
+            path="/DoctorCard"
+            element={
+              <ProtectedRoute>
+                <DoctorCard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/DoctorDetailes/:id"
+            element={
+              <ProtectedRoute>
+                <DoctorDetailes />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/Examination"
+            element={
+              <ProtectedRoute>
+                <Examination />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ProfilePage"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ReportsList/:id"
+            element={
+              <ProtectedRoute>
+                <ReportsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/verify-email" element={<VerifyEmail />} />
         </Routes>
+        <ToastContainer position="top-left" autoClose={3000} />
       </BrowserRouter>
     </div>
   );

@@ -1,16 +1,21 @@
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../component/Footer";
-import React from "react";
-import { Button, Container, Form, Row, Col } from "react-bootstrap";
+import { Button, Container, Form, Row, Col, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { State, City } from "country-state-city";
+import React, { State, City } from "country-state-city";
+import { useDispatch, useSelector } from "react-redux";
+import { CreateUser } from "../Redux/actions/Useraction";
+import { validateSignupForm } from "../Validations/validateSignupForm";
+import notify from "../Hook/useNotification";
 
 const SignupSection = () => {
+  const navigate = useNavigate();
   const [states, setStates] = useState([]);
   const [selectedState, setSelectedState] = useState("");
   const [cities, setCities] = useState([]);
+  const [selectedcity, setSelectedcity] = useState("");
   useEffect(() => {
     const germanStates = State.getStatesOfCountry("DE"); // DE = Germany
     setStates(germanStates);
@@ -21,6 +26,126 @@ const SignupSection = () => {
       setCities(foundCities);
     }
   }, [selectedState]);
+
+  const dispatch = useDispatch();
+
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [dateOfBirthDay, setDateOfBirthDay] = useState("");
+  const [dateOfBirthMonth, setDateOfBirthMonth] = useState("");
+  const [dateOfBirthYear, setDateOfBirthYear] = useState("");
+  const [gender, setGender] = useState("");
+  const [fullAddress, setFullAddress] = useState("");
+  const [loading, setloading] = useState(true);
+  const [ispress, setispress] = useState(false);
+  const User = useSelector((state) => state.alluser.User);
+
+  const resetFormFields = () => {
+    setFirstname("");
+    setLastname("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setGender("");
+    setDateOfBirthDay("Day");
+    setDateOfBirthMonth("Month");
+    setDateOfBirthYear("Year");
+    setSelectedState("");
+    setSelectedcity("");
+    setFullAddress("");
+    setloading(true);
+    setispress(false);
+  };
+  const handelSubmit = async (event) => {
+    event.preventDefault();
+
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const monthName = monthNames[parseInt(dateOfBirthMonth) - 1];
+    const stateObject = states.find((state) => state.isoCode === selectedState);
+    const stateName = stateObject ? stateObject.name : selectedState;
+
+    const userData = {
+      firstname,
+      lastname,
+      email,
+      password,
+      passwordConfirm: confirmPassword,
+      gender: gender.toLowerCase(),
+      dateOfBirth: {
+        day: Number(dateOfBirthDay),
+        month: monthName,
+        year: Number(dateOfBirthYear),
+      },
+      state: stateName,
+      city: selectedcity,
+      fullAddress,
+    };
+
+    const isValid = validateSignupForm({
+      firstname,
+      lastname,
+      email,
+      password,
+      passwordConfirm: confirmPassword,
+      dateOfBirthDay,
+      dateOfBirthMonth,
+      dateOfBirthYear,
+      gender,
+      state: selectedState,
+      city: selectedcity,
+      fullAddress,
+    });
+
+    if (!isValid) return;
+
+    setloading(true);
+    setispress(true);
+    console.log(userData);
+
+    await dispatch(CreateUser(userData)); // Redux thunk
+    setloading(false);
+  };
+
+  useEffect(() => {
+    if (loading === false && User) {
+      setispress(false);
+
+      if (User?.status === 201) {
+        resetFormFields();
+        notify(
+          "Account created. Please check your email for the verification link.",
+          "success"
+        );
+        navigate("/Login");
+      } else if (User?.data?.errors?.[0]?.msg === "Email already exists") {
+        console.log(User?.data?.errors?.[0]?.msg);
+        notify("Email already exists", "warn");
+      } else {
+        notify(User?.data?.message || "There is a problem", "error");
+      }
+
+      setTimeout(() => {
+        setloading(true); // يرجع الزر لحالته الطبيعية
+      }, 1500);
+    }
+  }, [loading, User]);
   return (
     <>
       {/* Hero Section */}
@@ -54,7 +179,8 @@ const SignupSection = () => {
                 <Form.Control
                   type="text"
                   placeholder="Enter first name"
-                  name="firstName"
+                  value={firstname}
+                  onChange={(e) => setFirstname(e.target.value)}
                 />
               </Form.Group>
             </Col>
@@ -64,7 +190,8 @@ const SignupSection = () => {
                 <Form.Control
                   type="text"
                   placeholder="Enter last name"
-                  name="lastName"
+                  value={lastname}
+                  onChange={(e) => setLastname(e.target.value)}
                 />
               </Form.Group>
             </Col>
@@ -74,7 +201,10 @@ const SignupSection = () => {
           <Form.Label>Date of Birth</Form.Label>
           <Row className="mb-3">
             <Col>
-              <Form.Select name="birthDay">
+              <Form.Select
+                value={dateOfBirthDay}
+                onChange={(e) => setDateOfBirthDay(e.target.value)}
+              >
                 <option>Day</option>
                 {Array.from({ length: 31 }, (_, i) => (
                   <option key={i + 1}>{i + 1}</option>
@@ -82,7 +212,10 @@ const SignupSection = () => {
               </Form.Select>
             </Col>
             <Col>
-              <Form.Select name="birthMonth">
+              <Form.Select
+                value={dateOfBirthMonth}
+                onChange={(e) => setDateOfBirthMonth(e.target.value)}
+              >
                 <option>Month</option>
                 {[
                   "January",
@@ -105,7 +238,10 @@ const SignupSection = () => {
               </Form.Select>
             </Col>
             <Col>
-              <Form.Select name="birthYear">
+              <Form.Select
+                value={dateOfBirthYear}
+                onChange={(e) => setDateOfBirthYear(e.target.value)}
+              >
                 <option>Year</option>
                 {Array.from({ length: 100 }, (_, i) => {
                   const year = new Date().getFullYear() - i;
@@ -117,15 +253,26 @@ const SignupSection = () => {
 
           <Form.Group className="mb-3">
             <Form.Label>Gender</Form.Label>
-            <Form.Select name="gender">
-              <option>Male</option>
-              <option>Female</option>
+            <Form.Select
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            >
+              <option value="" disabled hidden>
+                Select Gender
+              </option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
             </Form.Select>
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Email address</Form.Label>
-            <Form.Control type="email" placeholder="Enter email" name="email" />
+            <Form.Control
+              type="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -133,7 +280,8 @@ const SignupSection = () => {
             <Form.Control
               type="password"
               placeholder="Password"
-              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </Form.Group>
 
@@ -142,7 +290,8 @@ const SignupSection = () => {
             <Form.Control
               type="password"
               placeholder="Confirm Password"
-              name="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </Form.Group>
 
@@ -151,9 +300,12 @@ const SignupSection = () => {
             <Form.Label>State</Form.Label>
             <Form.Select
               name="state"
+              value={selectedState} // لازم تربطه بالقيمة الحالية
               onChange={(e) => setSelectedState(e.target.value)}
             >
-              <option>Select German State</option>
+              <option value="" disabled>
+                Select German State
+              </option>
               {states.map((state) => (
                 <option key={state.isoCode} value={state.isoCode}>
                   {state.name}
@@ -163,7 +315,10 @@ const SignupSection = () => {
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>City</Form.Label>
-            <Form.Select name="city">
+            <Form.Select
+              value={selectedcity}
+              onChange={(e) => setSelectedcity(e.target.value)}
+            >
               <option>Select City</option>
               {cities.map((city, i) => (
                 <option key={i}>{city.name}</option>
@@ -176,18 +331,22 @@ const SignupSection = () => {
             <Form.Control
               type="text"
               placeholder="Enter your address (street..)"
-              name="fullAddress"
+              value={fullAddress}
+              onChange={(e) => setFullAddress(e.target.value)}
             />
           </Form.Group>
 
-          <Button
-            href="/Verificationcode"
-            className="w-100 mb-2 welcome-button"
-            type="submit"
-          >
+          <Button className="w-100 mb-2 welcome-button" onClick={handelSubmit}>
             Sign Up
           </Button>
         </Form>
+        {ispress ? (
+          loading ? (
+            <Spinner animation="border" variant="primary" />
+          ) : (
+            <h4> done </h4>
+          )
+        ) : null}
       </Container>
     </>
   );

@@ -1,11 +1,77 @@
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../component/Footer";
-import React from "react";
-import { Button, Container, Form, Row } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Button, Container, Form, Row, Spinner } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { LoginUser } from "../Redux/actions/Useraction";
+import notify from "../Hook/useNotification";
+import { validateLogin } from "../Validations/validateSignupForm";
 
 const LoginSection = () => {
+  const dispatch = useDispatch();
+  const Navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [ispress, setispress] = useState(false);
+
+  const HandelSubmit = async (e) => {
+    e.preventDefault();
+
+    const isValid = validateLogin({ email, password, role });
+    if (!isValid) return;
+    setLoading(true);
+    setispress(true);
+    await dispatch(
+      LoginUser({
+        email,
+        password,
+        role,
+      })
+    );
+    setLoading(false);
+    setispress(false);
+  };
+  const res = useSelector((state) => state.alluser.loginUser);
+
+  useEffect(() => {
+    if (loading === false) {
+      if (res) {
+        console.log(res.data);
+        if (res.token) {
+          localStorage.setItem("token", res.token);
+          localStorage.setItem("user", JSON.stringify(res.data));
+          notify("logged in successfully", "success");
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1500);
+        } else if (res.data.message === "Invalid email or password or role") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          notify("Invalid E-mail or Password or Role", "error");
+        } else if (
+          res.data.message ===
+          "Your email is not verified. We have sent a new verification Link to your email."
+        ) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          notify(
+            "Your E-mail not verified. We sent new verification Link to your E-mail",
+            "error"
+          );
+        } else {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          // notify(,"error")
+        }
+        setLoading(true);
+      }
+    }
+  }, [loading]);
+
   return (
     <>
       {/* Hero Section */}
@@ -33,24 +99,44 @@ const LoginSection = () => {
         <Form>
           <Form.Group className="mb-3" controlId="formUsername">
             <Form.Label>Email</Form.Label>
-            <Form.Control type="text" placeholder="Enter Email" />
+            <Form.Control
+              type="text"
+              placeholder="Enter Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formPassword">
             <Form.Label>Password</Form.Label>
-            <Form.Control type="password" placeholder="Enter password" />
+            <Form.Control
+              type="password"
+              placeholder="Enter password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </Form.Group>
 
           <Form.Group className="mb-3 d-flex justify-content-around">
-            <Form.Check type="radio" name="role" label="Doctor" />
-            <Form.Check type="radio" name="role" label="Optician" />
+            <Form.Check
+              type="radio"
+              name="role"
+              label="Doctor"
+              value="doctor"
+              checked={role === "doctor"}
+              onChange={(e) => setRole(e.target.value)}
+            />
+            <Form.Check
+              type="radio"
+              name="role"
+              label="Optician"
+              value="optician"
+              checked={role === "optician"}
+              onChange={(e) => setRole(e.target.value)}
+            />
           </Form.Group>
 
-          <Button
-            href="/Examination"
-            className="w-100 mb-2 welcome-button"
-            type="submit"
-          >
+          <Button className="w-100 mb-2 welcome-button" onClick={HandelSubmit}>
             Log In
           </Button>
 
@@ -64,6 +150,13 @@ const LoginSection = () => {
             </small>
           </div>
         </Form>
+        {ispress ? (
+          loading ? (
+            <Spinner animation="border" variant="primary" />
+          ) : (
+            <h4> done </h4>
+          )
+        ) : null}
       </Container>
     </>
   );

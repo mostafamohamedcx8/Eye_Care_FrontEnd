@@ -294,3 +294,17 @@
   border-bottom: 2px solid #084298;
   border-radius: 0.375rem 0.375rem 0 0;
 }
+.patient-data {
+  color: #242525; /* اختر اللون الذي تريده */
+  font-weight: bold; /* لتغيير الوزن إذا كان الوزن ثقيلًا */
+}
+
+.patient-data:hover {
+  color: #28a745; /* تغيير اللون عند التمرير */
+}
+
+.multi-image-input__image {
+  width: 100px !important;
+  height: 100px !important;
+  object-fit: cover;
+}

@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
 import React from "react";
 import { Row } from "react-bootstrap";
-import NavBarProfile from "./../component/NavBarProfile";
+import NavBar from "../component/NavBar";
 import ExaminationHistory from "../component/ExaminationHistory";
 import Pagination from "../component/pagination";
-import PatientCards from "../component/ExaminationDetails";
+import PatientCards from "../component/patientDetails";
 
 const HistorySection = () => {
   return (
@@ -31,7 +31,7 @@ const History = () => {
   return (
     <div className="color-body">
       <Header />
-      <NavBarProfile />
+      <NavBar />
       <HistorySection />
       <ExaminationHistory />
       <PatientCards />

@@ -1,11 +1,63 @@
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../component/Footer";
-import React from "react";
-import { Button, Container, Form, Row, Card } from "react-bootstrap";
+import { Button, Container, Form, Row, Card, Spinner } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Create_New_Password } from "../Redux/actions/Useraction";
+import notify from "../Hook/useNotification";
+import { validationResetPassword } from "../Validations/validateSignupForm";
 
 const NewPasswordSection = () => {
+  const dispatch = useDispatch();
+  const Navigate = useNavigate();
+  const [newpassword, setnewpassword] = useState("");
+  const [confirmnewPassword, setConfirmnewPassword] = useState("");
+  const [email, setemail] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [ispress, setispress] = useState(false);
+
+  const HandelSubmit = async (e) => {
+    e.preventDefault();
+    const isValid = validationResetPassword({
+      newpassword,
+      confirmnewPassword,
+    });
+    if (!isValid) return;
+    setLoading(true);
+    setispress(true);
+
+    await dispatch(
+      Create_New_Password({
+        newpassword,
+        email: localStorage.getItem("user-email"),
+      })
+    );
+    setLoading(false);
+    setispress(false);
+  };
+
+  const res = useSelector((state) => state.alluser.createNewPassword);
+  console.log(res.data);
+  useEffect(() => {
+    if (loading === false) {
+      if (res) {
+        if (res.message === "Password reset successfully") {
+          notify("Password reset successfully", "success");
+          setTimeout(() => {
+            Navigate("/login");
+          }, 1000);
+        } else if (res.data.message === "Reset code is not verified") {
+          notify("Reset code is not verified", "error");
+        } else {
+          notify("Request New code", "error");
+        }
+        setLoading(true);
+      }
+    }
+  }, [loading]);
+
   return (
     <>
       {/* Hero Section */}
@@ -42,28 +94,36 @@ const NewPasswordSection = () => {
                 <Form.Control
                   type="password"
                   placeholder="Enter new password"
+                  value={newpassword}
+                  onChange={(e) => setnewpassword(e.target.value)}
                 />
               </Form.Group>
-
               <Form.Group className="mb-4">
                 <Form.Label>Confirm New Password</Form.Label>
                 <Form.Control
                   type="password"
                   placeholder="Confirm new password"
+                  value={confirmnewPassword}
+                  onChange={(e) => setConfirmnewPassword(e.target.value)}
                 />
               </Form.Group>
-
               <Button
-                href="/Login"
+                onClick={HandelSubmit}
                 variant="primary"
                 className="w-100"
-                type="submit"
               >
                 Reset Password
               </Button>
             </Form>
           </Card.Body>
         </Card>
+        {ispress ? (
+          loading ? (
+            <Spinner animation="border" variant="primary" />
+          ) : (
+            <h4> done </h4>
+          )
+        ) : null}
       </Container>
     </>
   );
