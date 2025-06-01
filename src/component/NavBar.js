@@ -44,8 +44,7 @@ const NavBar = () => {
                 {user.role !== "doctor" && (
                   <>
                     <Nav.Link href="/PatientPage">New Patient</Nav.Link>
-                    <Nav.Link href="/Examination">New Examination</Nav.Link>
-                    <Nav.Link href="/DoctorCard">Doctors</Nav.Link>
+                    <Nav.Link href="about">About Us</Nav.Link>
                   </>
                 )}
 
@@ -65,7 +64,6 @@ const NavBar = () => {
                   id="user-nav-dropdown"
                   align="end"
                 >
-                  <NavDropdown.Item href="/about">About Us</NavDropdown.Item>
                   <NavDropdown.Item href="/ProfilePage">
                     Your Profile
                   </NavDropdown.Item>
