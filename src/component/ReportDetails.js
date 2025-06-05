@@ -358,6 +358,17 @@ const ReportDetails = () => {
     if (!isValid) return;
 
     const formData = new FormData();
+    const rightEyeResults = {
+      disease1: { name: "Diabetic Retinopathy", percentage: 20 },
+      disease2: { name: "Glaucoma", percentage: 65 },
+      disease3: { name: "Cataract", percentage: 40 },
+    };
+
+    const leftEyeResults = {
+      disease1: { name: "Diabetic Retinopathy", percentage: 30 },
+      disease2: { name: "Glaucoma", percentage: 55 },
+      disease3: { name: "Cataract", percentage: 50 },
+    };
 
     formData.append("eyeExamination.rightEye.visusCC", rightVisusCC);
     formData.append(
@@ -415,12 +426,8 @@ const ReportDetails = () => {
       "eyeExamination.leftEye.amslerTestAbnormal",
       leftAmslerTestAbnormal
     );
-    formData.append("modelResults.disease1.name", "Diabetic Retinopathy");
-    formData.append("modelResults.disease1.percentage", "20");
-    formData.append("modelResults.disease2.name", "Diabetic Retinopathy");
-    formData.append("modelResults.disease2.percentage", "20");
-    formData.append("modelResults.disease3.name", "Diabetic Retinopathy");
-    formData.append("modelResults.disease3.percentage", "20");
+    formData.append("modelResults.rightEye", JSON.stringify(rightEyeResults));
+    formData.append("modelResults.leftEye", JSON.stringify(leftEyeResults));
     // Append medical history
 
     historyData.medical.forEach((condition, index) => {

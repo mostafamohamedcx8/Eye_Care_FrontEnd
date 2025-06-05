@@ -20,7 +20,7 @@ const LoginSection = () => {
   const HandelSubmit = async (e) => {
     e.preventDefault();
 
-    const isValid = validateLogin({ email, password});
+    const isValid = validateLogin({ email, password });
     if (!isValid) return;
     setLoading(true);
     setispress(true);
@@ -28,7 +28,7 @@ const LoginSection = () => {
       LoginUser({
         email,
         password,
-        role:"optician",
+        role: "optician",
       })
     );
     setLoading(false);
@@ -61,6 +61,10 @@ const LoginSection = () => {
             "Your E-mail not verified. We sent new verification Link to your E-mail",
             "warn"
           );
+        } else if (res?.data?.message === "Invalid email or password or role") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          notify("Invalid email or password or role", "warn");
         } else if (
           res.data.message ===
           "Your medical license is still under review. You will be notified by email once it's verified."
@@ -125,8 +129,6 @@ const LoginSection = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </Form.Group>
-
-          
 
           <Button className="w-100 mb-2 welcome-button" onClick={HandelSubmit}>
             Log In

@@ -1,5 +1,13 @@
 import React, { useRef, useEffect } from "react";
-import { Container, Row, Col, Card, ListGroup, Button } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  ListGroup,
+  Button,
+  Accordion,
+} from "react-bootstrap";
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
@@ -9,6 +17,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getSpecificReport } from "./../Redux/actions/Reportaction";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 const PatientReport = () => {
   const navigate = useNavigate();
@@ -513,7 +522,7 @@ const PatientReport = () => {
           </Card.Body>
         </Card>
         {/* Prediction */}
-        <Card className="mb-4 border-success">
+        {/* <Card className="mb-4 border-success">
           <Card.Header className="bg-success text-white">
             Model Prediction
           </Card.Header>
@@ -534,6 +543,278 @@ const PatientReport = () => {
               </li>
             </ul>
           </Card.Body>
+        </Card> */}
+        {/* <Card className="mb-4 border-success">
+          <Card.Header className="bg-success text-white">
+            Model Prediction - Right Eye
+          </Card.Header>
+          <Card.Body>
+            {Report?.modelResults?.rightEye ? (
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Disease</th>
+                    <th>Confidence (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from(Report.modelResults.rightEye.entries()).map(
+                    ([diseaseName, details]) => (
+                      <tr key={diseaseName}>
+                        <td>{details.name || diseaseName}</td>
+                        <td>
+                          <span className="badge bg-info text-dark">
+                            {details.percentage}%
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <p>No prediction data available for the right eye.</p>
+            )}
+          </Card.Body>
+
+          <Card.Header className="bg-success text-white">
+            Model Prediction - Left Eye
+          </Card.Header>
+          <Card.Body>
+            {Report?.modelResults?.leftEye ? (
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Disease</th>
+                    <th>Confidence (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from(Report.modelResults.leftEye.entries()).map(
+                    ([diseaseName, details]) => (
+                      <tr key={diseaseName}>
+                        <td>{details.name || diseaseName}</td>
+                        <td>
+                          <span className="badge bg-info text-dark">
+                            {details.percentage}%
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <p>No prediction data available for the left eye.</p>
+            )}
+          </Card.Body>
+        </Card> */}
+
+        {/* <Card className="mb-4 border-primary">
+          <Card.Header className="bg-primary text-white">
+            Model Prediction - Right Eye
+          </Card.Header>
+          <Card.Body>
+            {Report?.modelResults?.rightEye ? (
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Disease</th>
+                    <th>Confidence (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(JSON.parse(Report.modelResults.rightEye)).map(
+                    ([diseaseName, details]) => (
+                      <tr key={diseaseName}>
+                        <td>{details.name || diseaseName}</td>
+                        <td>
+                          <span className="badge bg-info text-dark">
+                            {details.percentage}%
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <p>No prediction data available for the right eye.</p>
+            )}
+          </Card.Body>
+
+          <Card.Header className="bg-primary text-white">
+            Model Prediction - Left Eye
+          </Card.Header>
+          <Card.Body>
+            {Report?.modelResults?.leftEye ? (
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Disease</th>
+                    <th>Confidence (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(JSON.parse(Report.modelResults.leftEye)).map(
+                    ([diseaseName, details]) => (
+                      <tr key={diseaseName}>
+                        <td>{details.name || diseaseName}</td>
+                        <td>
+                          <span className="badge bg-info text-dark">
+                            {details.percentage}%
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <p>No prediction data available for the left eye.</p>
+            )}
+          </Card.Body>
+        </Card> */}
+        <Card className="mb-4 border-primary">
+          <Card.Header className="bg-primary text-white">
+            Model Prediction - Right Eye
+          </Card.Header>
+          <Card.Body>
+            {/* Right Eye Table */}
+            {Report?.modelResults?.rightEye ? (
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Disease</th>
+                    <th>Confidence (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(JSON.parse(Report.modelResults.rightEye)).map(
+                    ([diseaseName, details]) => (
+                      <tr key={diseaseName}>
+                        <td>{details.name || diseaseName}</td>
+                        <td>
+                          <span className="badge bg-info text-dark">
+                            {details.percentage}%
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <p>No prediction data available for the right eye.</p>
+            )}
+          </Card.Body>
+
+          <Card.Header className="bg-primary text-white">
+            Model Prediction - Left Eye
+          </Card.Header>
+          <Card.Body>
+            {/* Left Eye Table */}
+            {Report?.modelResults?.leftEye ? (
+              <table className="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Disease</th>
+                    <th>Confidence (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(JSON.parse(Report.modelResults.leftEye)).map(
+                    ([diseaseName, details]) => (
+                      <tr key={diseaseName}>
+                        <td>{details.name || diseaseName}</td>
+                        <td>
+                          <span className="badge bg-info text-dark">
+                            {details.percentage}%
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <p>No prediction data available for the left eye.</p>
+            )}
+          </Card.Body>
+
+          {/* Doctor Feedback Section */}
+          {Report?.doctorFeedbacks?.length > 0 && (
+            <Card.Footer className="bg-light">
+              <h5 className="mb-3 text-success">Doctor Feedback</h5>
+
+              <Accordion>
+                {Report.doctorFeedbacks.map((feedback, index) => (
+                  <Accordion.Item
+                    eventKey={index.toString()}
+                    key={feedback._id}
+                  >
+                    <Accordion.Header>
+                      DR. {feedback.doctor?.firstname || "Unknown"}{" "}
+                      {feedback.doctor?.lastname || ""} –{" "}
+                      {moment(feedback.createdAt).format("DD MMM YYYY, h:mm A")}
+                    </Accordion.Header>
+                    <Accordion.Body>
+                      <div className="mb-3">
+                        <h6>Right Eye</h6>
+                        <p>
+                          <strong>Prediction Accuracy:</strong>{" "}
+                          <span
+                            className={`badge ${
+                              feedback.rightEyeFeedback.aiPredictionCorrect ===
+                              "correct"
+                                ? "bg-success"
+                                : "bg-danger"
+                            }`}
+                          >
+                            {feedback.rightEyeFeedback.aiPredictionCorrect}
+                          </span>
+                          <br />
+                          <strong>Comment:</strong>{" "}
+                          {feedback.rightEyeFeedback.comment}
+                        </p>
+                      </div>
+
+                      <div className="mb-3">
+                        <h6>Left Eye</h6>
+                        <p>
+                          <strong>Prediction Accuracy:</strong>{" "}
+                          <span
+                            className={`badge ${
+                              feedback.leftEyeFeedback.aiPredictionCorrect ===
+                              "correct"
+                                ? "bg-success"
+                                : "bg-danger"
+                            }`}
+                          >
+                            {feedback.leftEyeFeedback.aiPredictionCorrect}
+                          </span>
+                          <br />
+                          <strong>Comment:</strong>{" "}
+                          {feedback.leftEyeFeedback.comment}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h6>Diagnosis</h6>
+                        <p>
+                          <strong>Diagnosis:</strong> {feedback.diagnosis}
+                        </p>
+                        <p>
+                          <strong>Recommended Action:</strong>{" "}
+                          {feedback.recommendedAction}
+                        </p>
+                      </div>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                ))}
+              </Accordion>
+            </Card.Footer>
+          )}
         </Card>
 
         <div className="d-flex justify-content-center mt-4 gap-3">
