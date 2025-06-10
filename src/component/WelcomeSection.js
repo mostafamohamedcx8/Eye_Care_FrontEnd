@@ -7,7 +7,7 @@ const WelcomeSection = () => {
       <Container>
         <Row className="align-items-center">
           <Col md={6}>
-            <h2 className="welcome-title">Welcome to Eye Care Website</h2>
+            <h2 className="welcome-title">Welcome to Optia Website</h2>
             <p className="welcome-text">
               We are thrilled to have you on our platform, designed specifically
               for Doctors and Opticians. Here, you can upload images of your

@@ -10,7 +10,6 @@ const HeroSection = () => {
           <h5 className="hero-subtitle">
             EMPOWERING OPTICIANS TO DETECT EYE ISSUES FASTER
           </h5>
-          <h1 className="hero-title">Optia</h1>
           <Button href="/Signup" className="hero-button">
             SIGN UP
           </Button>
