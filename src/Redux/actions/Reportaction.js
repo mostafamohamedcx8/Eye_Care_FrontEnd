@@ -4,10 +4,12 @@ import {
   GET_SPECIFIC_REPORT,
   GETPPATIENTWITHREPORT,
   DELETEMYREPORT,
+  MARKDOCTORFEEDBACKASREAD,
 } from "../type";
 import { InsertDataWithImage } from "../../Hooks/useInsertData";
 import { useGetDataToken } from "../../Hooks/useGetData";
 import DeleteData from "../../Hooks/useDeleteData";
+import { updateDataWithToken } from "../../Hooks/useUpdateData";
 export const CreateReport = (FormatData, id) => async (dispatch) => {
   try {
     const response = await InsertDataWithImage(
@@ -75,6 +77,25 @@ export const deleteMyReport = (id) => async (dispatch) => {
   } catch (e) {
     dispatch({
       type: DELETEMYREPORT,
+      payload: e.response,
+    });
+  }
+};
+
+export const MarkDocotrFeedback = (id, body) => async (dispatch) => {
+  try {
+    const response = await updateDataWithToken(
+      `/api/v1/report/feedback/${id}`,
+      body
+    );
+    dispatch({
+      type: MARKDOCTORFEEDBACKASREAD,
+      payload: response,
+      loading: true,
+    });
+  } catch (e) {
+    dispatch({
+      type: MARKDOCTORFEEDBACKASREAD,
       payload: e.response,
     });
   }

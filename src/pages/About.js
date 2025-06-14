@@ -26,7 +26,7 @@ const AboutSection = () => {
 
       {/* Content Section */}
       <Container className="about-content text-center py-5">
-        <h2 className="section-title mb-4">Welcome to Eye Care Website</h2>
+        <h2 className="section-title mb-4">Welcome to Auge.cloud Website</h2>
         <p className="section-paragraph mx-auto">
           where cutting-edge technology meets healthcare innovation. Our mission
           is to revolutionize eye care through advanced imaging and analysis. We

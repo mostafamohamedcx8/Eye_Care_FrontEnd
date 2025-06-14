@@ -15,19 +15,19 @@ import { useDispatch, useSelector } from "react-redux";
 import Paginationcomponent from "../component/pagination";
 import { useNavigate } from "react-router-dom";
 import {
-  getMypatient,
-  getAllMyPatientPage,
+  getMyArchivedpatient,
+  getAllMyArchivedPatientPage,
   deleteMyPatient,
   toggleArchivePatient,
-} from "./../Redux/actions/Patientaction";
+} from "../Redux/actions/Patientaction";
 import notify from "../Hook/useNotification";
 
 const PatientTableUI = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [keyword, setKeyword] = useState("");
   const [archiveLoading, setArchiveLoading] = useState({});
   const [refreshData, setRefreshData] = useState(false);
+  const [keyword, setKeyword] = useState("");
   const [show, setShow] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -44,10 +44,12 @@ const PatientTableUI = () => {
   };
 
   useEffect(() => {
-    dispatch(getMypatient(10, keyword));
+    dispatch(getMyArchivedpatient(10, keyword));
   }, [keyword]);
 
-  const MypatinetData = useSelector((state) => state.allpatient.mypatient);
+  const MypatinetData = useSelector(
+    (state) => state.allpatient.archivedpatient
+  );
   const Loading = useSelector((state) => state.allpatient.loading);
 
   let pagecount = 0;
@@ -56,7 +58,7 @@ const PatientTableUI = () => {
   }
 
   const getpage = (page) => {
-    dispatch(getAllMyPatientPage(page));
+    dispatch(getAllMyArchivedPatientPage(page));
   };
 
   const AllPatient = MypatinetData?.data || [];
@@ -116,9 +118,12 @@ const PatientTableUI = () => {
     if (refreshData !== false) {
       // استدعاء دالة جلب البيانات مرة أخرى
       // مثال: dispatch(getAllPatients());
-      dispatch(getMypatient(10, keyword));
+      dispatch(getMyArchivedpatient(10, keyword));
     }
   }, [refreshData, keyword]);
+
+  const archive = useSelector((state) => state.allpatient.unarchivedpatient);
+  console.log("archive", archive);
 
   return (
     <>
@@ -126,7 +131,7 @@ const PatientTableUI = () => {
       <NavBar />
       <Container className="mt-5">
         <h2 className="text-center mb-4 fw-bold button-color">
-          Active Patients
+          Archived Patients
         </h2>
 
         <Row className="mb-3">
@@ -265,10 +270,12 @@ const PatientTableUI = () => {
                     </button>
                     <button
                       className="btn btn-sm btn-outline-secondary"
+                      title="Remove from Archive"
                       onClick={(e) => handleToggleArchive(patient._id, e)}
                       disabled={archiveLoading[patient._id]}
                     >
                       <i className="bi bi-archive"></i>
+                      <i className="bi bi-arrow-up-short ms-1"></i>
                     </button>
                   </td>
                 </tr>

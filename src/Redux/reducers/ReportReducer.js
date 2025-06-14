@@ -4,6 +4,7 @@ import {
   GET_SPECIFIC_REPORT,
   GETPPATIENTWITHREPORT,
   DELETEMYREPORT,
+  MARKDOCTORFEEDBACKASREAD,
 } from "../type";
 
 const initial = {
@@ -11,6 +12,7 @@ const initial = {
   specificreport: [],
   getpatientwithreport: [],
   deletemyreport: [],
+  feedback: [],
   error: null, // أضف حقل للخطأ
   loading: true,
 };
@@ -27,6 +29,12 @@ const reportReducer = (state = initial, action) => {
       return {
         ...state,
         specificreport: action.payload,
+        loading: false,
+      };
+    case MARKDOCTORFEEDBACKASREAD:
+      return {
+        ...state,
+        feedback: action.payload,
         loading: false,
       };
     case "CLEAR_PATIENT_REPORT":

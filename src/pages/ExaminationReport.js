@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import html2pdf from "html2pdf.js";
 import {
   Container,
   Row,
@@ -7,6 +8,7 @@ import {
   ListGroup,
   Button,
   Accordion,
+  Modal,
 } from "react-bootstrap";
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
@@ -15,7 +17,10 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getSpecificReport } from "./../Redux/actions/Reportaction";
+import {
+  getSpecificReport,
+  MarkDocotrFeedback,
+} from "./../Redux/actions/Reportaction";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 
@@ -24,6 +29,8 @@ const PatientReport = () => {
   const userFromStorage = JSON.parse(localStorage.getItem("user"));
   const dispatch = useDispatch();
   const { id } = useParams();
+  const [selectedImage, setSelectedImage] = useState(null);
+
   useEffect(() => {
     dispatch(getSpecificReport(id));
   }, []);
@@ -34,29 +41,22 @@ const PatientReport = () => {
   const reportRef = useRef();
 
   const handleDownloadPDF = () => {
-    const input = reportRef.current;
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
+    const element = reportRef.current;
 
-      const imgWidth = 210;
-      const pageHeight = 295;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
+    const opt = {
+      margin: 0,
+      filename: "eye-examination-report.pdf",
+      image: { type: "png", quality: 1.0 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        logging: true,
+      },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
 
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save("eye-examination-report.pdf");
-    });
+    html2pdf().set(opt).from(element).save();
   };
 
   const Report = ReportData.data || [];
@@ -91,6 +91,15 @@ const PatientReport = () => {
     );
   };
 
+  const handleMarkAsRead = (feedback) => {
+    if (!feedback.readed) {
+      dispatch(
+        MarkDocotrFeedback(Report._id, {
+          doctorId: feedback.doctor._id,
+        })
+      );
+    }
+  };
   return (
     <>
       <Header />
@@ -319,9 +328,75 @@ const PatientReport = () => {
 
         <Card className="mb-4">
           <Card.Header className="custom-card-header">
-            Right Eye Examination
+            Right Eye Examination & Analysis
           </Card.Header>
+
+          {/* الصور والعنوان وتاريخ الالتقاط */}
           <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="mb-0">Right Eye</h5>
+              {Report?.eyeExamination?.rightEye?.imageCaptureDate && (
+                <span className="text-muted">
+                  Image Capture Date:{" "}
+                  {new Date(
+                    Report.eyeExamination.rightEye.imageCaptureDate
+                  ).toLocaleDateString("de-DE")}
+                </span>
+              )}
+            </div>
+
+            {Report?.eyeExamination?.rightEye?.images?.length > 0 ? (
+              <div className="d-flex flex-wrap gap-3 mb-4">
+                {Report.eyeExamination.rightEye.images.map((link, idx) => (
+                  <div
+                    key={idx}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setSelectedImage(link)}
+                  >
+                    <img
+                      src={link}
+                      crossOrigin="anonymous"
+                      loading="lazy"
+                      alt={`Right Eye Image ${idx + 1}`}
+                      style={{
+                        width: "160px",
+                        height: "160px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        border: "1px solid #ccc",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No images available</p>
+            )}
+
+            {/* Modal for showing full image */}
+            <Modal
+              show={!!selectedImage}
+              onHide={() => setSelectedImage(null)}
+              centered
+              size="lg"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Image Preview</Modal.Title>
+              </Modal.Header>
+              <Modal.Body className="text-center">
+                <img
+                  src={selectedImage}
+                  alt="Preview"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "80vh",
+                    borderRadius: "8px",
+                  }}
+                />
+              </Modal.Body>
+            </Modal>
+
+            {/* بيانات الفحص */}
             <Row>
               <Col>
                 <strong>Visus (CC):</strong>{" "}
@@ -376,15 +451,192 @@ const PatientReport = () => {
                 )}
               </Col>
             </Row>
+
+            {/* تحليل النموذج */}
+            <div className="mt-4">
+              {Report?.modelResults?.rightEye ? (
+                (() => {
+                  const rightData = JSON.parse(Report.modelResults.rightEye);
+                  const isImageQualityBad =
+                    rightData.image_quality?.status !== "Adequate";
+
+                  const filteredDiseases = Object.entries(rightData).filter(
+                    ([key, value]) =>
+                      key !== "image_quality" &&
+                      key !== "eye_side" &&
+                      value.status === "Detected"
+                  );
+
+                  return (
+                    <>
+                      {filteredDiseases.length > 0 ? (
+                        <table className="table table-bordered mt-2">
+                          <thead>
+                            <tr>
+                              <th>Disease</th>
+                              <th>Confidence (%)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredDiseases.map(([key, value]) => (
+                              <tr key={key}>
+                                <td>{key}</td>
+                                <td>
+                                  <span className="badge bg-info text-dark">
+                                    {value.confidence ?? "N/A"}%
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <p>No detected diseases in the right eye.</p>
+                      )}
+
+                      {isImageQualityBad && (
+                        <div className="alert alert-warning mt-3">
+                          <strong>Bad image quality: - can be due to :</strong>
+                          <br />
+                          Media Opacity due to: Corneal opacity, Cataract,
+                          vitreous opacities, vitreous hemorrhage/ inflammation,
+                          tear film issues, etc. OR Optics misalignment (or
+                          insufficient pupillary dilation, focus)
+                        </div>
+                      )}
+                    </>
+                  );
+                })()
+              ) : (
+                <p>No prediction data available for the right eye.</p>
+              )}
+            </div>
+            {Report?.doctorFeedbacks?.length > 0 && (
+              <>
+                <h5 className="mt-4 text-success">Doctor Feedback</h5>
+
+                <Accordion>
+                  {Report.doctorFeedbacks.map((feedback, index) => (
+                    <Accordion.Item
+                      eventKey={index.toString()}
+                      key={feedback._id}
+                      onClick={() => handleMarkAsRead(feedback)}
+                    >
+                      <Accordion.Header>
+                        Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
+                        {feedback.doctor?.lastname || ""} –{" "}
+                        {moment(feedback.createdAt).format(
+                          "DD MMM YYYY, h:mm A"
+                        )}
+                      </Accordion.Header>
+                      <Accordion.Body>
+                        <p>
+                          <strong>Prediction Accuracy:</strong>{" "}
+                          <span
+                            className={`badge ${
+                              feedback.rightEyeFeedback?.aiPredictionCorrect ===
+                              "correct"
+                                ? "bg-success"
+                                : "bg-danger"
+                            }`}
+                          >
+                            {feedback.rightEyeFeedback?.aiPredictionCorrect ||
+                              "N/A"}
+                          </span>
+                        </p>
+                        <p>
+                          <strong>Comment:</strong>{" "}
+                          {feedback.rightEyeFeedback?.comment ||
+                            "No comment provided."}
+                        </p>
+                        <p>
+                          <strong>Diagnosis:</strong>{" "}
+                          {feedback.rightEyeFeedback?.diagnosis || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Recommended Action:</strong>{" "}
+                          {feedback.rightEyeFeedback?.recommendedAction ||
+                            "N/A"}
+                        </p>
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  ))}
+                </Accordion>
+              </>
+            )}
           </Card.Body>
         </Card>
-
-        {/* Left Eye Exam */}
         <Card className="mb-4">
           <Card.Header className="custom-card-header">
-            Left Eye Examination
+            Left Eye Examination & Analysis
           </Card.Header>
+
+          {/* الصور والعنوان وتاريخ الالتقاط */}
           <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="mb-0">Left Eye</h5>
+              {Report?.eyeExamination?.leftEye?.imageCaptureDate && (
+                <span className="text-muted">
+                  Image Capture Date:{" "}
+                  {new Date(
+                    Report.eyeExamination.leftEye.imageCaptureDate
+                  ).toLocaleDateString("de-DE")}
+                </span>
+              )}
+            </div>
+
+            {Report?.eyeExamination?.leftEye?.images?.length > 0 ? (
+              <div className="d-flex flex-wrap gap-3 mb-4">
+                {Report.eyeExamination.leftEye.images.map((link, idx) => (
+                  <div
+                    key={idx}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setSelectedImage(link)}
+                  >
+                    <img
+                      src={link}
+                      crossOrigin="anonymous"
+                      loading="lazy"
+                      alt={`Left Eye Image ${idx + 1}`}
+                      style={{
+                        width: "160px",
+                        height: "160px",
+                        objectFit: "cover",
+                        borderRadius: "8px",
+                        border: "1px solid #ccc",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No images available</p>
+            )}
+
+            {/* Modal for showing full image */}
+            <Modal
+              show={!!selectedImage}
+              onHide={() => setSelectedImage(null)}
+              centered
+              size="lg"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Image Preview</Modal.Title>
+              </Modal.Header>
+              <Modal.Body className="text-center">
+                <img
+                  src={selectedImage}
+                  alt="Preview"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "80vh",
+                    borderRadius: "8px",
+                  }}
+                />
+              </Modal.Body>
+            </Modal>
+
+            {/* بيانات الفحص */}
             <Row>
               <Col>
                 <strong>Visus (CC):</strong>{" "}
@@ -439,498 +691,119 @@ const PatientReport = () => {
                 )}
               </Col>
             </Row>
-          </Card.Body>
-        </Card>
 
-        {/* Eye Images */}
-        <Card className="mb-4">
-          <Card.Header className="custom-card-header">
-            Uploaded Eye Images
-          </Card.Header>
-          <Card.Body>
-            {/* Right Eye Section */}
-            <div className="d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Right Eye</h5>
-              {Report?.eyeExamination?.rightEye?.imageCaptureDate && (
-                <span className="text-muted">
-                  Image Capture Date:{" "}
-                  {new Date(
-                    Report.eyeExamination.rightEye.imageCaptureDate
-                  ).toLocaleDateString("de-DE")}
-                </span>
+            {/* تحليل النموذج */}
+            <div className="mt-4">
+              {Report?.modelResults?.leftEye ? (
+                (() => {
+                  const leftData = JSON.parse(Report.modelResults.leftEye);
+                  const isImageQualityBad =
+                    leftData.image_quality?.status !== "Adequate";
+
+                  const filteredDiseases = Object.entries(leftData).filter(
+                    ([key, value]) =>
+                      key !== "image_quality" &&
+                      key !== "eye_side" &&
+                      value.status === "Detected"
+                  );
+
+                  return (
+                    <>
+                      {filteredDiseases.length > 0 ? (
+                        <table className="table table-bordered mt-2">
+                          <thead>
+                            <tr>
+                              <th>Disease</th>
+                              <th>Confidence (%)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredDiseases.map(([key, value]) => (
+                              <tr key={key}>
+                                <td>{key}</td>
+                                <td>
+                                  <span className="badge bg-info text-dark">
+                                    {value.confidence ?? "N/A"}%
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <p>No detected diseases in the left eye.</p>
+                      )}
+
+                      {isImageQualityBad && (
+                        <div className="alert alert-warning mt-3">
+                          <strong>Bad image quality: - can be due to :</strong>
+                          <br />
+                          Media Opacity due to: Corneal opacity, Cataract,
+                          vitreous opacities, vitreous hemorrhage/ inflammation,
+                          tear film issues, etc. OR Optics misalignment (or
+                          insufficient pupillary dilation, focus)
+                        </div>
+                      )}
+                    </>
+                  );
+                })()
+              ) : (
+                <p>No prediction data available for the left eye.</p>
               )}
             </div>
-            {Report?.eyeExamination?.rightEye?.images?.length > 0 ? (
-              <ul>
-                <div className="d-flex flex-wrap gap-3 mt-2">
-                  {Report.eyeExamination.rightEye.images.map((link, idx) => (
-                    <a
-                      key={idx}
-                      href={link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="thumbnail-link"
+            {Report?.doctorFeedbacks?.length > 0 && (
+              <>
+                <h5 className="mt-4 text-success">Doctor Feedback</h5>
+
+                <Accordion>
+                  {Report.doctorFeedbacks.map((feedback, index) => (
+                    <Accordion.Item
+                      eventKey={index.toString()}
+                      key={feedback._id}
+                      onClick={() => handleMarkAsRead(feedback)}
                     >
-                      <img
-                        src={link}
-                        alt={`Right Eye Image ${idx + 1}`}
-                        className="eye-thumbnail"
-                      />
-                    </a>
-                  ))}
-                </div>
-              </ul>
-            ) : (
-              <p>No images available</p>
-            )}
-
-            {/* Left Eye Section */}
-            <div className="d-flex justify-content-between align-items-center mt-3">
-              <h5 className="mb-0">Left Eye</h5>
-              {Report?.eyeExamination?.leftEye?.imageCaptureDate && (
-                <span className="text-muted">
-                  Image Capture Date:{" "}
-                  {new Date(
-                    Report.eyeExamination.leftEye.imageCaptureDate
-                  ).toLocaleDateString("de-DE")}
-                </span>
-              )}
-            </div>
-            {Report?.eyeExamination?.leftEye?.images?.length > 0 ? (
-              <ul>
-                <div className="d-flex flex-wrap gap-3 mt-2">
-                  {Report.eyeExamination.leftEye.images.map((link, idx) => (
-                    <a
-                      key={idx}
-                      href={link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="thumbnail-link"
-                    >
-                      <img
-                        src={link}
-                        alt={`Left Eye Image ${idx + 1}`}
-                        className="eye-thumbnail"
-                      />
-                    </a>
-                  ))}
-                </div>
-              </ul>
-            ) : (
-              <p>No images available</p>
-            )}
-          </Card.Body>
-        </Card>
-        {/* Prediction */}
-        {/* <Card className="mb-4 border-success">
-          <Card.Header className="bg-success text-white">
-            Model Prediction
-          </Card.Header>
-          <Card.Body>
-            <h5>Final Prediction:</h5>
-            <ul>
-              <li>
-                <strong>{Report?.modelResults?.disease1?.name}:</strong>{" "}
-                {Report?.modelResults?.disease1?.percentage}%
-              </li>
-              <li>
-                <strong>{Report?.modelResults?.disease2?.name}:</strong>{" "}
-                {Report?.modelResults?.disease2?.percentage}%
-              </li>
-              <li>
-                <strong>{Report?.modelResults?.disease3?.name}:</strong>{" "}
-                {Report?.modelResults?.disease3?.percentage}%
-              </li>
-            </ul>
-          </Card.Body>
-        </Card> */}
-        {/* <Card className="mb-4 border-success">
-          <Card.Header className="bg-success text-white">
-            Model Prediction - Right Eye
-          </Card.Header>
-          <Card.Body>
-            {Report?.modelResults?.rightEye ? (
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Disease</th>
-                    <th>Confidence (%)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.from(Report.modelResults.rightEye.entries()).map(
-                    ([diseaseName, details]) => (
-                      <tr key={diseaseName}>
-                        <td>{details.name || diseaseName}</td>
-                        <td>
-                          <span className="badge bg-info text-dark">
-                            {details.percentage}%
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            ) : (
-              <p>No prediction data available for the right eye.</p>
-            )}
-          </Card.Body>
-
-          <Card.Header className="bg-success text-white">
-            Model Prediction - Left Eye
-          </Card.Header>
-          <Card.Body>
-            {Report?.modelResults?.leftEye ? (
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Disease</th>
-                    <th>Confidence (%)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.from(Report.modelResults.leftEye.entries()).map(
-                    ([diseaseName, details]) => (
-                      <tr key={diseaseName}>
-                        <td>{details.name || diseaseName}</td>
-                        <td>
-                          <span className="badge bg-info text-dark">
-                            {details.percentage}%
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            ) : (
-              <p>No prediction data available for the left eye.</p>
-            )}
-          </Card.Body>
-        </Card> */}
-
-        {/* <Card className="mb-4 border-primary">
-          <Card.Header className="bg-primary text-white">
-            Model Prediction - Right Eye
-          </Card.Header>
-          <Card.Body>
-            {Report?.modelResults?.rightEye ? (
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Disease</th>
-                    <th>Confidence (%)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(JSON.parse(Report.modelResults.rightEye)).map(
-                    ([diseaseName, details]) => (
-                      <tr key={diseaseName}>
-                        <td>{details.name || diseaseName}</td>
-                        <td>
-                          <span className="badge bg-info text-dark">
-                            {details.percentage}%
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            ) : (
-              <p>No prediction data available for the right eye.</p>
-            )}
-          </Card.Body>
-
-          <Card.Header className="bg-primary text-white">
-            Model Prediction - Left Eye
-          </Card.Header>
-          <Card.Body>
-            {Report?.modelResults?.leftEye ? (
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Disease</th>
-                    <th>Confidence (%)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(JSON.parse(Report.modelResults.leftEye)).map(
-                    ([diseaseName, details]) => (
-                      <tr key={diseaseName}>
-                        <td>{details.name || diseaseName}</td>
-                        <td>
-                          <span className="badge bg-info text-dark">
-                            {details.percentage}%
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            ) : (
-              <p>No prediction data available for the left eye.</p>
-            )}
-          </Card.Body>
-        </Card> */}
-        <Card className="mb-4 border-primary">
-          <Card.Header className="bg-primary text-white">
-            Model Prediction - Right Eye
-          </Card.Header>
-
-          {/* <Card.Body>
-            {Report?.modelResults?.rightEye ? (
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Disease</th>
-                    <th>Confidence (%)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(JSON.parse(Report.modelResults.rightEye)).map(
-                    ([diseaseName, details]) => (
-                      <tr key={diseaseName}>
-                        <td>{details.name || diseaseName}</td>
-                        <td>
-                          <span className="badge bg-info text-dark">
-                            {details.percentage}%
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            ) : (
-              <p>No prediction data available for the right eye.</p>
-            )}
-          </Card.Body> */}
-          {console.log(Report?.modelResults?.rightEye)}
-          <Card.Body>
-            {Report?.modelResults?.rightEye ? (
-              (() => {
-                const rightData = JSON.parse(Report.modelResults.rightEye);
-                const isImageQualityBad =
-                  rightData.image_quality?.status !== "Adequate";
-
-                const filteredDiseases = Object.entries(rightData).filter(
-                  ([key, value]) =>
-                    key !== "image_quality" &&
-                    key !== "eye_side" &&
-                    value.status === "Detected"
-                );
-
-                return (
-                  <>
-                    {filteredDiseases.length > 0 ? (
-                      <table className="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th>Disease</th>
-                            <th>Confidence (%)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredDiseases.map(([key, value]) => (
-                            <tr key={key}>
-                              <td>{key}</td>
-                              <td>
-                                <span className="badge bg-info text-dark">
-                                  {value.confidence ?? "N/A"}%
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p>No detected diseases in the right eye.</p>
-                    )}
-
-                    {isImageQualityBad && (
-                      <div className="alert alert-warning mt-3">
-                        <strong>Bad image quality: - can be due to :</strong>
-                        <br />
-                        Media Opacity due to: Corneal opacity, Cataract,
-                        vitreous opacities, vitreous hemorrhage/ inflammation,
-                        tear film issues, etc. OR Optics misalignment (or
-                        insufficient pupillary dilation, focus)
-                      </div>
-                    )}
-                  </>
-                );
-              })()
-            ) : (
-              <p>No prediction data available for the right eye.</p>
-            )}
-          </Card.Body>
-
-          <Card.Header className="bg-primary text-white">
-            Model Prediction - Left Eye
-          </Card.Header>
-          {/* <Card.Body>
-            {Report?.modelResults?.leftEye ? (
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Disease</th>
-                    <th>Confidence (%)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(JSON.parse(Report.modelResults.leftEye)).map(
-                    ([diseaseName, details]) => (
-                      <tr key={diseaseName}>
-                        <td>{details.name || diseaseName}</td>
-                        <td>
-                          <span className="badge bg-info text-dark">
-                            {details.percentage}%
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            ) : (
-              <p>No prediction data available for the left eye.</p>
-            )}
-          </Card.Body> */}
-          <Card.Body>
-            {Report?.modelResults?.leftEye ? (
-              (() => {
-                const leftData = JSON.parse(Report.modelResults.leftEye);
-                const isImageQualityBad =
-                  leftData.image_quality?.status !== "Adequate";
-
-                const filteredDiseases = Object.entries(leftData).filter(
-                  ([key, value]) =>
-                    key !== "image_quality" &&
-                    key !== "eye_side" &&
-                    value.status === "Detected"
-                );
-
-                return (
-                  <>
-                    {filteredDiseases.length > 0 ? (
-                      <table className="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th>Disease</th>
-                            <th>Confidence (%)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredDiseases.map(([key, value]) => (
-                            <tr key={key}>
-                              <td>{key}</td>
-                              <td>
-                                <span className="badge bg-info text-dark">
-                                  {value.confidence ?? "N/A"}%
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p>No detected diseases in the left eye.</p>
-                    )}
-
-                    {isImageQualityBad && (
-                      <div className="alert alert-warning mt-3">
-                        <strong>Bad image quality: - can be due to :</strong>
-                        <br />
-                        Media Opacity due to: Corneal opacity, Cataract,
-                        vitreous opacities, vitreous hemorrhage/ inflammation,
-                        tear film issues, etc. OR Optics misalignment (or
-                        insufficient pupillary dilation, focus)
-                      </div>
-                    )}
-                  </>
-                );
-              })()
-            ) : (
-              <p>No prediction data available for the left eye.</p>
-            )}
-          </Card.Body>
-
-          {/* Doctor Feedback Section */}
-          {Report?.doctorFeedbacks?.length > 0 && (
-            <Card.Footer className="bg-light">
-              <h5 className="mb-3 text-success">Doctor Feedback</h5>
-
-              <Accordion>
-                {Report.doctorFeedbacks.map((feedback, index) => (
-                  <Accordion.Item
-                    eventKey={index.toString()}
-                    key={feedback._id}
-                  >
-                    <Accordion.Header>
-                      DR. {feedback.doctor?.firstname || "Unknown"}{" "}
-                      {feedback.doctor?.lastname || ""} –{" "}
-                      {moment(feedback.createdAt).format("DD MMM YYYY, h:mm A")}
-                    </Accordion.Header>
-                    <Accordion.Body>
-                      <div className="mb-3">
-                        <h6>Right Eye</h6>
+                      <Accordion.Header>
+                        Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
+                        {feedback.doctor?.lastname || ""} –{" "}
+                        {moment(feedback.createdAt).format(
+                          "DD MMM YYYY, h:mm A"
+                        )}
+                      </Accordion.Header>
+                      <Accordion.Body>
                         <p>
                           <strong>Prediction Accuracy:</strong>{" "}
                           <span
                             className={`badge ${
-                              feedback.rightEyeFeedback.aiPredictionCorrect ===
+                              feedback.leftEyeFeedback?.aiPredictionCorrect ===
                               "correct"
                                 ? "bg-success"
                                 : "bg-danger"
                             }`}
                           >
-                            {feedback.rightEyeFeedback.aiPredictionCorrect}
+                            {feedback.leftEyeFeedback?.aiPredictionCorrect ||
+                              "N/A"}
                           </span>
-                          <br />
-                          <strong>Comment:</strong>{" "}
-                          {feedback.rightEyeFeedback.comment}
                         </p>
-                      </div>
-
-                      <div className="mb-3">
-                        <h6>Left Eye</h6>
                         <p>
-                          <strong>Prediction Accuracy:</strong>{" "}
-                          <span
-                            className={`badge ${
-                              feedback.leftEyeFeedback.aiPredictionCorrect ===
-                              "correct"
-                                ? "bg-success"
-                                : "bg-danger"
-                            }`}
-                          >
-                            {feedback.leftEyeFeedback.aiPredictionCorrect}
-                          </span>
-                          <br />
                           <strong>Comment:</strong>{" "}
-                          {feedback.leftEyeFeedback.comment}
+                          {feedback.leftEyeFeedback?.comment ||
+                            "No comment provided."}
                         </p>
-                      </div>
-
-                      <div>
-                        <h6>Diagnosis</h6>
                         <p>
-                          <strong>Diagnosis:</strong> {feedback.diagnosis}
+                          <strong>Diagnosis:</strong>{" "}
+                          {feedback.leftEyeFeedback?.diagnosis || "N/A"}
                         </p>
                         <p>
                           <strong>Recommended Action:</strong>{" "}
-                          {feedback.recommendedAction}
+                          {feedback.leftEyeFeedback?.recommendedAction || "N/A"}
                         </p>
-                      </div>
-                    </Accordion.Body>
-                  </Accordion.Item>
-                ))}
-              </Accordion>
-            </Card.Footer>
-          )}
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  ))}
+                </Accordion>
+              </>
+            )}
+          </Card.Body>
         </Card>
 
         <div className="d-flex justify-content-center mt-4 gap-3">
