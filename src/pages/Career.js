@@ -43,7 +43,7 @@ const CareerSection = () => {
           <li>Clinical Consultant (Ophthalmology)</li>
           <li>Support & Customer Success</li>
         </ul>
-        <p>📧 Send your CV to ahmadsfar@gmail.com</p>
+        <p>📧 Send your CV to jobs@augenarzt.cloud</p>
       </Container>
     </>
   );

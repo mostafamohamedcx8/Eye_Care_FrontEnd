@@ -40,7 +40,6 @@ const PatientTab = () => {
       ethnicity,
     };
 
-    console.log("Sending patient data:", patientData);
     setloading(true);
     setispress(true);
     await dispatch(CreatePatient(patientData));

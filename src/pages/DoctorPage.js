@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import {
   Card,
   Button,
@@ -11,78 +10,19 @@ import {
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllDoctor, getAllDOCTORPage } from "../Redux/actions/Doctoraction";
 import Paginationcomponent from "../component/pagination";
-import { useNavigate, useParams } from "react-router-dom";
-import {
-  getSpecificpatient,
-  SendPatient,
-} from "../Redux/actions/Patientaction";
-import notify from "../Hook/useNotification";
-
+import { Doctorpage_Hook } from "./../Hook/Doctorpage_Hook";
 const DoctorCard = () => {
-  const { id } = useParams();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const [keyword, setKeyword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [ispress, setispress] = useState(false);
-
-  useEffect(() => {
-    dispatch(getAllDoctor(4, keyword));
-  }, [keyword]);
-  useEffect(() => {
-    dispatch(getSpecificpatient(id));
-  }, []);
-  const patient = useSelector((state) => state.allpatient.getspecificpatient);
-  console.log(patient);
-
-  const doctorData = useSelector((state) => state.alldoctor.doctor);
-  const res = useSelector((state) => state.allpatient.sendpatient);
-  console.log(res);
-  console.log(doctorData); // Add optional chaining for safety
-  let pagecount = 0;
-  if (doctorData?.paginationresults?.numberOfPages) {
-    pagecount = doctorData.paginationresults.numberOfPages;
-  }
-
-  const getpage = (page) => {
-    dispatch(getAllDOCTORPage(page));
-  };
-
-  const doctors = doctorData?.data || [];
-
-  const sendPatientToDoctor = async (event, doctorId) => {
-    event.preventDefault();
-    const dataToSend = {
-      patientId: id,
-      doctorId: doctorId,
-    };
-
-    console.log("Sending patient data:", dataToSend);
-    setLoading(true);
-    setispress(true);
-    await dispatch(SendPatient(dataToSend));
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (!loading && ispress) {
-      if (res?.status === 200) {
-        notify("Patient successfully sent to doctor", "success");
-      } else if (res?.status === 400) {
-        notify("This patient is already assigned to this doctor", "warn");
-      } else notify("there is problem", "error");
-
-      // Reset states after response
-      setispress(false);
-      setTimeout(() => {
-        setispress(false);
-      }, 1000);
-    }
-  }, [[loading]]);
+  const [
+    patient,
+    keyword,
+    loading,
+    onChangeKeyword,
+    doctors,
+    pagecount,
+    getpage,
+    onChangesendPatient,
+  ] = Doctorpage_Hook();
 
   return (
     <>
@@ -141,7 +81,7 @@ const DoctorCard = () => {
           <Form.Control
             placeholder="Search by name,State,City,Postal Code Or Specialty ..."
             value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
+            onChange={onChangeKeyword}
           />
         </InputGroup>
         <Row>
@@ -171,9 +111,7 @@ const DoctorCard = () => {
                     <Button
                       variant="primary"
                       className="w-100 mt-auto"
-                      onClick={(e) => {
-                        sendPatientToDoctor(e, doctor._id);
-                      }}
+                      onClick={(e) => onChangesendPatient(e, doctor._id)}
                     >
                       Send Patient
                     </Button>

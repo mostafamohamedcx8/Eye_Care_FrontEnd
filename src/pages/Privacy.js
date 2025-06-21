@@ -56,7 +56,8 @@ const PrivacySection = () => {
           <br />
           <strong>auge.cloud</strong>
           <br />
-          Email: <a href="mailto:ahmadsfar@gmail.com">ahmadsfar@gmail.com</a>
+          Email:{" "}
+          <a href="mailto:support@augenarzt.cloud">support@augenarzt.cloud</a>
         </p>
 
         <h5>2. Categories of Data We Process</h5>
@@ -172,7 +173,8 @@ const PrivacySection = () => {
 
         <h5>14. Contact</h5>
         <p>
-          Email: <a href="mailto:ahmadsfar@gmail.com">ahmadsfar@gmail.com</a>
+          Email:{" "}
+          <a href="mailto:support@augenarzt.cloud">support@augenarzt.cloud</a>
           <br />
           Website: <a href="https://auge.cloud">auge.cloud</a>
         </p>

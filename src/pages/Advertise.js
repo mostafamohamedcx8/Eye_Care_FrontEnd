@@ -36,7 +36,7 @@ const AdvertiseSection = () => {
           <li>Medical equipment providers</li>
           <li>Health tech companies</li>
         </ul>
-        <p>📩 Contact us at ahmadsfar@gmail.com</p>
+        <p>📩 Contact us at jobs@augenarzt.cloud</p>
       </Container>
     </>
   );

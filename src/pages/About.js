@@ -32,7 +32,7 @@ const AboutSection = () => {
           is to revolutionize eye care through advanced imaging and analysis. We
           understand the vital role that vision plays in your life, and we are
           dedicated to ensuring that everyone has access to comprehensive eye
-          health assessments. At Eye Care Website, we utilize state-of-the-art
+          health assessments. At Auge.cloud Website, we utilize state-of-the-art
           imaging techniques to capture detailed pictures of the eye. Our
           sophisticated algorithms analyze these images to detect potential eye
           diseases at their earliest stages, allowing for timely intervention

@@ -105,7 +105,8 @@ const TermsSection = () => {
 
         <h5>10. Contact</h5>
         <p>
-          Email: <a href="mailto:ahmadsfar@gmail.com">ahmadsfar@gmail.com</a>
+          Email:{" "}
+          <a href="mailto:support@augenarzt.cloud">support@augenarzt.cloud</a>
           <br />
           Website: <a href="https://auge.cloud">auge.cloud</a>
         </p>

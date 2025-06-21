@@ -72,7 +72,7 @@ const NavBar = () => {
                   <NavDropdown.Item href="/ProfilePage">
                     Your Profile
                   </NavDropdown.Item>
-                  <NavDropdown.Item href="mailto:yasminashraf048@gmail.com">
+                  <NavDropdown.Item href="mailto:support@augenarzt.cloud">
                     Contact Us
                   </NavDropdown.Item>
                   <NavDropdown.Divider />
@@ -101,7 +101,7 @@ const NavBar = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Fundus.cloud
+                    Refer To Doctor
                   </Nav.Link>
                 </OverlayTrigger>
                 <Button
