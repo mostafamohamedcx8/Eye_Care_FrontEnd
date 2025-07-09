@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
 import React from "react";
 import { Container, Row } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const CareerSection = () => {
+  const { t } = useTranslation();
   return (
     <>
       {/* Hero Section */}
@@ -14,36 +16,32 @@ const CareerSection = () => {
           <div className="overlay hero-section">
             <div className="breadcrumb">
               <Link to="/" className="breadcrumb-link">
-                Home
+                {t("career.breadcrumb_home")}
               </Link>
               <span className="separator">/</span>
-              <span className="active">Career</span>
+              <span className="active">{t("career.breadcrumb_career")}</span>
             </div>
-            <h1 className="title">Career</h1>
+            <h1 className="title">{t("career.title")}</h1>
           </div>
         </div>
       </Row>
 
       {/* Content Section */}
       <Container className="py-5">
-        <h2>Career</h2>
-        <p>
-          We are always looking for passionate professionals to join our mission
-          of revolutionizing early eye disease detection.
-        </p>
-        <p>
-          If you are an experienced developer, data scientist, medical
-          professional, or optician looking to make a difference with technology
-          — we'd love to hear from you.
-        </p>
-        <h5>Current Openings:</h5>
+        <h2>{t("career.section_title")}</h2>
+        <p>{t("career.paragraph_1")}</p>
+        <p>{t("career.paragraph_2")}</p>
+        <h5>{t("career.current_openings")}</h5>
         <ul>
-          <li>Machine Learning Engineer</li>
-          <li>Frontend Developer (React.js)</li>
-          <li>Clinical Consultant (Ophthalmology)</li>
-          <li>Support & Customer Success</li>
+          <li>{t("career.opening_1")}</li>
+          <li>{t("career.opening_2")}</li>
+          <li>{t("career.opening_3")}</li>
+          <li>{t("career.opening_4")}</li>
         </ul>
-        <p>📧 Send your CV to jobs@augenarzt.cloud</p>
+        <p>
+          📧 {t("career.contact")}{" "}
+          <a href="mailto:jobs@augenarzt.cloud">jobs@augenarzt.cloud</a>
+        </p>
       </Container>
     </>
   );

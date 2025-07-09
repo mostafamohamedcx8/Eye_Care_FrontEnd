@@ -6,7 +6,7 @@ import { validateSignupForm } from "../Validations/validateSignupForm";
 import notify from "../Hook/useNotification";
 import { useNavigate } from "react-router-dom";
 
-export const Signup_Hook = () => {
+export const Signup_Hook = (t) => {
   const navigate = useNavigate();
   const [states, setStates] = useState([]);
   const [selectedState, setSelectedState] = useState("");
@@ -76,6 +76,7 @@ export const Signup_Hook = () => {
       state: selectedState,
       city: selectedcity,
       fullAddress,
+      t,
     });
 
     if (!isValid) return; // لو فيه خطأ ميفتحش المودال
@@ -142,21 +143,7 @@ export const Signup_Hook = () => {
   const handelSubmit = async (event) => {
     event.preventDefault();
 
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
+    const monthNames = t("signup.englishMonths", { returnObjects: true });
     const monthName = monthNames[parseInt(dateOfBirthMonth) - 1];
     const stateObject = states.find((state) => state.isoCode === selectedState);
     const stateName = stateObject ? stateObject.name : selectedState;
@@ -196,6 +183,7 @@ export const Signup_Hook = () => {
       state: selectedState,
       city: selectedcity,
       fullAddress,
+      t,
     });
 
     if (!isValid) return;
@@ -211,23 +199,17 @@ export const Signup_Hook = () => {
   useEffect(() => {
     if (loading === false && User) {
       setispress(false);
-
       if (User?.status === 201) {
         resetFormFields();
-        notify(
-          "Account created. Please check your email for the verification link.",
-          "success"
-        );
+        notify(t("signuphook.successAccountCreated"), "success");
         navigate("/Login");
       } else if (User?.data?.errors?.[0]?.msg === "Email already exists") {
-        console.log(User?.data?.errors?.[0]?.msg);
-        notify("Email already exists", "warn");
+        notify(t("signuphook.emailExists"), "warn");
       } else {
-        notify(User?.data?.message || "There is a problem", "error");
+        notify(User?.data?.message || t("signuphook.errorOccurred"), "error");
       }
-
       setTimeout(() => {
-        setloading(true); // يرجع الزر لحالته الطبيعية
+        setloading(true);
       }, 1500);
     }
   }, [loading, User]);

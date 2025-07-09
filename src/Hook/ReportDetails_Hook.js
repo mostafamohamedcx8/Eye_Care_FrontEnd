@@ -11,8 +11,9 @@ import {
   validateImageFiles,
   validateLeftEyeSection,
 } from "../Validations/reportValidation";
-
+import { useTranslation } from "react-i18next";
 export const ReportDetails_Hook = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const Navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("history");
@@ -303,11 +304,11 @@ export const ReportDetails_Hook = () => {
 
     // التحقق من أن كل الملفات صور
     if (!validateImageFiles(ItemRightImages)) {
-      notify("Some right eye images are not valid image files.", "error");
+      notify(t("reportForm.notifications.invalidRightEyeImages"), "error");
       return;
     }
     if (!validateImageFiles(ItemLeftImages)) {
-      notify("Some left eye images are not valid image files.", "error");
+      notify(t("reportForm.notifications.invalidLeftEyeImages"), "error");
       return;
     }
 
@@ -466,28 +467,19 @@ export const ReportDetails_Hook = () => {
     if (activeTab === "history" && innerTab === "medical") {
       const isValid = validateMedicalHistory(historyData);
       if (!isValid) {
-        notify(
-          "Please complete the Medical History section before proceeding.",
-          "Warn"
-        );
+        notify(t("reportForm.notifications.completeMedicalHistory"), "warn");
         return;
       }
     } else if (activeTab === "history" && innerTab === "eye") {
       const isValid = validateEyeHistory(historyData);
       if (!isValid) {
-        notify(
-          "Please complete the Eye History section before proceeding.",
-          "Warn"
-        );
+        notify(t("reportForm.notifications.completeEyeHistory"), "warn");
         return;
       }
     } else if (activeTab === "exam" && innerTab === "rightEye") {
       const isValid = validateRightEyeSection(rightEyeData);
       if (!isValid) {
-        notify(
-          "Please complete the Right Eye section before proceeding.",
-          "Warn"
-        );
+        notify(t("reportForm.notifications.completeRightEye"), "warn");
         return;
       }
     }
@@ -503,8 +495,8 @@ export const ReportDetails_Hook = () => {
       const isValid = validateMedicalHistory(historyData);
       if (!isValid) {
         notify(
-          "Please complete the Medical History section before switching.",
-          "Warn"
+          t("reportForm.notifications.completeMedicalHistorySwitch"),
+          "warn"
         );
         return;
       }
@@ -515,10 +507,7 @@ export const ReportDetails_Hook = () => {
     ) {
       const isValid = validateRightEyeSection(rightEyeData);
       if (!isValid) {
-        notify(
-          "Please complete the Right Eye section before switching.",
-          "Warn"
-        );
+        notify(t("reportForm.notifications.completeRightEyeSwitch"), "warn");
         return;
       }
     }

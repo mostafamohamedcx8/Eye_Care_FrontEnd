@@ -36,6 +36,9 @@ export const Examination_Hook = () => {
         useCORS: true,
         allowTaint: false,
         logging: true,
+        ignoreElements: (el) => {
+          return el.classList?.contains("no-print");
+        },
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     };
@@ -44,7 +47,9 @@ export const Examination_Hook = () => {
   };
 
   const Report = ReportData.data || [];
-  console.log(Report);
+  console.log("Rdsfds", Report);
+
+  const opticianName = `${Report?.optician?.firstname} ${Report?.optician?.lastname}`;
 
   const displayValue = (value) => {
     return value !== undefined && value !== null && value !== "" ? (
@@ -96,5 +101,6 @@ export const Examination_Hook = () => {
     displayValue,
     displayDate,
     displayBoolean,
+    opticianName,
   ];
 };

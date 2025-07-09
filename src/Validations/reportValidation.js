@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-
+import i18n from "i18next";
 // إشعار
 export const notify = (msg, type = "warn") => {
   if (type === "warn") toast.warn(msg);
@@ -7,10 +7,12 @@ export const notify = (msg, type = "warn") => {
   else toast.error(msg);
 };
 
+const t = i18n.t.bind(i18n);
+
 // التحقق من نص مكتوب
 export const validateText = (value, label) => {
   if (typeof value !== "string" || value === "") {
-    notify(`${label} is required`);
+    notify(t("reportForm.validation.required", { label }));
     return false;
   }
   return true;
@@ -19,7 +21,7 @@ export const validateText = (value, label) => {
 // التحقق من قيمة رقمية
 export const validateNumber = (value, label) => {
   if (value === "" || isNaN(Number(value))) {
-    notify(`${label} must be a valid number`);
+    notify(t("reportForm.validation.invalidNumber", { label }));
     return false;
   }
   return true;
@@ -31,12 +33,12 @@ export const validateDate = (value, label) => {
   const now = new Date();
 
   if (!value || isNaN(date.getTime())) {
-    notify(`${label} must be a valid date`);
+    notify(t("reportForm.validation.invalidDate", { label }));
     return false;
   }
 
   if (date > now) {
-    notify(`${label} must be a date in the past`);
+    notify(t("reportForm.validation.dateInPast", { label }));
     return false;
   }
 
@@ -48,7 +50,10 @@ const validateDiseaseHistory = (list, label) => {
     if (item.hasCondition) {
       if (item.appliesTo !== "Self" && item.appliesTo !== "In Family") {
         notify(
-          `${label}: ${item.name} - you must select 'Self' or 'In Family'`
+          t("reportForm.validation.diseaseSelectSelfOrFamily", {
+            label,
+            disease: item.name,
+          })
         );
         return false;
       }
@@ -59,7 +64,11 @@ const validateDiseaseHistory = (list, label) => {
       !item.hasCondition
     ) {
       notify(
-        `${label}: ${item.name} - you must select 'Yes' before choosing '${item.appliesTo}'`
+        t("reportForm.validation.diseaseSelectYes", {
+          label,
+          disease: item.name,
+          appliesTo: item.appliesTo,
+        })
       );
       return false;
     }
@@ -170,10 +179,7 @@ export const validateRightEyeSection = ({
     rightAxis !== "";
 
   if (!coreFieldsFilled) {
-    notify(
-      "Since you're starting to fill in data, you need to fill in all of the Visus, Sphere, Cylinder, and Axis.",
-      "warn"
-    );
+    notify(t("reportForm.validation.coreFieldsRequired"), "warn");
     return false;
   }
 
@@ -182,10 +188,7 @@ export const validateRightEyeSection = ({
   const hasSince = rightSince !== "";
 
   if ((hasPrevious && !hasSince) || (!hasPrevious && hasSince)) {
-    notify(
-      "Both 'Previous Value (Decimal)' and 'Since' must be filled together.",
-      "warn"
-    );
+    notify(t("reportForm.validation.previousAndSinceTogether"), "warn");
     return false;
   }
 
@@ -193,7 +196,7 @@ export const validateRightEyeSection = ({
   if (rightCornealThickness !== "" && rightCornealThickness !== null) {
     const thickness = Number(rightCornealThickness);
     if (isNaN(thickness) || thickness <= 350 || thickness >= 700) {
-      notify("Corneal Thickness must be a number between 350 and 700.", "warn");
+      notify(t("reportForm.validation.cornealThicknessRange"), "warn");
       return false;
     }
   }
@@ -202,18 +205,12 @@ export const validateRightEyeSection = ({
     Rightimages && Object.values(Rightimages).some((val) => val !== "");
 
   if (hasImages && !hasImageDate) {
-    notify(
-      "Please enter 'Image Capture Date' for the uploaded images.",
-      "warn"
-    );
+    notify(t("reportForm.validation.imageDateRequired"), "warn");
     return false;
   }
 
   if (!hasImages && hasImageDate) {
-    notify(
-      "You cannot enter 'Image Capture Date' without uploading an image.",
-      "warn"
-    );
+    notify(t("reportForm.validation.noImageDateWithoutImage"), "warn");
     return false;
   }
   if (hasImageDate) {
@@ -225,7 +222,7 @@ export const validateRightEyeSection = ({
     today.setHours(0, 0, 0, 0);
 
     if (imageDate > today) {
-      notify("Image Capture Date cannot be in the future.", "warn");
+      notify(t("reportForm.validation.imageDateNotFuture"), "warn");
       return false;
     }
   }
@@ -272,10 +269,7 @@ export const validateLeftEyeSection = ({
     leftAxis !== "";
 
   if (!coreFieldsFilled) {
-    notify(
-      "Since you're starting to fill in data, you need to fill in all of the Visus, Sphere, Cylinder, and Axis.",
-      "warn"
-    );
+    notify(t("reportForm.validation.coreFieldsRequired"), "warn");
     return false;
   }
 
@@ -284,10 +278,7 @@ export const validateLeftEyeSection = ({
   const hasSince = leftSince !== "";
 
   if ((hasPrevious && !hasSince) || (!hasPrevious && hasSince)) {
-    notify(
-      "Both 'Previous Value (Decimal)' and 'Since' must be filled together.",
-      "warn"
-    );
+    notify(t("reportForm.validation.previousAndSinceTogether"), "warn");
     return false;
   }
 
@@ -295,10 +286,7 @@ export const validateLeftEyeSection = ({
   if (leftCornealThickness !== "") {
     const thickness = Number(leftCornealThickness); // استخدمنا Number بدل parseFloat
     if (isNaN(thickness) || thickness <= 350 || thickness >= 700) {
-      notify(
-        "Corneal Thickness must be a number between 350 and 700 (exclusive).",
-        "warn"
-      );
+      notify(t("reportForm.validation.cornealThicknessRange"), "warn");
       return false;
     }
   }
@@ -307,18 +295,12 @@ export const validateLeftEyeSection = ({
     Leftimages && Object.values(Leftimages).some((val) => val !== "");
 
   if (hasImages && !hasImageDate) {
-    notify(
-      "Please enter 'Image Capture Date' for the uploaded images.",
-      "warn"
-    );
+    notify(t("reportForm.validation.imageDateRequired"), "warn");
     return false;
   }
 
   if (!hasImages && hasImageDate) {
-    notify(
-      "You cannot enter 'Image Capture Date' without uploading an image.",
-      "warn"
-    );
+    notify(t("reportForm.validation.noImageDateWithoutImage"), "warn");
     return false;
   }
   if (hasImageDate) {
@@ -330,7 +312,7 @@ export const validateLeftEyeSection = ({
     today.setHours(0, 0, 0, 0);
 
     if (imageDate > today) {
-      notify("Image Capture Date cannot be in the future.", "warn");
+      notify(t("reportForm.validation.imageDateNotFuture"), "warn");
       return false;
     }
   }

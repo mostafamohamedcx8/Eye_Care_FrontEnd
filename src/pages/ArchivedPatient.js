@@ -13,8 +13,9 @@ import Footer from "../component/Footer";
 import Paginationcomponent from "../component/pagination";
 import { useNavigate } from "react-router-dom";
 import { Arcivedpatient_Hook } from "../Hook/Arcivedpatient_Hook";
-
+import { useTranslation } from "react-i18next";
 const PatientTableUI = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [
     keyword,
@@ -31,7 +32,7 @@ const PatientTableUI = () => {
     handleClose,
     handleDeleteConfirmed,
     onChangeKeyword,
-  ] = Arcivedpatient_Hook();
+  ] = Arcivedpatient_Hook(t);
 
   return (
     <>
@@ -39,13 +40,13 @@ const PatientTableUI = () => {
       <NavBar />
       <Container className="mt-5">
         <h2 className="text-center mb-4 fw-bold button-color">
-          Archived Patients
+          {t("patientTable.archived.title")}
         </h2>
 
         <Row className="mb-3">
           <Col md={6}>
             <Form.Control
-              placeholder="Search by name..."
+              placeholder={t("patientTable.archived.searchPlaceholder")}
               value={keyword}
               onChange={onChangeKeyword}
             />
@@ -55,19 +56,19 @@ const PatientTableUI = () => {
         <Table striped bordered hover responsive>
           <thead>
             <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Date of Birth</th>
-              <th>AI Report Count</th>
-              <th>Feedback Count</th>
-              <th>Tools</th>
+              <th>{t("patientTable.archived.tableHeaders.number")}</th>
+              <th>{t("patientTable.archived.tableHeaders.name")}</th>
+              <th>{t("patientTable.archived.tableHeaders.dateOfBirth")}</th>
+              <th>{t("patientTable.archived.tableHeaders.aiReportCount")}</th>
+              <th>{t("patientTable.archived.tableHeaders.feedbackCount")}</th>
+              <th>{t("patientTable.archived.tableHeaders.tools")}</th>
             </tr>
           </thead>
           <tbody>
             {Loading ? (
               <tr>
                 <td colSpan="7" className="text-center">
-                  Loading...
+                  {t("patientTable.archived.loading")}
                 </td>
               </tr>
             ) : AllPatient.length > 0 ? (
@@ -143,11 +144,15 @@ const PatientTableUI = () => {
 
                       return (
                         <div className="d-flex align-items-center gap-2">
-                          <span title="Seen Feedbacks">
+                          <span
+                            title={t("patientTable.archived.feedback.seen")}
+                          >
                             <i className="bi bi-eye-fill text-success"></i>{" "}
                             {readCount}
                           </span>
-                          <span title="Unseen Feedbacks">
+                          <span
+                            title={t("patientTable.archived.feedback.unseen")}
+                          >
                             <i className="bi bi-eye-slash-fill text-secondary"></i>{" "}
                             {unreadCount}
                           </span>
@@ -178,7 +183,7 @@ const PatientTableUI = () => {
                     </button>
                     <button
                       className="btn btn-sm btn-outline-secondary"
-                      title="Remove from Archive"
+                      title={t("patientTable.archived.archiveButton")}
                       onClick={(e) => handleToggleArchive(patient._id, e)}
                       disabled={archiveLoading[patient._id]}
                     >
@@ -191,7 +196,7 @@ const PatientTableUI = () => {
             ) : (
               <tr>
                 <td colSpan="7" className="text-center">
-                  No patients found.
+                  {t("patientTable.archived.noPatients")}
                 </td>
               </tr>
             )}
@@ -205,15 +210,15 @@ const PatientTableUI = () => {
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>{t("patientTable.archived.modal.title")}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this patient?</Modal.Body>
+        <Modal.Body>{t("patientTable.archived.modal.body")}</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Cancel
+            {t("patientTable.archived.modal.cancel")}
           </Button>
           <Button variant="danger" onClick={handleDeleteConfirmed}>
-            Delete
+            {t("patientTable.archived.modal.delete")}
           </Button>
         </Modal.Footer>
       </Modal>

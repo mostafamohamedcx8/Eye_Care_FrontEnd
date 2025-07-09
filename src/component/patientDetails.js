@@ -5,8 +5,9 @@ import { CreatePatient } from "../Redux/actions/Patientaction";
 import { validatePatientForm } from "../Validations/patientValidation";
 import notify from "../Hook/useNotification";
 import { useNavigate } from "react-router-dom";
-
+import { useTranslation } from "react-i18next";
 const PatientTab = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -50,7 +51,7 @@ const PatientTab = () => {
     if (loading === false) {
       if (res.status === 201) {
         const id = res?.data?.data?._id;
-        notify("Patient created successfully.", "success");
+        notify(t("patientForm.notifications.createSuccess"), "success");
         navigate(`/Examination/${id}`);
       }
       setFirstname("");
@@ -64,20 +65,20 @@ const PatientTab = () => {
         setispress(false);
       }, 3000);
     }
-  }, [loading]);
+  }, [loading, t]);
 
   return (
     <Container className="mt-5 mb-5">
       <h2 className="text-center mb-4 fw-bold button-color">
-        Create New Patient
+        {t("patientForm.title")}
       </h2>
       <Form onSubmit={handelSubmit}>
         <Row>
           <Col>
             <Form.Group>
-              <Form.Label>First Name</Form.Label>
+              <Form.Label>{t("patientForm.labels.firstName")}</Form.Label>
               <Form.Control
-                placeholder="Enter First Name"
+                placeholder={t("patientForm.placeholders.firstName")}
                 required
                 onChange={(e) => setFirstname(e.target.value)}
                 value={firstname}
@@ -86,9 +87,9 @@ const PatientTab = () => {
           </Col>
           <Col>
             <Form.Group>
-              <Form.Label>Last Name</Form.Label>
+              <Form.Label>{t("patientForm.labels.lastName")}</Form.Label>
               <Form.Control
-                placeholder="Enter Last Name"
+                placeholder={t("patientForm.placeholders.lastName")}
                 required
                 onChange={(e) => setLastname(e.target.value)}
                 value={lastname}
@@ -97,19 +98,27 @@ const PatientTab = () => {
           </Col>
           <Col>
             <Form.Group className="mb-3">
-              <Form.Label>Salutation</Form.Label>
+              <Form.Label>{t("patientForm.labels.salutation")}</Form.Label>
               <Form.Select
                 required
                 onChange={(e) => setSalutation(e.target.value)}
                 value={salutation}
               >
                 <option value="" disabled hidden>
-                  Select Salutation
+                  {t("patientForm.placeholders.salutation")}
                 </option>
-                <option value="Mr">Mr</option>
-                <option value="Mrs">Mrs</option>
-                <option value="Ms">Ms</option>
-                <option value="Mx">Mx</option>
+                <option value="Mr">
+                  {t("patientForm.salutationOptions.mr")}
+                </option>
+                <option value="Mrs">
+                  {t("patientForm.salutationOptions.mrs")}
+                </option>
+                <option value="Ms">
+                  {t("patientForm.salutationOptions.ms")}
+                </option>
+                <option value="Mx">
+                  {t("patientForm.salutationOptions.mx")}
+                </option>
               </Form.Select>
             </Form.Group>
           </Col>
@@ -117,7 +126,7 @@ const PatientTab = () => {
         <Row>
           <Col>
             <Form.Group>
-              <Form.Label>Date of Birth</Form.Label>
+              <Form.Label>{t("patientForm.labels.dateOfBirth")}</Form.Label>
 
               <Form.Control
                 type="date"
@@ -129,7 +138,7 @@ const PatientTab = () => {
           </Col>
           <Col>
             <Form.Group>
-              <Form.Label>Ethnicity</Form.Label>
+              <Form.Label>{t("patientForm.labels.ethnicity")}</Form.Label>
 
               <Form.Select
                 required
@@ -137,53 +146,75 @@ const PatientTab = () => {
                 value={ethnicity}
               >
                 <option value="" disabled hidden>
-                  Select ethnicity
+                  {t("patientForm.placeholders.ethnicity")}
                 </option>
-                <optgroup label="Asian or Asian British">
-                  <option value="Indian">Indian</option>
-                  <option value="Pakistani">Pakistani</option>
-                  <option value="Bangladeshi">Bangladeshi</option>
-                  <option value="Chinese">Chinese</option>
+                <optgroup label={t("patientForm.ethnicityOptions.asian.label")}>
+                  <option value="Indian">
+                    {t("patientForm.ethnicityOptions.asian.indian")}
+                  </option>
+                  <option value="Pakistani">
+                    {t("patientForm.ethnicityOptions.asian.pakistani")}
+                  </option>
+                  <option value="Bangladeshi">
+                    {t("patientForm.ethnicityOptions.asian.bangladeshi")}
+                  </option>
+                  <option value="Chinese">
+                    {t("patientForm.ethnicityOptions.asian.chinese")}
+                  </option>
                   <option value="Any other Asian background">
-                    Any other Asian background
+                    {t("patientForm.ethnicityOptions.asian.other")}
                   </option>
                 </optgroup>
-                <optgroup label="Black, Black British, Caribbean or African">
-                  <option value="Caribbean">Caribbean</option>
-                  <option value="African">African</option>
+                <optgroup label={t("patientForm.ethnicityOptions.black.label")}>
+                  <option value="Caribbean">
+                    {t("patientForm.ethnicityOptions.black.caribbean")}
+                  </option>
+                  <option value="African">
+                    {t("patientForm.ethnicityOptions.black.african")}
+                  </option>
                   <option value="Any other Black, Black British, or Caribbean background">
-                    Any other Black, Black British, or Caribbean background
+                    {t("patientForm.ethnicityOptions.black.other")}
                   </option>
                 </optgroup>
-                <optgroup label="Mixed or multiple ethnic groups">
+                <optgroup label={t("patientForm.ethnicityOptions.mixed.label")}>
                   <option value="White and Black Caribbean">
-                    White and Black Caribbean
+                    {t(
+                      "patientForm.ethnicityOptions.mixed.whiteBlackCaribbean"
+                    )}
                   </option>
                   <option value="White and Black African">
-                    White and Black African
+                    {t("patientForm.ethnicityOptions.mixed.whiteBlackAfrican")}
                   </option>
-                  <option value="White and Asian">White and Asian</option>
+                  <option value="White and Asian">
+                    {t("patientForm.ethnicityOptions.mixed.whiteAsian")}
+                  </option>
                   <option value="Any other Mixed or multiple ethnic background">
-                    Any other Mixed or multiple ethnic background
+                    {t("patientForm.ethnicityOptions.mixed.other")}
                   </option>
                 </optgroup>
-                <optgroup label="White">
+                <optgroup label={t("patientForm.ethnicityOptions.white.label")}>
                   <option value="English, Welsh, Scottish, Northern Irish or British">
-                    English, Welsh, Scottish, Northern Irish or British
+                    {t("patientForm.ethnicityOptions.white.british")}
                   </option>
-                  <option value="Irish">Irish</option>
+                  <option value="Irish">
+                    {t("patientForm.ethnicityOptions.white.irish")}
+                  </option>
                   <option value="Gypsy or Irish Traveller">
-                    Gypsy or Irish Traveller
+                    {t("patientForm.ethnicityOptions.white.gypsy")}
                   </option>
-                  <option value="Roma">Roma</option>
+                  <option value="Roma">
+                    {t("patientForm.ethnicityOptions.white.roma")}
+                  </option>
                   <option value="Any other White background">
-                    Any other White background
+                    {t("patientForm.ethnicityOptions.white.other")}
                   </option>
                 </optgroup>
-                <optgroup label="Other ethnic group">
-                  <option value="Arab">Arab</option>
+                <optgroup label={t("patientForm.ethnicityOptions.other.label")}>
+                  <option value="Arab">
+                    {t("patientForm.ethnicityOptions.other.arab")}
+                  </option>
                   <option value="Any other ethnic group">
-                    Any other ethnic group
+                    {t("patientForm.ethnicityOptions.other.anyOther")}
                   </option>
                 </optgroup>
               </Form.Select>
@@ -194,7 +225,7 @@ const PatientTab = () => {
         <Row className="mt-4">
           <Col>
             <Button type="submit" variant="primary">
-              Create Patient
+              {t("patientForm.buttons.create")}
             </Button>
           </Col>
         </Row>

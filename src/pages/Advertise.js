@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
 import React from "react";
 import { Container, Row } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const AdvertiseSection = () => {
+  const { t } = useTranslation();
   return (
     <>
       {/* Hero Section */}
@@ -14,29 +16,31 @@ const AdvertiseSection = () => {
           <div className="overlay hero-section">
             <div className="breadcrumb">
               <Link to="/" className="breadcrumb-link">
-                Home
+                {t("advertise.breadcrumb_home")}
               </Link>
               <span className="separator">/</span>
-              <span className="active">Advertise</span>
+              <span className="active">
+                {t("advertise.breadcrumb_advertise")}
+              </span>
             </div>
-            <h1 className="title">Advertise</h1>
+            <h1 className="title">{t("advertise.title")}</h1>
           </div>
         </div>
       </Row>
 
       {/* Content Section */}
       <Container className="py-5">
-        <h2>Advertise With Us</h2>
-        <p>
-          Interested in advertising with us? We offer targeted advertising
-          opportunities for:
-        </p>
+        <h2>{t("advertise.section_title")}</h2>
+        <p>{t("advertise.paragraph_1")}</p>
         <ul>
-          <li>Eye clinics</li>
-          <li>Medical equipment providers</li>
-          <li>Health tech companies</li>
+          <li>{t("advertise.list_item_1")}</li>
+          <li>{t("advertise.list_item_2")}</li>
+          <li>{t("advertise.list_item_3")}</li>
         </ul>
-        <p>📩 Contact us at jobs@augenarzt.cloud</p>
+        <p>
+          📩 {t("advertise.contact")}
+          <a href="mailto:jobs@augenarzt.cloud">jobs@augenarzt.cloud</a>
+        </p>
       </Container>
     </>
   );

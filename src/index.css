@@ -348,3 +348,13 @@
   padding: 6px 10px;
   border-radius: 6px;
 }
+
+.no-print {
+  display: block;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
