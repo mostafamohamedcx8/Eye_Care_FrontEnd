@@ -39,7 +39,7 @@ const AdvertiseSection = () => {
         </ul>
         <p>
           📩 {t("advertise.contact")}
-          <a href="mailto:jobs@augenarzt.cloud">jobs@augenarzt.cloud</a>
+          <a href="mailto:advertise@augenarzt.cloud">jobs@augenarzt.cloud</a>
         </p>
       </Container>
     </>

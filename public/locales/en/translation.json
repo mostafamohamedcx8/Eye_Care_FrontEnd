@@ -11,7 +11,8 @@
     "registration": "Registration",
     "for_doctors": "For Doctors",
     "fundus_tooltip": "Refer for doctor website",
-    "language": "Language"
+    "language": "Language",
+    "user_avatar": "User Avatar"
   },
   "hero": {
     "subtitle": "EMPOWERING OPTICIANS TO DETECT EYE ISSUES FASTER",
@@ -664,6 +665,45 @@
   },
   "reportdata": {
     "title": "Patient Eye Examination Report",
+    "image_quality": "Image quality",
+    "image_quality_good": "Good",
+    "image_quality_bad": "Bad",
+    "opticianLabel": "Optician",
+    "addressLabel": "Address",
+    "commonValues": {
+      "Yes": "Yes",
+      "No": "No",
+      "Narrow": "Narrow",
+      "Within Normal Limits": "Within Normal Limits",
+      "wide": "Wide"
+    },
+    "ethnicityOptions": {
+      "White and Asian": "White and Asian",
+      "White and Black Caribbean": "White and Black Caribbean",
+      "White and Black African": "White and Black African",
+      "Indian": "Indian",
+      "Pakistani": "Pakistani",
+      "Bangladeshi": "Bangladeshi",
+      "Chinese": "Chinese",
+      "Caribbean": "Caribbean",
+      "African": "African",
+      "English, Welsh, Scottish, Northern Irish or British": "English, Welsh, Scottish, Northern Irish or British",
+      "Irish": "Irish",
+      "Gypsy or Irish Traveller": "Gypsy or Irish Traveller",
+      "Roma": "Roma",
+      "Arab": "Arab",
+      "Any other Asian background": "Any other Asian background",
+      "Any other Black, Black British, or Caribbean background": "Any other Black, Black British, or Caribbean background",
+      "Any other Mixed or multiple ethnic background": "Any other Mixed or multiple ethnic background",
+      "Any other White background": "Any other White background",
+      "Any other ethnic group": "Any other ethnic group"
+    },
+    "salutations": {
+      "Mr": "Mr",
+      "Mrs": "Mrs",
+      "Ms": "Ms",
+      "Mx": "Mx"
+    },
     "patientInfo": {
       "header": "Patient Information",
       "name": "Name",
@@ -676,7 +716,22 @@
     "medicalHistory": {
       "header": "Medical History",
       "hasCondition": "Has Condition",
-      "appliesTo": "Applies To"
+      "appliesTo": "Applies To",
+      "values": {
+        "Yes": "Yes",
+        "No": "No",
+        "Self": "Self",
+        "In Family": "In Family",
+        "Diabetes M.": "Diabetes M.",
+        "Hypertension": "Hypertension",
+        "Rheumatic diseases": "Rheumatic diseases",
+        "Thyroid": "Thyroid",
+        "Tumours": "Tumours",
+        "Genetic": "Genetic",
+        "Cataract": "Cataract",
+        "Glaucoma": "Glaucoma",
+        "Age-related macular degeneration": "Age-related macular degeneration"
+      }
     },
     "eyeHistory": {
       "header": "Eye History"
@@ -718,7 +773,7 @@
     },
     "buttons": {
       "referToDoctor": "Refer To a Doctor",
-      "downloadReport": "Download Report"
+      "downloadReport": "Print Report"
     },
     "optician": "Optician"
   },

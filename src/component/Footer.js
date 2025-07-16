@@ -45,8 +45,8 @@ const Footer = () => {
             </ul>
           </Col>
           <Col md={4}>
-            <h5>{t("footer.social_media")}</h5>
-            <div className="social-icons">
+            <h5 className="no-print">{t("footer.social_media")}</h5>
+            <div className="social-icons no-print">
               <a href="#">
                 <FaFacebookF />
               </a>

@@ -76,7 +76,7 @@ const NavBar = () => {
                       width="40"
                       height="40"
                       style={{ objectFit: "cover" }}
-                      alt="User Avatar"
+                      alt={t("navbar.user_avatar")}
                     />
                   }
                   id="user-nav-dropdown"

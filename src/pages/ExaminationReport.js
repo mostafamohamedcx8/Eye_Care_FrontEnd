@@ -24,21 +24,47 @@ const PatientReport = () => {
     Report,
     handleMarkAsRead,
     userFromStorage,
-    handleDownloadPDF,
+    handlePrint,
     setSelectedImage,
     selectedImage,
     displayValue,
     displayDate,
     displayBoolean,
     opticianName,
+    opticianAddress,
   ] = Examination_Hook();
   return (
     <>
-      <div ref={reportRef}>
+      <div ref={reportRef} className="report-content">
         <Header />
         <NavBar className="no-print" />
         <Container className="mt-5 mb-5 p-4 border rounded shadow bg-light">
-          <h2 className="mb-4 text-center">{t("reportdata.title")}</h2>
+          <div
+            className="d-flex justify-content-between align-items-center flex-wrap"
+            style={{
+              padding: "10px 20px",
+              borderBottom: "2px solid #ccc",
+              marginBottom: "20px",
+            }}
+          >
+            {/* Optician Info - left */}
+            <div style={{ fontSize: "0.8rem", textAlign: "left" }}>
+              <div>
+                <strong>{t("reportdata.opticianLabel")}:</strong> {opticianName}
+              </div>
+              <div>
+                <strong>{t("reportdata.addressLabel")}:</strong>{" "}
+                {opticianAddress}
+              </div>
+            </div>
+
+            {/* Title - center */}
+            <div className="mx-auto text-center">
+              <h2 style={{ fontWeight: "bold", margin: 0 }}>
+                {t("reportdata.title")}
+              </h2>
+            </div>
+          </div>
 
           {/* Patient Info */}
           <Card className="mb-4 shadow rounded-2">
@@ -55,11 +81,13 @@ const PatientReport = () => {
                   </div>
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.salutation")}:</strong>{" "}
-                    {Report?.patient?.salutation}
+                    {t(`reportdata.salutations.${Report?.patient?.salutation}`)}
                   </div>
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.ethnicity")}:</strong>{" "}
-                    {Report?.patient?.ethnicity}
+                    {t(
+                      `reportdata.ethnicityOptions.${Report?.patient?.ethnicity}`
+                    )}
                   </div>
                 </Col>
                 {/* Left Column */}
@@ -93,20 +121,28 @@ const PatientReport = () => {
                 {Report?.history?.medical?.map((disease, idx) => (
                   <ListGroup.Item key={idx}>
                     <div className="d-flex justify-content-between">
-                      <strong>{disease.name}</strong>
+                      <strong>
+                        {t(`reportdata.medicalHistory.values.${disease.name}`)}
+                      </strong>
                       <div className="ms-3">
                         <span>
                           <strong>
                             {t("reportdata.medicalHistory.hasCondition")}:
                           </strong>{" "}
-                          {disease.hasCondition ? "Yes" : "No"}
+                          {t(
+                            `reportdata.medicalHistory.values.${
+                              disease.hasCondition ? "Yes" : "No"
+                            }`
+                          )}
                         </span>
                         <span className="ms-3">
                           <strong>
                             {" "}
                             {t("reportdata.medicalHistory.appliesTo")}:
                           </strong>{" "}
-                          {disease.appliesTo}
+                          {t(
+                            `reportdata.medicalHistory.values.${disease.appliesTo}`
+                          )}
                         </span>
                       </div>
                     </div>
@@ -126,19 +162,28 @@ const PatientReport = () => {
                 {Report?.history?.eye?.map((disease, idx) => (
                   <ListGroup.Item key={idx}>
                     <div className="d-flex justify-content-between">
-                      <strong>{disease.name}</strong>
+                      <strong>
+                        {t(`reportdata.medicalHistory.values.${disease.name}`)}
+                      </strong>
+
                       <div className="ms-3">
                         <span>
                           <strong>
                             {t("reportdata.medicalHistory.hasCondition")}:
                           </strong>{" "}
-                          {disease.hasCondition ? "Yes" : "No"}
+                          {t(
+                            `reportdata.medicalHistory.values.${
+                              disease.hasCondition ? "Yes" : "No"
+                            }`
+                          )}
                         </span>
                         <span className="ms-3">
                           <strong>
                             {t("reportdata.medicalHistory.appliesTo")}:
                           </strong>{" "}
-                          {disease.appliesTo}
+                          {t(
+                            `reportdata.medicalHistory.values.${disease.appliesTo}`
+                          )}
                         </span>
                       </div>
                     </div>
@@ -183,9 +228,8 @@ const PatientReport = () => {
                           idx + 1
                         }`}
                         style={{
-                          width: "160px",
-                          height: "160px",
-                          objectFit: "cover",
+                          width: "100%", // أو ممكن تستخدم "auto"
+                          height: "auto",
                           borderRadius: "8px",
                           border: "1px solid #ccc",
                         }}
@@ -270,7 +314,13 @@ const PatientReport = () => {
                 </Col>
                 <Col>
                   <strong>{t("reportdata.rightEye.chamberAngle")}:</strong>{" "}
-                  {displayValue(Report?.eyeExamination?.rightEye?.chamberAngle)}
+                  {Report?.eyeExamination?.rightEye?.chamberAngle ? (
+                    t(
+                      `reportdata.commonValues.${Report.eyeExamination.rightEye.chamberAngle}`
+                    )
+                  ) : (
+                    <span style={{ color: "red" }}>--</span>
+                  )}
                 </Col>
               </Row>
               <Row className="mt-2">
@@ -278,8 +328,12 @@ const PatientReport = () => {
                   <strong>
                     {t("reportdata.rightEye.amslerTestAbnormal")}:
                   </strong>{" "}
-                  {displayBoolean(
-                    Report?.eyeExamination?.rightEye?.amslerTestAbnormal
+                  {t(
+                    `reportdata.commonValues.${
+                      Report?.eyeExamination?.rightEye?.amslerTestAbnormal
+                        ? "Yes"
+                        : "No"
+                    }`
                   )}
                 </Col>
               </Row>
@@ -301,6 +355,18 @@ const PatientReport = () => {
 
                     return (
                       <>
+                        <p>
+                          <strong>{t("reportdata.image_quality")} : </strong>
+                          <span
+                            style={{
+                              color: isImageQualityBad ? "red" : "green",
+                            }}
+                          >
+                            {isImageQualityBad
+                              ? t("reportdata.image_quality_bad")
+                              : t("reportdata.image_quality_good")}
+                          </span>
+                        </p>
                         {filteredDiseases.length > 0 ? (
                           <table className="table table-bordered mt-2">
                             <thead>
@@ -346,73 +412,76 @@ const PatientReport = () => {
                   <p>{t("reportdata.rightEye.noPredictionData")}</p>
                 )}
               </div>
-              {Report?.doctorFeedbacks?.length > 0 && (
-                <>
-                  <h5 className="mt-4 text-success">
-                    {t("reportdata.doctorFeedback.header")}
-                  </h5>
+              {Report?.eyeExamination?.rightEye?.images?.length > 0 &&
+                Report?.doctorFeedbacks?.length > 0 && (
+                  <>
+                    <h5 className="mt-4 text-success no-print">
+                      {t("reportdata.doctorFeedback.header")}
+                    </h5>
 
-                  <Accordion>
-                    {Report.doctorFeedbacks.map((feedback, index) => (
-                      <Accordion.Item
-                        eventKey={index.toString()}
-                        key={feedback._id}
-                        onClick={() => handleMarkAsRead(feedback)}
-                      >
-                        <Accordion.Header>
-                          Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
-                          {feedback.doctor?.lastname || ""} –{" "}
-                          {moment(feedback.createdAt).format(
-                            "DD MMM YYYY, h:mm A"
-                          )}
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <p>
-                            <strong>
-                              {t(
-                                "reportdata.doctorFeedback.predictionAccuracy"
-                              )}
-                              :
-                            </strong>{" "}
-                            <span
-                              className={`badge ${
-                                feedback.rightEyeFeedback
-                                  ?.aiPredictionCorrect === "correct"
-                                  ? "bg-success"
-                                  : "bg-danger"
-                              }`}
-                            >
-                              {feedback.rightEyeFeedback?.aiPredictionCorrect ||
+                    <Accordion className="no-print">
+                      {Report.doctorFeedbacks.map((feedback, index) => (
+                        <Accordion.Item
+                          eventKey={index.toString()}
+                          key={feedback._id}
+                          onClick={() => handleMarkAsRead(feedback)}
+                        >
+                          <Accordion.Header>
+                            Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
+                            {feedback.doctor?.lastname || ""} –{" "}
+                            {moment(feedback.createdAt).format(
+                              "DD MMM YYYY, h:mm A"
+                            )}
+                          </Accordion.Header>
+                          <Accordion.Body>
+                            <p>
+                              <strong>
+                                {t(
+                                  "reportdata.doctorFeedback.predictionAccuracy"
+                                )}
+                                :
+                              </strong>{" "}
+                              <span
+                                className={`badge ${
+                                  feedback.rightEyeFeedback
+                                    ?.aiPredictionCorrect === "correct"
+                                    ? "bg-success"
+                                    : "bg-danger"
+                                }`}
+                              >
+                                {feedback.rightEyeFeedback
+                                  ?.aiPredictionCorrect || "N/A"}
+                              </span>
+                            </p>
+                            <p>
+                              <strong>
+                                {t("reportdata.doctorFeedback.comment")}:
+                              </strong>{" "}
+                              {feedback.rightEyeFeedback?.comment ||
+                                t("reportdata.doctorFeedback.noComment")}
+                            </p>
+                            <p>
+                              <strong>
+                                {t("reportdata.doctorFeedback.diagnosis")}:
+                              </strong>{" "}
+                              {feedback.rightEyeFeedback?.diagnosis || "N/A"}
+                            </p>
+                            <p>
+                              <strong>
+                                {t(
+                                  "reportdata.doctorFeedback.recommendedAction"
+                                )}
+                                :
+                              </strong>{" "}
+                              {feedback.rightEyeFeedback?.recommendedAction ||
                                 "N/A"}
-                            </span>
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.comment")}:
-                            </strong>{" "}
-                            {feedback.rightEyeFeedback?.comment ||
-                              "No comment provided."}
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.diagnosis")}:
-                            </strong>{" "}
-                            {feedback.rightEyeFeedback?.diagnosis || "N/A"}
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.recommendedAction")}
-                              :
-                            </strong>{" "}
-                            {feedback.rightEyeFeedback?.recommendedAction ||
-                              "N/A"}
-                          </p>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                    ))}
-                  </Accordion>
-                </>
-              )}
+                            </p>
+                          </Accordion.Body>
+                        </Accordion.Item>
+                      ))}
+                    </Accordion>
+                  </>
+                )}
             </Card.Body>
           </Card>
           <Card className="mb-4">
@@ -450,9 +519,8 @@ const PatientReport = () => {
                           idx + 1
                         }`}
                         style={{
-                          width: "160px",
-                          height: "160px",
-                          objectFit: "cover",
+                          width: "100%", // أو ممكن تستخدم "auto"
+                          height: "auto",
                           borderRadius: "8px",
                           border: "1px solid #ccc",
                         }}
@@ -535,7 +603,13 @@ const PatientReport = () => {
                 </Col>
                 <Col>
                   <strong>{t("reportdata.rightEye.chamberAngle")}:</strong>{" "}
-                  {displayValue(Report?.eyeExamination?.leftEye?.chamberAngle)}
+                  {Report?.eyeExamination?.leftEye?.chamberAngle ? (
+                    t(
+                      `reportdata.commonValues.${Report.eyeExamination.leftEye.chamberAngle}`
+                    )
+                  ) : (
+                    <span style={{ color: "red" }}>--</span>
+                  )}
                 </Col>
               </Row>
               <Row className="mt-2">
@@ -543,8 +617,12 @@ const PatientReport = () => {
                   <strong>
                     {t("reportdata.rightEye.amslerTestAbnormal")}:
                   </strong>{" "}
-                  {displayBoolean(
-                    Report?.eyeExamination?.leftEye?.amslerTestAbnormal
+                  {t(
+                    `reportdata.commonValues.${
+                      Report?.eyeExamination?.leftEye?.amslerTestAbnormal
+                        ? "Yes"
+                        : "No"
+                    }`
                   )}
                 </Col>
               </Row>
@@ -566,6 +644,18 @@ const PatientReport = () => {
 
                     return (
                       <>
+                        <p>
+                          <strong>{t("reportdata.image_quality")} : </strong>
+                          <span
+                            style={{
+                              color: isImageQualityBad ? "red" : "green",
+                            }}
+                          >
+                            {isImageQualityBad
+                              ? t("reportdata.image_quality_bad")
+                              : t("reportdata.image_quality_good")}
+                          </span>
+                        </p>
                         {filteredDiseases.length > 0 ? (
                           <table className="table table-bordered mt-2">
                             <thead>
@@ -611,72 +701,75 @@ const PatientReport = () => {
                   <p>{t("reportdata.leftEye.noPredictionData")}</p>
                 )}
               </div>
-              {Report?.doctorFeedbacks?.length > 0 && (
-                <>
-                  <h5 className="mt-4 text-success">
-                    {t("reportdata.doctorFeedback.header")}
-                  </h5>
+              {Report?.eyeExamination?.leftEye?.images?.length > 0 &&
+                Report?.doctorFeedbacks?.length > 0 && (
+                  <>
+                    <h5 className="mt-4 text-success no-print">
+                      {t("reportdata.doctorFeedback.header")}
+                    </h5>
 
-                  <Accordion>
-                    {Report.doctorFeedbacks.map((feedback, index) => (
-                      <Accordion.Item
-                        eventKey={index.toString()}
-                        key={feedback._id}
-                        onClick={() => handleMarkAsRead(feedback)}
-                      >
-                        <Accordion.Header>
-                          Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
-                          {feedback.doctor?.lastname || ""} –{" "}
-                          {moment(feedback.createdAt).format(
-                            "DD MMM YYYY, h:mm A"
-                          )}
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <p>
-                            <strong>
-                              {t(
-                                "reportdata.doctorFeedback.predictionAccuracy"
-                              )}
-                            </strong>{" "}
-                            <span
-                              className={`badge ${
-                                feedback.leftEyeFeedback
-                                  ?.aiPredictionCorrect === "correct"
-                                  ? "bg-success"
-                                  : "bg-danger"
-                              }`}
-                            >
-                              {feedback.leftEyeFeedback?.aiPredictionCorrect ||
+                    <Accordion className="no-print">
+                      {Report.doctorFeedbacks.map((feedback, index) => (
+                        <Accordion.Item
+                          eventKey={index.toString()}
+                          key={feedback._id}
+                          onClick={() => handleMarkAsRead(feedback)}
+                        >
+                          <Accordion.Header>
+                            Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
+                            {feedback.doctor?.lastname || ""} –{" "}
+                            {moment(feedback.createdAt).format(
+                              "DD MMM YYYY, h:mm A"
+                            )}
+                          </Accordion.Header>
+                          <Accordion.Body>
+                            <p>
+                              <strong>
+                                {t(
+                                  "reportdata.doctorFeedback.predictionAccuracy"
+                                )}
+                              </strong>{" "}
+                              <span
+                                className={`badge ${
+                                  feedback.leftEyeFeedback
+                                    ?.aiPredictionCorrect === "correct"
+                                    ? "bg-success"
+                                    : "bg-danger"
+                                }`}
+                              >
+                                {feedback.leftEyeFeedback
+                                  ?.aiPredictionCorrect || "N/A"}
+                              </span>
+                            </p>
+                            <p>
+                              <strong>
+                                {t("reportdata.doctorFeedback.comment")}:
+                              </strong>{" "}
+                              {feedback.leftEyeFeedback?.comment ||
+                                t("reportdata.doctorFeedback.noComment")}
+                            </p>
+                            <p>
+                              <strong>
+                                {t("reportdata.doctorFeedback.diagnosis")}:
+                              </strong>{" "}
+                              {feedback.leftEyeFeedback?.diagnosis || "N/A"}
+                            </p>
+                            <p>
+                              <strong>
+                                {t(
+                                  "reportdata.doctorFeedback.recommendedAction"
+                                )}
+                                :
+                              </strong>{" "}
+                              {feedback.leftEyeFeedback?.recommendedAction ||
                                 "N/A"}
-                            </span>
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.comment")}:
-                            </strong>{" "}
-                            {feedback.leftEyeFeedback?.comment ||
-                              "No comment provided."}
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.diagnosis")}:
-                            </strong>{" "}
-                            {feedback.leftEyeFeedback?.diagnosis || "N/A"}
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.recommendedAction")}
-                              :
-                            </strong>{" "}
-                            {feedback.leftEyeFeedback?.recommendedAction ||
-                              "N/A"}
-                          </p>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                    ))}
-                  </Accordion>
-                </>
-              )}
+                            </p>
+                          </Accordion.Body>
+                        </Accordion.Item>
+                      ))}
+                    </Accordion>
+                  </>
+                )}
             </Card.Body>
           </Card>
 
@@ -685,12 +778,13 @@ const PatientReport = () => {
               <Button
                 onClick={() => navigate(`/DoctorCard/${Report?.patient?._id}`)}
                 variant="primary"
+                className="no-print"
               >
                 {t("reportdata.buttons.referToDoctor")}
               </Button>
             )}
 
-            <Button onClick={handleDownloadPDF} variant="danger">
+            <Button onClick={handlePrint} variant="danger" className="no-print">
               {t("reportdata.buttons.downloadReport")}
             </Button>
           </div>
