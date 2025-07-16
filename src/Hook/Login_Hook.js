@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { LoginUser } from "../Redux/actions/Useraction";
 import notify from "../Hook/useNotification";
 import { validateLogin } from "../Validations/validateSignupForm";
-export const Login_Hook = () => {
+export const Login_Hook = (t) => {
   const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
@@ -14,7 +14,7 @@ export const Login_Hook = () => {
   const HandelSubmit = async (e) => {
     e.preventDefault();
 
-    const isValid = validateLogin({ email, password });
+    const isValid = validateLogin({ email, password, t });
     if (!isValid) return;
     setLoading(true);
     setispress(true);
@@ -46,47 +46,41 @@ export const Login_Hook = () => {
         if (res.token) {
           localStorage.setItem("token", res.token);
           localStorage.setItem("user", JSON.stringify(res.data));
-          notify("logged in successfully", "success");
+          notify(t("loginHook.notifySuccess"), "success");
           setTimeout(() => {
             window.location.href = "/";
           }, 1500);
         } else if (res?.data?.message === "Invalid email or password ") {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          notify("Invalid E-mail or Password ", "warn");
+          notify(t("loginHook.notifyInvalidCredentials"), "warn");
         } else if (
           res?.data?.message ===
           "Your email is not verified. We have sent a new verification link to your email."
         ) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          notify(
-            "Your E-mail not verified. We sent new verification Link to your E-mail",
-            "warn"
-          );
+          notify(t("loginHook.notifyEmailNotVerified"), "warn");
         } else if (res?.data?.message === "Invalid email or password or role") {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          notify("Invalid email or password or role", "warn");
+          notify(t("loginHook.notifyInvalidRole"), "warn");
         } else if (
           res.data.message ===
           "Your medical license is still under review. You will be notified by email once it's verified."
         ) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          notify(
-            "Your medical license is still under review. You will be notified by email once it's verified",
-            "warn"
-          );
+          notify(t("loginHook.notifyLicenseUnderReview"), "warn");
         } else {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          // notify(,"error")
+          // notify(t("loginHook.notifyGenericError"), "error");
         }
         setLoading(true);
       }
     }
-  }, [loading]);
+  }, [loading, t]);
 
   return [
     email,

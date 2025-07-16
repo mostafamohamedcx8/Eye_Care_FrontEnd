@@ -7,7 +7,8 @@ import {
   SendPatient,
 } from "../Redux/actions/Patientaction";
 import notify from "../Hook/useNotification";
-export const Doctorpage_Hook = () => {
+
+export const Doctorpage_Hook = (t) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [keyword, setKeyword] = useState("");
@@ -62,18 +63,17 @@ export const Doctorpage_Hook = () => {
   useEffect(() => {
     if (!loading && ispress) {
       if (res?.status === 200) {
-        notify("Patient successfully sent to doctor", "success");
+        notify(t("doctorpage.notifications.success"), "success");
       } else if (res?.status === 400) {
-        notify("This patient is already assigned to this doctor", "warn");
-      } else notify("there is problem", "error");
+        notify(t("doctorpage.notifications.warn"), "warn");
+      } else notify(t("doctorpage.notifications.error"), "error");
 
-      // Reset states after response
       setispress(false);
       setTimeout(() => {
         setispress(false);
       }, 1000);
     }
-  }, [[loading]]);
+  }, [loading]);
 
   return [
     patient,

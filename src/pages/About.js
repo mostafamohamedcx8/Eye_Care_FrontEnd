@@ -4,8 +4,11 @@ import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
 import React from "react";
 import { Container, Row } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const AboutSection = () => {
+  const { t } = useTranslation();
+
   return (
     <>
       {/* Hero Section */}
@@ -14,31 +17,21 @@ const AboutSection = () => {
           <div className="overlay hero-section">
             <div className="breadcrumb">
               <Link to="/" className="breadcrumb-link">
-                Home
+                {t("about.breadcrumb_home")}
               </Link>
               <span className="separator">/</span>
-              <span className="active">About</span>
+              <span className="active">{t("about.breadcrumb_about")}</span>
             </div>
-            <h1 className="title">About Us</h1>
+            <h1 className="title">{t("about.title")}</h1>
           </div>
         </div>
       </Row>
 
       {/* Content Section */}
       <Container className="about-content text-center py-5">
-        <h2 className="section-title mb-4">Welcome to Auge.cloud Website</h2>
+        <h2 className="section-title mb-4">{t("about.section_title")}</h2>
         <p className="section-paragraph mx-auto">
-          where cutting-edge technology meets healthcare innovation. Our mission
-          is to revolutionize eye care through advanced imaging and analysis. We
-          understand the vital role that vision plays in your life, and we are
-          dedicated to ensuring that everyone has access to comprehensive eye
-          health assessments. At Auge.cloud Website, we utilize state-of-the-art
-          imaging techniques to capture detailed pictures of the eye. Our
-          sophisticated algorithms analyze these images to detect potential eye
-          diseases at their earliest stages, allowing for timely intervention
-          and treatment. Whether it's glaucoma, diabetic retinopathy, or other
-          eye conditions, our goal is to empower individuals with the knowledge
-          they need to maintain their eye health.
+          {t("about.section_paragraph")}
         </p>
       </Container>
     </>

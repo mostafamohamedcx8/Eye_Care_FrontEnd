@@ -12,8 +12,10 @@ import {
   Modal,
 } from "react-bootstrap";
 import { Signup_Hook } from "../Hook/Signup_Hook";
+import { useTranslation } from "react-i18next";
 
 const SignupSection = () => {
+  const { t } = useTranslation();
   const [
     handleShowModal,
     firstname,
@@ -51,7 +53,8 @@ const SignupSection = () => {
     onChangedsalutation,
     onChangedPassword,
     onChangeConfirmPassword,
-  ] = Signup_Hook();
+  ] = Signup_Hook(t);
+
   return (
     <>
       {/* Hero Section */}
@@ -60,12 +63,12 @@ const SignupSection = () => {
           <div className="overlay hero-section">
             <div className="breadcrumb">
               <Link to="/" className="breadcrumb-link">
-                Home
+                {t("signup.breadcrumb_home")}
               </Link>
               <span className="separator">/</span>
-              <span className="active">Registration</span>
+              <span className="active">{t("signup.breadcrumb_signup")}</span>
             </div>
-            <h1 className="title">Sign Up</h1>
+            <h1 className="title">{t("signup.title")}</h1>
           </div>
         </div>
       </Row>
@@ -75,16 +78,16 @@ const SignupSection = () => {
         className="mt-5 mb-5 p-4 border rounded shadow"
         style={{ maxWidth: "600px", backgroundColor: "#f8f9fa" }}
       >
-        <h3 className="text-center mb-4">Sign Up</h3>
+        <h3 className="text-center mb-4">{t("signup.title")}</h3>
 
         <Form onSubmit={handleShowModal}>
           <Row>
             <Col>
               <Form.Group className="mb-3">
-                <Form.Label>First Name</Form.Label>
+                <Form.Label>{t("signup.first_name")}</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Enter first name"
+                  placeholder={t("signup.first_name_placeholder")}
                   value={firstname}
                   onChange={onChangefirstname}
                 />
@@ -92,10 +95,10 @@ const SignupSection = () => {
             </Col>
             <Col>
               <Form.Group className="mb-3">
-                <Form.Label>Last Name</Form.Label>
+                <Form.Label>{t("signup.last_name")}</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Enter last name"
+                  placeholder={t("signup.last_name_placeholder")}
                   value={lastname}
                   onChange={onChangelastname}
                 />
@@ -104,14 +107,14 @@ const SignupSection = () => {
           </Row>
 
           {/* تاريخ الميلاد */}
-          <Form.Label>Date of Birth</Form.Label>
+          <Form.Label>{t("signup.date_of_birth")}</Form.Label>
           <Row className="mb-3">
             <Col>
               <Form.Select
                 value={dateOfBirthDay}
                 onChange={onChangedateOfBirthDay}
               >
-                <option>Day</option>
+                <option>{t("signup.day")}</option>
                 {Array.from({ length: 31 }, (_, i) => (
                   <option key={i + 1}>{i + 1}</option>
                 ))}
@@ -122,25 +125,14 @@ const SignupSection = () => {
                 value={dateOfBirthMonth}
                 onChange={onChangedateOfBirthMonth}
               >
-                <option>Month</option>
-                {[
-                  "January",
-                  "February",
-                  "March",
-                  "April",
-                  "May",
-                  "June",
-                  "July",
-                  "August",
-                  "September",
-                  "October",
-                  "November",
-                  "December",
-                ].map((month, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {month}
-                  </option>
-                ))}
+                <option value="">{t("signup.month")}</option>
+                {t("signup.months", { returnObjects: true }).map(
+                  (monthLabel, i) => (
+                    <option key={i} value={i + 1}>
+                      {monthLabel}
+                    </option>
+                  )
+                )}
               </Form.Select>
             </Col>
             <Col>
@@ -148,7 +140,7 @@ const SignupSection = () => {
                 value={dateOfBirthYear}
                 onChange={onChangedateOfBirthYear}
               >
-                <option>Year</option>
+                <option>{t("signup.year")}</option>
                 {Array.from({ length: 100 }, (_, i) => {
                   const year = new Date().getFullYear() - i;
                   return <option key={year}>{year}</option>;
@@ -158,58 +150,61 @@ const SignupSection = () => {
           </Row>
 
           <Form.Group className="mb-3">
-            <Form.Label>Salutation</Form.Label>
+            <Form.Label>{t("signup.salutation")}</Form.Label>
             <Form.Select value={salutation} onChange={onChangedsalutation}>
               <option value="" disabled hidden>
-                Select Salutation
+                {t("signup.salutation_placeholder")}
               </option>
-              <option value="Mr">Mr</option>
-              <option value="Mrs">Mrs</option>
-              <option value="Ms">Ms</option>
-              <option value="Mx">Mx</option>
+              {t("signup.salutations", { returnObjects: true }).map(
+                (sal, index) => (
+                  <option key={index} value={sal.value}>
+                    {sal.label}
+                  </option>
+                )
+              )}
             </Form.Select>
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Email address</Form.Label>
+            <Form.Label>{t("signup.email")}</Form.Label>
             <Form.Control
               type="email"
-              placeholder="Enter email"
+              placeholder={t("signup.email_placeholder")}
               value={email}
               onChange={onChangeEmail}
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>{t("signup.password")}</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Password"
+              placeholder={t("signup.password_placeholder")}
               value={password}
               onChange={onChangedPassword}
             />
           </Form.Group>
 
           <Form.Group className="mb-4">
-            <Form.Label>Confirm Password</Form.Label>
+            <Form.Label>{t("signup.confirm_password")}</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Confirm Password"
+              placeholder={t("signup.confirm_password_placeholder")}
               value={confirmPassword}
               onChange={onChangeConfirmPassword}
             />
           </Form.Group>
 
-          {/* العنوان */}
+          {/* Address */}
           <Form.Group className="mb-3">
-            <Form.Label>State</Form.Label>
+            <Form.Label>{t("signup.state")}</Form.Label>
             <Form.Select
               name="state"
-              value={selectedState} // لازم تربطه بالقيمة الحالية
+              value={selectedState}
               onChange={onChangedSelectedState}
             >
               <option value="" disabled>
-                Select German State
+                {t("signup.state_placeholder")}
               </option>
               {states.map((state) => (
                 <option key={state.isoCode} value={state.isoCode}>
@@ -219,53 +214,53 @@ const SignupSection = () => {
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>City</Form.Label>
+            <Form.Label>{t("signup.city")}</Form.Label>
             <Form.Select value={selectedcity} onChange={onChangedSelectedcity}>
-              <option>Select City</option>
+              <option>{t("signup.city_placeholder")}</option>
               {cities.map((city, i) => (
                 <option key={i}>{city.name}</option>
               ))}
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-4">
-            <Form.Label>Postal Code</Form.Label>
+            <Form.Label>{t("signup.postal_code")}</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter your Postal Code (12564)"
+              placeholder={t("signup.postal_code_placeholder")}
               value={postalCode}
               onChange={onChangedPostalCode}
             />
           </Form.Group>
 
           <Form.Group className="mb-4">
-            <Form.Label>Full Address</Form.Label>
+            <Form.Label>{t("signup.full_address")}</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter your address (street..)"
+              placeholder={t("signup.full_address_placeholder")}
               value={fullAddress}
               onChange={onChangedFullAddress}
             />
           </Form.Group>
 
           <Button type="submit" className="w-100 mb-2 welcome-button">
-            Sign Up
+            {t("signup.submit_button")}
           </Button>
         </Form>
         {ispress ? (
           loading ? (
             <Spinner animation="border" variant="primary" />
           ) : (
-            <h4> done </h4>
+            <h4> {t("signup.success_message")} </h4>
           )
         ) : null}
       </Container>
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Medical license Or Shop license </Modal.Title>
+          <Modal.Title>{t("signup.modal_title")} </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group>
-            <Form.Label>Medical license Or Shop license</Form.Label>
+            <Form.Label>{t("signup.modal_label")}</Form.Label>
             <Form.Control
               type="file"
               accept="image/*"
@@ -275,7 +270,7 @@ const SignupSection = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
-            Cancel
+            {t("signup.modal_cancel_button")}
           </Button>
           <Button
             variant="primary"
@@ -285,7 +280,7 @@ const SignupSection = () => {
             }}
             disabled={!imagemedicallicense} // اعمل تعطيل للزر لو مفيش صورة
           >
-            Confirm & Sign Up
+            {t("signup.modal_confirm_button")}
           </Button>
         </Modal.Footer>
       </Modal>

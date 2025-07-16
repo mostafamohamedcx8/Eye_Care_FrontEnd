@@ -1,5 +1,5 @@
 import { toast } from "react-toastify";
-
+import i18n from "i18next";
 export const notify = (msg, type) => {
   if (type === "warn") toast.warn(msg);
   else if (type === "success") toast.success(msg);
@@ -15,19 +15,19 @@ export const validatePatientForm = ({
   ethnicity,
 }) => {
   if (!firstname.trim()) {
-    notify("Name is required", "warn");
+    notify(i18n.t("patientForm.validation.nameRequired"), "warn");
     return false;
   }
   if (!lastname.trim()) {
-    notify("Name is required", "warn");
+    notify(i18n.t("patientForm.validation.nameRequired"), "warn");
     return false;
   }
   if (!salutation) {
-    notify("Gender is required", "warn");
+    notify(i18n.t("patientForm.validation.genderRequired"), "warn");
     return false;
   }
   if (!dateOfBirth) {
-    notify("Date of Birth is required", "warn");
+    notify(i18n.t("patientForm.validation.dobRequired"), "warn");
     return false;
   }
 
@@ -36,17 +36,17 @@ export const validatePatientForm = ({
   const now = new Date();
 
   if (isNaN(dob.getTime())) {
-    notify("Date of Birth is invalid", "warn");
+    notify(i18n.t("patientForm.validation.dobInvalid"), "warn");
     return false;
   }
 
   if (dob >= now) {
-    notify("Date of Birth must be in the past", "warn");
+    notify(i18n.t("patientForm.validation.dobFuture"), "warn");
     return false;
   }
 
   if (!ethnicity) {
-    notify("Ethnicity is required", "warn");
+    notify(i18n.t("patientForm.validation.ethnicityRequired"), "warn");
     return false;
   }
 

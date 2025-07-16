@@ -1,17 +1,21 @@
 import React from "react";
 import { Container, Button } from "react-bootstrap";
-
+import { useTranslation } from "react-i18next";
 const HeroSection = () => {
+  const { t } = useTranslation(); // Initialize translation hook
+
   return (
     <div className="hero-section">
       <div className="overlay">
         <Container className="text-center text-white hero-content">
-          <img src={"logo.png"} alt="Logo" className="hero-logo" />
-          <h5 className="hero-subtitle">
-            EMPOWERING OPTICIANS TO DETECT EYE ISSUES FASTER
-          </h5>
+          <img
+            src={"logo.png"}
+            alt={t("hero.logo_alt")}
+            className="hero-logo"
+          />
+          <h5 className="hero-subtitle">{t("hero.subtitle")}</h5>
           <Button href="/Signup" className="hero-button">
-            SIGN UP
+            {t("hero.sign_up")}
           </Button>
         </Container>
       </div>

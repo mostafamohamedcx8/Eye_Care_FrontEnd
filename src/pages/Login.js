@@ -4,8 +4,9 @@ import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
 import { Button, Container, Form, Row, Spinner } from "react-bootstrap";
 import { Login_Hook } from "../Hook/Login_Hook";
-
+import { useTranslation } from "react-i18next";
 const LoginSection = () => {
+  const { t } = useTranslation();
   const [
     email,
     password,
@@ -14,7 +15,7 @@ const LoginSection = () => {
     HandelSubmit,
     onChangeEmail,
     onChangePassword,
-  ] = Login_Hook();
+  ] = Login_Hook(t);
 
   return (
     <>
@@ -24,12 +25,14 @@ const LoginSection = () => {
           <div className="overlay hero-section">
             <div className="breadcrumb">
               <Link to="/" className="breadcrumb-link">
-                Home
+                {t("login.breadcrumbHome")}
               </Link>
-              <span className="separator">/</span>
-              <span className="active">Login</span>
+              <span className="separator">
+                {t("login.breadcrumbSeparator")}
+              </span>
+              <span className="active">{t("login.breadcrumbLogin")}</span>
             </div>
-            <h1 className="title">Login</h1>
+            <h1 className="title">{t("login.title")}</h1>
           </div>
         </div>
       </Row>
@@ -39,39 +42,40 @@ const LoginSection = () => {
         className="mt-5 mb-5 p-4 border rounded shadow"
         style={{ maxWidth: "600px", backgroundColor: "#f8f9fa" }}
       >
-        <h2 className="text-center mb-4">Login</h2>
+        <h2 className="text-center mb-4">{t("login.formHeading")}</h2>
         <Form onSubmit={HandelSubmit}>
           <Form.Group className="mb-3" controlId="formUsername">
-            <Form.Label>Email</Form.Label>
+            <Form.Label>{t("login.emailLabel")}</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter Email"
+              placeholder={t("login.emailPlaceholder")}
               value={email}
               onChange={onChangeEmail}
             />
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formPassword">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>{t("login.passwordLabel")}</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Enter password"
+              placeholder={t("login.passwordPlaceholder")}
               value={password}
               onChange={onChangePassword}
             />
           </Form.Group>
 
           <Button type="submit" className="w-100 mb-2 welcome-button">
-            Log In
+            {t("login.button")}
           </Button>
 
-          <div className="text-center ">
+          <div className="text-center">
             <small>
-              Forgotten password <a href="/ResetPassword">Click here</a>
+              {t("login.forgottenPassword")}{" "}
+              <a href="/ResetPassword">{t("login.clickHere")}</a>
             </small>
             <br />
             <small>
-              Don't have an account? <a href="/Signup">Sign Up</a>
+              {t("login.noAccount")} <a href="/Signup">{t("login.signUp")}</a>
             </small>
           </div>
         </Form>
@@ -79,7 +83,7 @@ const LoginSection = () => {
           loading ? (
             <Spinner animation="border" variant="primary" />
           ) : (
-            <h4> done </h4>
+            <h4>{t("login.done")} </h4>
           )
         ) : null}
       </Container>

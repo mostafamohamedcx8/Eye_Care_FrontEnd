@@ -8,7 +8,9 @@ import {
   toggleArchivePatient,
 } from "./../Redux/actions/Patientaction";
 import notify from "../Hook/useNotification";
+import { useTranslation } from "react-i18next";
 export const Allpatient_Hook = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [keyword, setKeyword] = useState("");
@@ -69,15 +71,15 @@ export const Allpatient_Hook = () => {
   useEffect(() => {
     if (loading === false) {
       if (res === "") {
-        notify("Patient deleted successfully", "success");
+        notify(t("patientTable.notifications.deleteSuccess"), "success");
         setTimeout(() => {
           window.location.reload(false);
         }, 1000);
       } else {
-        notify("There was a problem with the deletion", "error");
+        notify(t("patientTable.notifications.deleteError"), "error");
       }
     }
-  }, [loading]);
+  }, [loading, t]);
 
   const handleToggleArchive = async (patientId) => {
     try {
@@ -92,9 +94,9 @@ export const Allpatient_Hook = () => {
 
       // إظهار رسالة نجاح (اختياري)
       // يمكنك استخدام toast أو alert
-      notify("Patient archive status updated successfully!", "success");
+      notify(t("patientTable.notifications.archiveSuccess"), "success");
     } catch (error) {
-      notify("Faild updating patient archive status", "error");
+      notify(t("patientTable.notifications.archiveError"), "error");
     } finally {
       // إلغاء loading
       setArchiveLoading((prev) => ({ ...prev, [patientId]: false }));

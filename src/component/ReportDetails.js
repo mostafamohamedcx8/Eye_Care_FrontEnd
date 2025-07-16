@@ -15,10 +15,11 @@ import {
   validateMedicalHistory,
   validateRightEyeSection,
 } from "../Validations/reportValidation";
-
+import { useTranslation } from "react-i18next";
 import { ReportDetails_Hook } from "../Hook/ReportDetails_Hook";
 
 const ReportDetails = () => {
+  const { t } = useTranslation();
   const [
     patient,
     activeTab,
@@ -96,44 +97,51 @@ const ReportDetails = () => {
   return (
     <Container className="mt-5 mb-5">
       <h2 className="text-center mb-4 fw-bold button-color">
-        Create Report for Patient
+        {t("reportForm.title")}{" "}
       </h2>
       {patient && (
         <Card className="mb-4">
           <Card.Body>
-            <h5 className="text-center mb-4">Patient Information</h5>
-
+            <h5 className="text-center mb-4">
+              {t("reportForm.patientInfo.title")}
+            </h5>
             <div className="patient-data-container">
               <div className="patient-info-block">
-                <span className="patient-label">Name</span>
+                <span className="patient-label">
+                  {t("reportForm.patientInfo.labels.name")}
+                </span>
                 <span className="patient-data">
                   {patient?.data?.firstname} {patient?.data?.lastname}
                 </span>
               </div>
-
               <div className="patient-info-block">
-                <span className="patient-label">Salutation</span>
+                <span className="patient-label">
+                  {t("reportForm.patientInfo.labels.salutation")}
+                </span>
                 <span className="patient-data">
                   {patient?.data?.salutation}
                 </span>
               </div>
-
               <div className="patient-info-block">
-                <span className="patient-label">Date of Birth</span>
+                <span className="patient-label">
+                  {t("reportForm.patientInfo.labels.dateOfBirth")}
+                </span>
                 <span className="patient-data">
                   {new Date(patient?.data?.dateOfBirth).toLocaleDateString(
                     "de-DE"
                   )}
                 </span>
               </div>
-
               <div className="patient-info-block">
-                <span className="patient-label">Ethnicity</span>
+                <span className="patient-label">
+                  {t("reportForm.patientInfo.labels.ethnicity")}
+                </span>
                 <span className="patient-data">{patient?.data?.ethnicity}</span>
               </div>
-
               <div className="patient-info-block">
-                <span className="patient-label">Patient ID</span>
+                <span className="patient-label">
+                  {t("reportForm.patientInfo.labels.patientId")}
+                </span>
                 <span className="patient-data">{patient?.data?._id}</span>
               </div>
             </div>
@@ -146,13 +154,13 @@ const ReportDetails = () => {
         onSelect={handleOuterTabSelect}
         className="mb-3"
       >
-        <Tab eventKey="history" title="History">
+        <Tab eventKey="history" title={t("reportForm.tabs.history")}>
           <Tabs
             activeKey={innerTab}
             onSelect={handleInnerTabSelect}
             className="mb-3"
           >
-            <Tab eventKey="medical" title="Medical">
+            <Tab eventKey="medical" title={t("reportForm.tabs.medical")}>
               <Form>
                 {allMedicalDiseases.map((disease, index) => {
                   const existing =
@@ -161,12 +169,19 @@ const ReportDetails = () => {
                   return (
                     <Row key={index} className="mb-2 align-items-center">
                       <Col md={4}>
-                        <Form.Label>{disease}</Form.Label>
+                        <Form.Label>
+                          {t(
+                            `reportForm.medicalHistory.diseases.${disease
+                              .toLowerCase()
+                              .replace(/[\s.]/g, "")}`,
+                            { defaultValue: disease }
+                          )}
+                        </Form.Label>
                       </Col>
                       <Col>
                         <Form.Check
                           type="checkbox"
-                          label="Yes"
+                          label={t("reportForm.medicalHistory.labels.yes")}
                           checked={existing.hasCondition || false}
                           onChange={(e) =>
                             updateMedicalData(
@@ -180,7 +195,7 @@ const ReportDetails = () => {
                       <Col>
                         <Form.Check
                           type="checkbox"
-                          label="Self"
+                          label={t("reportForm.medicalHistory.labels.self")}
                           checked={existing.appliesTo === "Self"}
                           onChange={(e) =>
                             updateMedicalData(
@@ -194,7 +209,7 @@ const ReportDetails = () => {
                       <Col>
                         <Form.Check
                           type="checkbox"
-                          label="In Family"
+                          label={t("reportForm.medicalHistory.labels.inFamily")}
                           checked={existing.appliesTo === "In Family"}
                           onChange={(e) =>
                             updateMedicalData(
@@ -211,14 +226,16 @@ const ReportDetails = () => {
                 <Row className="mt-3">
                   <Col md={6}>
                     <Form.Control
-                      placeholder="Add new medical disease"
+                      placeholder={t(
+                        "reportForm.medicalHistory.placeholders.newDisease"
+                      )}
                       value={newMedicalDisease}
                       onChange={onChangeMedicalDisease}
                     />
                   </Col>
                   <Col>
                     <Button onClick={handleAddMedicalDisease}>
-                      Add Disease
+                      {t("reportForm.medicalHistory.buttons.addDisease")}
                     </Button>
                   </Col>
                 </Row>
@@ -232,12 +249,12 @@ const ReportDetails = () => {
                     }
                   }}
                 >
-                  Next
+                  {t("reportForm.medicalHistory.buttons.next")}
                 </Button>
               </Form>
             </Tab>
 
-            <Tab eventKey="eye" title="Eye">
+            <Tab eventKey="eye" title={t("reportForm.tabs.eye")}>
               <Form>
                 {eyeDiseases.map((disease, index) => {
                   const existing =
@@ -245,12 +262,19 @@ const ReportDetails = () => {
                   return (
                     <Row key={index} className="mb-2 align-items-center">
                       <Col md={4}>
-                        <Form.Label>{disease}</Form.Label>
+                        <Form.Label>
+                          {t(
+                            `reportForm.eyeHistory.diseases.${disease
+                              .toLowerCase()
+                              .replace(/[\s-]/g, "")}`,
+                            { defaultValue: disease }
+                          )}
+                        </Form.Label>
                       </Col>
                       <Col>
                         <Form.Check
                           type="checkbox"
-                          label="Yes"
+                          label={t("reportForm.eyeHistory.labels.yes")}
                           checked={existing.hasCondition || false}
                           onChange={(e) =>
                             updateEyeData(
@@ -264,7 +288,7 @@ const ReportDetails = () => {
                       <Col>
                         <Form.Check
                           type="checkbox"
-                          label="Self"
+                          label={t("reportForm.eyeHistory.labels.self")}
                           checked={existing.appliesTo === "Self"}
                           onChange={(e) =>
                             updateEyeData(
@@ -278,7 +302,7 @@ const ReportDetails = () => {
                       <Col>
                         <Form.Check
                           type="checkbox"
-                          label="In Family"
+                          label={t("reportForm.eyeHistory.labels.inFamily")}
                           checked={existing.appliesTo === "In Family"}
                           onChange={(e) =>
                             updateEyeData(
@@ -296,13 +320,17 @@ const ReportDetails = () => {
                 <Row className="mt-3">
                   <Col md={6}>
                     <Form.Control
-                      placeholder="Add new eye disease"
+                      placeholder={t(
+                        "reportForm.eyeHistory.placeholders.newDisease"
+                      )}
                       value={newEyeDisease}
                       onChange={onChangeEyeDisease}
                     />
                   </Col>
                   <Col>
-                    <Button onClick={handleAddEyeDisease}>Add Disease</Button>
+                    <Button onClick={handleAddEyeDisease}>
+                      {t("reportForm.eyeHistory.buttons.addDisease")}
+                    </Button>
                   </Col>
                 </Row>
               </Form>
@@ -318,98 +346,76 @@ const ReportDetails = () => {
                   }
                 }}
               >
-                Next
+                {t("reportForm.eyeHistory.buttons.next")}
               </Button>
             </Tab>
           </Tabs>
         </Tab>
 
-        <Tab eventKey="exam" title="Eye Examination">
+        <Tab eventKey="exam" title={t("reportForm.tabs.eyeExamination")}>
           <Tabs
             activeKey={innerTab}
             onSelect={handleInnerTabSelect}
             className="mb-3"
           >
             {/* Right Eye Card */}
-            <Tab eventKey="rightEye" title="Right Eye">
+            <Tab eventKey="rightEye" title={t("reportForm.tabs.rightEye")}>
               <Card className="mb-4">
                 <Card.Body>
-                  <h5 className="mb-3">Right Eye</h5>
+                  <h5 className="mb-3">{t("reportForm.tabs.rightEye")}</h5>
 
                   <Row>
                     <Col md={4}>
                       <Form.Group>
                         <Form.Label>
-                          Visus (CC){" "}
-                          <span className="text-muted">(Decimal)</span>
+                          {t("reportForm.eyeExamination.labels.visusCC")}{" "}
+                          <span className="text-muted">
+                            {t("reportForm.eyeExamination.labels.visusDecimal")}
+                          </span>
                         </Form.Label>
                         <Form.Select
                           value={rightVisusCC}
                           onChange={onChangeRightVisusCC}
                         >
-                          <option value="">Select Visus</option>
-                          <option>2.0 (20/10)</option>
-                          <option>1.6 (20/12)</option>
-                          <option>1.26 (20/16)</option>
-                          <option>1.0 (20/20)</option>
-                          <option>0.8 (20/25)</option>
-                          <option>0.63 (20/30)</option>
-                          <option>0.5 (20/40)</option>
-                          <option>0.4 (20/50)</option>
-                          <option>0.32 (20/60)</option>
-                          <option>0.25 (20/80)</option>
-                          <option>0.2 (20/100)</option>
-                          <option>0.16 (20/125)</option>
-                          <option>0.13 (20/160)</option>
-                          <option>0.1 (20/200)</option>
-                          <option>0.08 (20/250)</option>
-                          <option>0.063 (20/300)</option>
-                          <option>0.05 (20/400)</option>
-                          <option>0.04 (20/500)</option>
-                          <option>0.032 (20/600)</option>
-                          <option>0.025 (20/800)</option>
-                          <option>0.02 (20/1000)</option>
+                          <option value="">
+                            {t("reportForm.eyeExamination.placeholders.visus")}
+                          </option>
+                          {t("reportForm.eyeExamination.options.visus", {
+                            returnObjects: true,
+                          }).map((option, index) => (
+                            <option key={index}>{option}</option>
+                          ))}
                         </Form.Select>
                       </Form.Group>
                     </Col>
                     <Col md={4}>
                       <Form.Group>
                         <Form.Label>
-                          Previous Value{" "}
-                          <span className="text-muted">(Decimal)</span>
+                          {t("reportForm.eyeExamination.labels.previousValue")}{" "}
+                          <span className="text-muted">
+                            {t("reportForm.eyeExamination.labels.visusDecimal")}
+                          </span>
                         </Form.Label>
                         <Form.Select
                           value={rightPreviousValue}
                           onChange={onChangeRightPreviousValue}
                         >
-                          <option value="">Select Visus</option>
-                          <option>2.0 (20/10)</option>
-                          <option>1.6 (20/12)</option>
-                          <option>1.26 (20/16)</option>
-                          <option>1.0 (20/20)</option>
-                          <option>0.8 (20/25)</option>
-                          <option>0.63 (20/30)</option>
-                          <option>0.5 (20/40)</option>
-                          <option>0.4 (20/50)</option>
-                          <option>0.32 (20/60)</option>
-                          <option>0.25 (20/80)</option>
-                          <option>0.2 (20/100)</option>
-                          <option>0.16 (20/125)</option>
-                          <option>0.13 (20/160)</option>
-                          <option>0.1 (20/200)</option>
-                          <option>0.08 (20/250)</option>
-                          <option>0.063 (20/300)</option>
-                          <option>0.05 (20/400)</option>
-                          <option>0.04 (20/500)</option>
-                          <option>0.032 (20/600)</option>
-                          <option>0.025 (20/800)</option>
-                          <option>0.02 (20/1000)</option>
+                          <option value="">
+                            {t("reportForm.eyeExamination.placeholders.visus")}
+                          </option>
+                          {t("reportForm.eyeExamination.options.visus", {
+                            returnObjects: true,
+                          }).map((option, index) => (
+                            <option key={index}>{option}</option>
+                          ))}
                         </Form.Select>
                       </Form.Group>
                     </Col>
                     <Col md={4}>
                       <Form.Group>
-                        <Form.Label>Since</Form.Label>
+                        <Form.Label>
+                          {t("reportForm.eyeExamination.labels.since")}
+                        </Form.Label>
                         <Form.Control
                           type="date"
                           value={rightSince}
@@ -419,8 +425,9 @@ const ReportDetails = () => {
                     </Col>
                   </Row>
                   <div className="text-form pb-2 pt-2">
-                    {" "}
-                    Upload Images (Right Eye)
+                    {t("reportForm.eyeExamination.labels.uploadImages", {
+                      eye: t("reportForm.tabs.rightEye"),
+                    })}
                   </div>
 
                   <MultiImageInput
@@ -432,13 +439,16 @@ const ReportDetails = () => {
                     cropConfig={{ crop, ruleOfThirds: true }}
                   />
                   <Form.Text className="text-muted">
-                    Please upload high-quality images. Blurry images may affect
-                    diagnosis.
+                    {t("reportForm.eyeExamination.imageNote")}
                   </Form.Text>
                   <Row className="mt-3">
                     <Col md={4}>
                       <Form.Group>
-                        <Form.Label>Image Capture Date</Form.Label>
+                        <Form.Label>
+                          {t(
+                            "reportForm.eyeExamination.labels.imageCaptureDate"
+                          )}
+                        </Form.Label>
                         <Form.Control
                           type="date"
                           value={rightImageCaptureDate}
@@ -449,9 +459,13 @@ const ReportDetails = () => {
                   </Row>
                   <Row className="mt-3">
                     <Col md={4}>
-                      <Form.Label>Sphere</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.sphere")}
+                      </Form.Label>
                       <Form.Control
-                        placeholder="(+/- 0.0 - 25.0)"
+                        placeholder={t(
+                          "reportForm.eyeExamination.placeholders.sphere"
+                        )}
                         type="number"
                         step="0.25"
                         min="-25.0"
@@ -461,9 +475,13 @@ const ReportDetails = () => {
                       />
                     </Col>
                     <Col md={4}>
-                      <Form.Label>Cylinder</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.cylinder")}
+                      </Form.Label>
                       <Form.Control
-                        placeholder="(+/-)"
+                        placeholder={t(
+                          "reportForm.eyeExamination.placeholders.cylinder"
+                        )}
                         type="number"
                         step="0.25"
                         value={rightCylinder}
@@ -471,9 +489,13 @@ const ReportDetails = () => {
                       />
                     </Col>
                     <Col md={4}>
-                      <Form.Label>Axis</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.axis")}
+                      </Form.Label>
                       <Form.Control
-                        placeholder="Axis"
+                        placeholder={t(
+                          "reportForm.eyeExamination.placeholders.axis"
+                        )}
                         type="number"
                         min="0"
                         max="180"
@@ -485,20 +507,34 @@ const ReportDetails = () => {
 
                   <Row className="mt-3">
                     <Col>
-                      <Form.Label>Intraocular Pressure (mmHg)</Form.Label>
+                      <Form.Label>
+                        {t(
+                          "reportForm.eyeExamination.labels.intraocularPressure"
+                        )}
+                      </Form.Label>
                       <Form.Select
                         value={rightIntraocularPressure}
                         onChange={onChangeRightIntraocularPressure}
                       >
-                        <option value="">Select</option>
+                        <option value="">
+                          {t(
+                            "reportForm.eyeExamination.placeholders.intraocularPressure"
+                          )}
+                        </option>
                         {[...Array(91)].map((_, i) => (
                           <option key={i}>{i}</option>
                         ))}
-                        <option>Not Measurable</option>
+                        <option>
+                          {t(
+                            "reportForm.eyeExamination.options.intraocularPressure.notMeasurable"
+                          )}
+                        </option>
                       </Form.Select>
                     </Col>
                     <Col>
-                      <Form.Label>Corneal Thickness</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.cornealThickness")}
+                      </Form.Label>
                       <Form.Control
                         type="number"
                         value={rightCornealThickness}
@@ -506,17 +542,33 @@ const ReportDetails = () => {
                       />
                     </Col>
                     <Col>
-                      <Form.Label>Anterior Chamber Angle</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.chamberAngle")}
+                      </Form.Label>
                       <Form.Select
                         value={rightChamberAngle}
                         onChange={onChangeRightChamberAngle}
                       >
-                        <option value="">Select an option</option>
-                        <option value="Narrow">Narrow</option>
-                        <option value="Within Normal Limits">
-                          Within Normal Limits
+                        <option value="">
+                          {t(
+                            "reportForm.eyeExamination.placeholders.chamberAngle"
+                          )}
                         </option>
-                        <option value="wide">Wide</option>
+                        <option value="Narrow">
+                          {t(
+                            "reportForm.eyeExamination.options.chamberAngle.narrow"
+                          )}
+                        </option>
+                        <option value="Within Normal Limits">
+                          {t(
+                            "reportForm.eyeExamination.options.chamberAngle.normal"
+                          )}
+                        </option>
+                        <option value="wide">
+                          {t(
+                            "reportForm.eyeExamination.options.chamberAngle.wide"
+                          )}
+                        </option>
                       </Form.Select>
                     </Col>
                   </Row>
@@ -524,7 +576,9 @@ const ReportDetails = () => {
                   <Form.Check
                     className="mt-2"
                     type="checkbox"
-                    label="Amsler Test Abnormal"
+                    label={t(
+                      "reportForm.eyeExamination.labels.amslerTestAbnormal"
+                    )}
                     checked={rightAmslerTestAbnormal}
                     onChange={onChangeRightAmslerTestAbnormal}
                   />
@@ -537,91 +591,69 @@ const ReportDetails = () => {
                       setInnerTab("leftEye");
                     }}
                   >
-                    Next
+                    {t("reportForm.eyeExamination.buttons.next")}
                   </Button>
                 </Card.Body>
               </Card>
             </Tab>
             {/* Left Eye Card */}
-            <Tab eventKey="leftEye" title="Left Eye">
+            <Tab eventKey="leftEye" title={t("reportForm.tabs.leftEye")}>
               <Card className="mb-4">
                 <Card.Body>
-                  <h5 className="mb-3">Left Eye</h5>
+                  <h5 className="mb-3">{t("reportForm.tabs.leftEye")}</h5>
 
                   <Row>
                     <Col md={4}>
                       <Form.Group>
                         <Form.Label>
-                          Visus (CC){" "}
-                          <span className="text-muted">(Decimal)</span>
+                          {t("reportForm.eyeExamination.labels.visusCC")}{" "}
+                          <span className="text-muted">
+                            {t("reportForm.eyeExamination.labels.visusDecimal")}
+                          </span>
                         </Form.Label>
                         <Form.Select
                           value={leftVisusCC}
                           onChange={onChangeLeftVisusCC}
                         >
-                          <option value="">Select Visus</option>
-                          <option>2.0 (20/10)</option>
-                          <option>1.6 (20/12)</option>
-                          <option>1.26 (20/16)</option>
-                          <option>1.0 (20/20)</option>
-                          <option>0.8 (20/25)</option>
-                          <option>0.63 (20/30)</option>
-                          <option>0.5 (20/40)</option>
-                          <option>0.4 (20/50)</option>
-                          <option>0.32 (20/60)</option>
-                          <option>0.25 (20/80)</option>
-                          <option>0.2 (20/100)</option>
-                          <option>0.16 (20/125)</option>
-                          <option>0.13 (20/160)</option>
-                          <option>0.1 (20/200)</option>
-                          <option>0.08 (20/250)</option>
-                          <option>0.063 (20/300)</option>
-                          <option>0.05 (20/400)</option>
-                          <option>0.04 (20/500)</option>
-                          <option>0.032 (20/600)</option>
-                          <option>0.025 (20/800)</option>
-                          <option>0.02 (20/1000)</option>
+                          <option value="">
+                            {t("reportForm.eyeExamination.placeholders.visus")}
+                          </option>
+                          {t("reportForm.eyeExamination.options.visus", {
+                            returnObjects: true,
+                          }).map((option, index) => (
+                            <option key={index}>{option}</option>
+                          ))}
                         </Form.Select>
                       </Form.Group>
                     </Col>
                     <Col md={4}>
                       <Form.Group>
                         <Form.Label>
-                          Previous Value{" "}
-                          <span className="text-muted">(Decimal)</span>
+                          {t("reportForm.eyeExamination.labels.previousValue")}{" "}
+                          <span className="text-muted">
+                            {t("reportForm.eyeExamination.labels.visusDecimal")}
+                          </span>
                         </Form.Label>
                         <Form.Select
                           value={leftPreviousValue}
                           onChange={onChangeLeftPreviousValue}
                         >
-                          <option value="">Select Visus</option>
-                          <option>2.0 (20/10)</option>
-                          <option>1.6 (20/12)</option>
-                          <option>1.26 (20/16)</option>
-                          <option>1.0 (20/20)</option>
-                          <option>0.8 (20/25)</option>
-                          <option>0.63 (20/30)</option>
-                          <option>0.5 (20/40)</option>
-                          <option>0.4 (20/50)</option>
-                          <option>0.32 (20/60)</option>
-                          <option>0.25 (80)</option>
-                          <option>0.2 (20/100)</option>
-                          <option>0.16 (20/125)</option>
-                          <option>0.13 (20/160)</option>
-                          <option>0.1 (20/200)</option>
-                          <option>0.08 (20/250)</option>
-                          <option>0.063 (20/300)</option>
-                          <option>0.05 (20/400)</option>
-                          <option>0.04 (20/500)</option>
-                          <option>0.032 (20/600)</option>
-                          <option>0.025 (20/800)</option>
-                          <option>0.02 (20/1000)</option>
+                          <option value="">
+                            {t("reportForm.eyeExamination.placeholders.visus")}
+                          </option>
+                          {t("reportForm.eyeExamination.options.visus", {
+                            returnObjects: true,
+                          }).map((option, index) => (
+                            <option key={index}>{option}</option>
+                          ))}
                         </Form.Select>
                       </Form.Group>
                     </Col>
                     <Col md={4}>
                       <Form.Group>
-                        <Form.Label>Since</Form.Label>
+                        <Form.Label>
+                          {t("reportForm.eyeExamination.labels.since")}
+                        </Form.Label>
                         <Form.Control
                           type="date"
                           value={leftSince}
@@ -632,8 +664,11 @@ const ReportDetails = () => {
                   </Row>
 
                   <div className="text-form pb-2 pt-2">
-                    {" "}
-                    Upload Images (Left Eye)
+                    <div className="text-form pb-2 pt-2">
+                      {t("reportForm.eyeExamination.labels.uploadImages", {
+                        eye: t("reportForm.tabs.leftEye"),
+                      })}
+                    </div>
                   </div>
 
                   <MultiImageInput
@@ -644,13 +679,17 @@ const ReportDetails = () => {
                     cropConfig={{ crop, ruleOfThirds: true }}
                   />
                   <Form.Text className="text-muted">
-                    Please upload high-quality images. Blurry images may affect
+                    {t("reportForm.eyeExamination.imageNote")}
                     diagnosis.
                   </Form.Text>
                   <Row className="mt-3">
                     <Col md={4}>
                       <Form.Group>
-                        <Form.Label>Image Capture Date</Form.Label>
+                        <Form.Label>
+                          {t(
+                            "reportForm.eyeExamination.labels.imageCaptureDate"
+                          )}
+                        </Form.Label>
                         <Form.Control
                           type="date"
                           value={leftImageCaptureDate}
@@ -662,9 +701,13 @@ const ReportDetails = () => {
 
                   <Row className="mt-3">
                     <Col md={4}>
-                      <Form.Label>Sphere</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.sphere")}
+                      </Form.Label>
                       <Form.Control
-                        placeholder="(+/- 0.0 - 25.0)"
+                        placeholder={t(
+                          "reportForm.eyeExamination.placeholders.sphere"
+                        )}
                         type="number"
                         step="0.25"
                         min="-25.0"
@@ -674,9 +717,13 @@ const ReportDetails = () => {
                       />
                     </Col>
                     <Col md={4}>
-                      <Form.Label>Cylinder</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.cylinder")}
+                      </Form.Label>
                       <Form.Control
-                        placeholder="(+/-)"
+                        placeholder={t(
+                          "reportForm.eyeExamination.placeholders.cylinder"
+                        )}
                         type="number"
                         step="0.25"
                         value={leftCylinder}
@@ -684,9 +731,13 @@ const ReportDetails = () => {
                       />
                     </Col>
                     <Col md={4}>
-                      <Form.Label>Axis</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.axis")}
+                      </Form.Label>
                       <Form.Control
-                        placeholder="Axis"
+                        placeholder={t(
+                          "reportForm.eyeExamination.placeholders.axis"
+                        )}
                         type="number"
                         min="0"
                         max="180"
@@ -698,20 +749,34 @@ const ReportDetails = () => {
 
                   <Row className="mt-3">
                     <Col>
-                      <Form.Label>Intraocular Pressure (mmHg)</Form.Label>
+                      <Form.Label>
+                        {t(
+                          "reportForm.eyeExamination.labels.intraocularPressure"
+                        )}
+                      </Form.Label>
                       <Form.Select
                         value={leftIntraocularPressure}
                         onChange={onChangeLeftIntraocularPressure}
                       >
-                        <option value="">Select</option>
+                        <option value="">
+                          {t(
+                            "reportForm.eyeExamination.placeholders.intraocularPressure"
+                          )}
+                        </option>
                         {[...Array(91)].map((_, i) => (
                           <option key={i}>{i}</option>
                         ))}
-                        <option>Not Measurable</option>
+                        <option>
+                          {t(
+                            "reportForm.eyeExamination.options.intraocularPressure.notMeasurable"
+                          )}
+                        </option>
                       </Form.Select>
                     </Col>
                     <Col>
-                      <Form.Label>Corneal Thickness</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.cornealThickness")}
+                      </Form.Label>
                       <Form.Control
                         type="number"
                         value={leftCornealThickness}
@@ -719,17 +784,33 @@ const ReportDetails = () => {
                       />
                     </Col>
                     <Col>
-                      <Form.Label>Anterior Chamber Angle</Form.Label>
+                      <Form.Label>
+                        {t("reportForm.eyeExamination.labels.chamberAngle")}
+                      </Form.Label>
                       <Form.Select
                         value={leftChamberAngle}
                         onChange={onChangeLeftChamberAngle}
                       >
-                        <option value="">Select an option</option>
-                        <option value="Narrow">Narrow</option>
-                        <option value="Within Normal Limits">
-                          Within Normal Limits
+                        <option value="">
+                          {t(
+                            "reportForm.eyeExamination.placeholders.chamberAngle"
+                          )}
                         </option>
-                        <option value="wide">Wide</option>
+                        <option value="Narrow">
+                          {t(
+                            "reportForm.eyeExamination.options.chamberAngle.narrow"
+                          )}
+                        </option>
+                        <option value="Within Normal Limits">
+                          {t(
+                            "reportForm.eyeExamination.options.chamberAngle.normal"
+                          )}
+                        </option>
+                        <option value="wide">
+                          {t(
+                            "reportForm.eyeExamination.options.chamberAngle.wide"
+                          )}
+                        </option>
                       </Form.Select>
                     </Col>
                   </Row>
@@ -737,7 +818,9 @@ const ReportDetails = () => {
                   <Form.Check
                     className="mt-2"
                     type="checkbox"
-                    label="Amsler Test Abnormal"
+                    label={t(
+                      "reportForm.eyeExamination.labels.amslerTestAbnormal"
+                    )}
                     checked={leftAmslerTestAbnormal}
                     onChange={onChangeLeftAmslerTestAbnormal}
                   />
@@ -748,7 +831,7 @@ const ReportDetails = () => {
                 className="mt-2"
                 onClick={HandelSendingData}
               >
-                Save Data
+                {t("reportForm.eyeExamination.buttons.save")}
               </Button>
             </Tab>
           </Tabs>

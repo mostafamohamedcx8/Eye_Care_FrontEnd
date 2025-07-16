@@ -8,7 +8,8 @@ import {
   toggleArchivePatient,
 } from "../Redux/actions/Patientaction";
 import notify from "../Hook/useNotification";
-export const Arcivedpatient_Hook = () => {
+
+export const Arcivedpatient_Hook = (t) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [archiveLoading, setArchiveLoading] = useState({});
@@ -67,15 +68,15 @@ export const Arcivedpatient_Hook = () => {
   useEffect(() => {
     if (loading === false) {
       if (res === "") {
-        notify("Patient deleted successfully", "success");
+        notify(t("patientTable.notifications.deleteSuccess"), "success");
         setTimeout(() => {
           window.location.reload(false);
         }, 1000);
       } else {
-        notify("There was a problem with the deletion", "error");
+        notify(t("patientTable.notifications.deleteError"), "error");
       }
     }
-  }, [loading]);
+  }, [loading, t]);
   const onChangeKeyword = (e) => {
     setKeyword(e.target.value);
   };
@@ -93,9 +94,9 @@ export const Arcivedpatient_Hook = () => {
 
       // إظهار رسالة نجاح (اختياري)
       // يمكنك استخدام toast أو alert
-      notify("Patient archive status updated successfully!", "success");
+      notify(t("patientTable.notifications.archiveSuccess"), "success");
     } catch (error) {
-      notify("Faild updating patient archive status", "error");
+      notify(t("patientTable.notifications.archiveError"), "error");
     } finally {
       // إلغاء loading
       setArchiveLoading((prev) => ({ ...prev, [patientId]: false }));

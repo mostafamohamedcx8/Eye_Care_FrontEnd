@@ -1,0 +1,819 @@
+{
+  "navbar": {
+    "home": "Home",
+    "new_patient": "New Patient",
+    "archived_patients": "Archived Patients",
+    "about_us": "About Us",
+    "your_profile": "Your Profile",
+    "contact_us": "Contact Us",
+    "logout": "Logout",
+    "login": "Login",
+    "registration": "Registration",
+    "for_doctors": "For Doctors",
+    "fundus_tooltip": "Refer for doctor website",
+    "language": "Language"
+  },
+  "hero": {
+    "subtitle": "EMPOWERING OPTICIANS TO DETECT EYE ISSUES FASTER",
+    "sign_up": "SIGN UP",
+    "logo_alt": "Logo"
+  },
+  "welcome": {
+    "title": "Welcome to Auge.cloud Website",
+    "text": "We are thrilled to have you on our platform, designed specifically for Doctors and Opticians. Here, you can upload images of your patients' eyes for advanced analysis. Our system will provide you with a detailed report, including potential diagnoses and the likelihood of various conditions. Our mission is to empower you with the tools you need to deliver exceptional care to your patients. Thank you for trusting us with your practice!",
+    "learn_more": "Learn More",
+    "image_alt": "Doctor"
+  },
+  "footer": {
+    "company": "Company",
+    "about_us": "About Us",
+    "career": "Career",
+    "team": "Team",
+    "more": "More",
+    "terms_conditions": "Terms & Conditions",
+    "privacy": "Privacy",
+    "advertise": "Advertise",
+    "social_media": "Social Media"
+  },
+  "about": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_about": "About",
+    "title": "About Us",
+    "section_title": "Welcome to Auge.cloud Website",
+    "section_paragraph": "where cutting-edge technology meets healthcare innovation. Our mission is to revolutionize eye care through advanced imaging and analysis. We understand the vital role that vision plays in your life, and we are dedicated to ensuring that everyone has access to comprehensive eye health assessments. At Auge.cloud Website, we utilize state-of-the-art imaging techniques to capture detailed pictures of the eye. Our sophisticated algorithms analyze these images to detect potential eye diseases at their earliest stages, allowing for timely intervention and treatment. Whether it's glaucoma, diabetic retinopathy, or other eye conditions, our goal is to empower individuals with the knowledge they need to maintain their eye health."
+  },
+  "career": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_career": "Career",
+    "title": "Career",
+    "section_title": "Career",
+    "paragraph_1": "We are always looking for passionate professionals to join our mission of revolutionizing early eye disease detection.",
+    "paragraph_2": "If you are an experienced developer, data scientist, medical professional, or optician looking to make a difference with technology — we'd love to hear from you.",
+    "current_openings": "Current Openings:",
+    "opening_1": "Machine Learning Engineer",
+    "opening_2": "Frontend Developer (React.js)",
+    "opening_3": "Clinical Consultant (Ophthalmology)",
+    "opening_4": "Support & Customer Success",
+    "contact": "Send your CV to "
+  },
+  "advertise": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_advertise": "Advertise",
+    "title": "Advertise",
+    "section_title": "Advertise With Us",
+    "paragraph_1": "Interested in advertising with us? We offer targeted advertising opportunities for:",
+    "list_item_1": "Eye clinics",
+    "list_item_2": "Medical equipment providers",
+    "list_item_3": "Health tech companies",
+    "contact": "Contact us at "
+  },
+  "privacy": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_privacy": "Privacy",
+    "title": "Privacy",
+    "section_title": "Privacy Policy",
+    "effective_date": "Effective Date: 12.06.2025",
+    "last_updated": "Last Updated: 12.06.2025",
+    "intro_1": "We at auge.cloud ('we', 'our', 'us') are committed to protecting and respecting your privacy in accordance with the European Union General Data Protection Regulation (GDPR), the German Federal Data Protection Act (BDSG), and all applicable laws and professional confidentiality obligations in Germany related to medical data.",
+    "intro_2": "This Privacy Policy explains how we collect, use, store, and share your personal data, particularly sensitive health information, when you visit our website https://auge.cloud, use our services, or otherwise interact with us.",
+    "section_1_title": "1. Data Controller",
+    "section_1_text": "The data controller for the processing of your personal data is: auge.cloud, Email: support@augenarzt.cloud",
+    "section_2_title": "2. Categories of Data We Process",
+    "section_2_text": "We may process the following categories of personal data:",
+    "section_2_general": "General personal data:",
+    "section_2_general_list": [
+      "Name",
+      "Address",
+      "Email address",
+      "IP address and cookies"
+    ],
+    "section_2_health": "Health-related and special category data:",
+    "section_2_health_list": [
+      "Medical images (e.g., retinal scans, diagnostic images)",
+      "Medical history (if submitted by user or physician)",
+      "Diagnoses",
+      "Uploaded documents or files containing health data"
+    ],
+    "section_2_note": "This includes data voluntarily submitted by opticians, doctors, or patients, or data we generate through our diagnostic platform.",
+    "section_3_title": "3. Legal Basis for Processing",
+    "section_3_text": "In accordance with GDPR (Art. 6 & Art. 9):",
+    "section_3_list": [
+      "Consent (Art. 6(1)(a))",
+      "Contractual necessity (Art. 6(1)(b))",
+      "Legitimate interests (Art. 6(1)(f))",
+      "Medical diagnosis (Art. 9(2)(h))"
+    ],
+    "section_4_title": "4. Purpose of Data Processing",
+    "section_4_list": [
+      "Provide diagnostic services",
+      "Enable feedback by physicians",
+      "Improve services and maintain security",
+      "Fulfill legal and professional obligations"
+    ],
+    "section_5_title": "5. Data Recipients and Third-Party Access",
+    "section_5_text": "We do not share your data unless:",
+    "section_5_list": [
+      "You consent",
+      "Legally required",
+      "Needed for secure data storage under GDPR-compliant terms"
+    ],
+    "section_6_title": "6. Data Retention",
+    "section_6_list": [
+      "Health data stored for up to 10 years",
+      "Data deleted upon request (Art. 17 GDPR), unless legally required"
+    ],
+    "section_7_title": "7. Data Security",
+    "section_7_list": [
+      "HTTPS encryption",
+      "Access controls",
+      "Secure EU-based hosting",
+      "Regular audits"
+    ],
+    "section_8_title": "8. Your Rights under GDPR",
+    "section_8_list": [
+      "Access",
+      "Rectification",
+      "Erasure",
+      "Restriction",
+      "Portability",
+      "Objection"
+    ],
+    "section_8_complaint": "Right to lodge a complaint: https://www.bfdi.bund.de",
+    "section_9_title": "9. Cookies and Tracking",
+    "section_9_text": "Essential cookies only; analytics cookies used with consent. Preferences manageable via browser or banner.",
+    "section_10_title": "10. International Data Transfers",
+    "section_10_text": "No data is transferred outside the EEA unless under EU safeguards.",
+    "section_11_title": "11. Automated Decision-Making",
+    "section_11_text": "AI suggestions do not replace professional medical judgment.",
+    "section_12_title": "12. Children",
+    "section_12_text": "Not intended for users under 16 without parental consent.",
+    "section_13_title": "13. Changes to This Policy",
+    "section_13_text": "We may update this notice. Latest version is available at https://auge.cloud.",
+    "section_14_title": "14. Contact",
+    "section_14_text": "Email: support@augenarzt.cloud, Website: auge.cloud"
+  },
+  "terms": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_terms": "Terms",
+    "title": "Terms",
+    "section_title": "Terms and Conditions",
+    "effective_date": "Effective Date: 12.06.2025",
+    "last_updated": "Last Updated: 12.06.2025",
+    "intro": "Welcome to <0>auge.cloud</0> ('we', 'our', 'us'). By accessing or using our website <1>https://auge.cloud</1>, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you must not use our services.",
+    "section_1_title": "1. Scope of Services",
+    "section_1_list": [
+      "Opticians upload eye images",
+      "Doctors review and provide feedback",
+      "AI tools generate preliminary suggestions"
+    ],
+    "section_1_text": "All services are currently offered free of charge.",
+    "section_2_title": "2. No Medical Treatment or Paid Services",
+    "section_2_text": "We do not provide direct treatment or commercial services. The platform supports—but does not replace—medical expertise.",
+    "section_3_title": "3. User Eligibility and Responsibilities",
+    "section_3_list": [
+      "Only qualified opticians and doctors may use the platform",
+      "Users must upload lawful, accurate, and relevant medical data",
+      "System misuse is strictly prohibited"
+    ],
+    "section_4_title": "4. Data Protection",
+    "section_4_text": "We comply with GDPR and BDSG. Users must ensure patient consent is obtained before uploading data. See our <0>Privacy Policy</0> for full details.",
+    "section_5_title": "5. Intellectual Property",
+    "section_5_text": "All content belongs to <0>auge.cloud</0> unless otherwise noted. Users may not copy, alter, or redistribute any part without written permission.",
+    "section_6_title": "6. Limitation of Liability",
+    "section_6_list": [
+      "Accuracy of AI-generated output",
+      "Clinical decisions based on platform use",
+      "System downtime or data loss"
+    ],
+    "section_6_text": "Use is at the user’s own risk.",
+    "section_7_title": "7. Modification of Services",
+    "section_7_text": "We reserve the right to update or suspend services at any time. Changes will be announced via <0>https://auge.cloud</0>.",
+    "section_8_title": "8. Termination of Access",
+    "section_8_text": "We may suspend users who violate terms or upload harmful/illegal content.",
+    "section_9_title": "9. Governing Law and Jurisdiction",
+    "section_9_text": "German law applies. Disputes fall under German courts’ jurisdiction.",
+    "section_10_title": "10. Contact",
+    "section_10_text": "Email: <0>support@augenarzt.cloud</0><br />Website: <1>auge.cloud</1>"
+  },
+  "team": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_team": "Team",
+    "title": "Team",
+    "section_title": "Our Team",
+    "supervisory_team": "Supervisory Team",
+    "supervisor_1": "Dr. Ahmed Samir Alfaar – Chief Medical Officer",
+    "supervisor_2": "Dr. Sameh Abosamra – Chief Technology Officer",
+    "development_team": "Development Team",
+    "developer_1": "Eng. Mostafa Mohamed – Full Stack Developer, AI Integration Lead, Server Deployment & Domain Integration",
+    "developer_2": "Eng. Yasmin Ashraf – Frontend Developer (React & Redux) & UI/UX Design Support",
+    "developer_3": "Eng. Maiven Daniel – Frontend Developer (React & Redux) & UI/UX Design Support",
+    "developer_4": "Eng. Youssef Helmy – Devops & software engineer",
+    "developer_5": "Eng. Sara AbdelFattah – Backend Developer",
+    "developer_6": "Eng. Rana Alaa – Data Collection & Model Building",
+    "developer_7": "Eng. Yasmin Yasser – AI Model Building",
+    "developer_8": "Eng. Eslam Ahmed – Mobile Application Developer"
+  },
+  "signup": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_signup": "Registration",
+    "title": "Sign Up",
+    "first_name": "First Name",
+    "first_name_placeholder": "Enter first name",
+    "last_name": "Last Name",
+    "last_name_placeholder": "Enter last name",
+    "date_of_birth": "Date of Birth",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "englishMonths": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "salutation": "Salutation",
+    "salutation_placeholder": "Select Salutation",
+    "salutations": [
+      { "value": "Mr", "label": "Mr" },
+      { "value": "Mrs", "label": "Mrs" },
+      { "value": "Ms", "label": "Ms" },
+      { "value": "Mx", "label": "Mx" }
+    ],
+    "email": "Email address",
+    "email_placeholder": "Enter email",
+    "password": "Password",
+    "password_placeholder": "Password",
+    "confirm_password": "Confirm Password",
+    "confirm_password_placeholder": "Confirm Password",
+    "state": "State",
+    "state_placeholder": "Select German State",
+    "city": "City",
+    "city_placeholder": "Select City",
+    "postal_code": "Postal Code",
+    "postal_code_placeholder": "Enter your Postal Code (e.g., 12564)",
+    "full_address": "Full Address",
+    "full_address_placeholder": "Enter your address (street, etc.)",
+    "submit_button": "Sign Up",
+    "success_message": "Done",
+    "modal_title": "Medical License or Shop License",
+    "modal_label": "Upload Medical License or Shop License",
+    "modal_cancel_button": "Cancel",
+    "modal_confirm_button": "Confirm & Sign Up"
+  },
+  "login": {
+    "breadcrumbHome": "Home",
+    "breadcrumbSeparator": "/",
+    "breadcrumbLogin": "Login",
+    "title": "Login",
+    "formHeading": "Login",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter Email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter password",
+    "button": "Log In",
+    "forgottenPassword": "Forgotten password",
+    "clickHere": "Click here",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign Up",
+    "done": "done"
+  },
+  "resetPassword": {
+    "breadcrumbHome": "Home",
+    "breadcrumbSeparator": "/",
+    "breadcrumbResetPassword": "Reset Password",
+    "title": "Reset Your Password",
+    "formHeading": "Find Your Account",
+    "instructionText": "Please Enter Your E-mail To Receive OTP To Reset Your Password.",
+    "emailPlaceholder": "Email address",
+    "cancelButton": "Cancel",
+    "searchButton": "Search",
+    "done": "done",
+    "notifySuccess": "Check your Email for Reset Code",
+    "notifyError": "No user with this email"
+  },
+  "otpCode": {
+    "breadcrumbHome": "Home",
+    "breadcrumbSeparator": "/",
+    "breadcrumbResetPassword": "Reset Password",
+    "title": "Verify Your Identity",
+    "formHeading": "Enter Verification Code",
+    "instructionText": "Please enter the 6-digit code that was sent to your email address.",
+    "codePlaceholder": "Enter verification code",
+    "cancelButton": "Cancel",
+    "verifyButton": "Verify",
+    "done": "done",
+    "notifySuccess": "Reset code verified successfully",
+    "notifyError": "Invalid or expired reset code"
+  },
+  "newPassword": {
+    "breadcrumbHome": "Home",
+    "breadcrumbSeparator": "/",
+    "breadcrumbResetPassword": "Reset Password",
+    "title": "Reset Your Password",
+    "formHeading": "Create a New Password",
+    "instructionText": "Your new password must be different from the previous password.",
+    "newPasswordLabel": "New Password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmPasswordLabel": "Confirm New Password",
+    "confirmPasswordPlaceholder": "Confirm new password",
+    "resetButton": "Reset Password",
+    "done": "done",
+    "notifySuccess": "Password reset successfully",
+    "notifyErrorNotVerified": "Reset code is not verified",
+    "notifyErrorRequestNew": "Request New code"
+  },
+  "loginHook": {
+    "notifySuccess": "logged in successfully",
+    "notifyInvalidCredentials": "Invalid E-mail or Password",
+    "notifyEmailNotVerified": "Your E-mail not verified. We sent new verification Link to your E-mail",
+    "notifyInvalidRole": "Invalid email or password or role",
+    "notifyLicenseUnderReview": "Your medical license is still under review. You will be notified by email once it's verified"
+  },
+  "Signupvalidation": {
+    "notifyFirstNameRequired": "First name is required",
+    "notifyLastNameRequired": "Last name is required",
+    "notifyEmailRequired": "Email is required",
+    "notifyInvalidEmail": "Invalid email format",
+    "notifyPasswordRequired": "Password is required",
+    "notifyPasswordLength": "Password must be at least 6 characters",
+    "notifyPasswordsMismatch": "Passwords do not match",
+    "notifyDateOfBirthRequired": "Complete Date of Birth is required",
+    "notifySalutationRequired": "salutation is required",
+    "notifyStateRequired": "State is required",
+    "notifyCityRequired": "City is required",
+    "notifyPostalCodeInvalid": "Postal Code must be exactly 5 digits",
+    "notifyFullAddressRequired": "Full address is required"
+  },
+  "signuphook": {
+    "successAccountCreated": "Account created. Please check your email for the verification link.",
+    "emailExists": "Email already exists",
+    "errorOccurred": "There is a problem",
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ]
+  },
+  "patientTable": {
+    "title": "Active Patients",
+    "searchPlaceholder": "Search by name...",
+    "tableHeaders": {
+      "number": "#",
+      "name": "Name",
+      "dateOfBirth": "Date of Birth",
+      "aiReportCount": "AI Report Count",
+      "feedbackCount": "Feedback Count",
+      "tools": "Tools"
+    },
+    "loading": "Loading...",
+    "noPatients": "No patients found.",
+    "feedback": {
+      "seen": "Seen Feedbacks",
+      "unseen": "Unseen Feedbacks"
+    },
+    "modal": {
+      "title": "Confirm Deletion",
+      "body": "Are you sure you want to delete this patient?",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "notifications": {
+      "deleteSuccess": "Patient deleted successfully",
+      "deleteError": "There was a problem with the deletion",
+      "archiveSuccess": "Patient archive status updated successfully!",
+      "archiveError": "Failed updating patient archive status"
+    },
+    "archived": {
+      "title": "Archived Patients",
+      "searchPlaceholder": "Search by name...",
+      "tableHeaders": {
+        "number": "#",
+        "name": "Name",
+        "dateOfBirth": "Date of Birth",
+        "aiReportCount": "AI Report Count",
+        "feedbackCount": "Feedback Count",
+        "tools": "Tools"
+      },
+      "loading": "Loading...",
+      "noPatients": "No patients found.",
+      "feedback": {
+        "seen": "Seen Feedbacks",
+        "unseen": "Unseen Feedbacks"
+      },
+      "modal": {
+        "title": "Confirm Deletion",
+        "body": "Are you sure you want to delete this patient?",
+        "cancel": "Cancel",
+        "delete": "Delete"
+      },
+      "archiveButton": "Remove from Archive"
+    }
+  },
+  "patientForm": {
+    "title": "Create New Patient",
+    "labels": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "salutation": "Salutation",
+      "dateOfBirth": "Date of Birth",
+      "ethnicity": "Ethnicity"
+    },
+    "placeholders": {
+      "firstName": "Enter First Name",
+      "lastName": "Enter Last Name",
+      "salutation": "Select Salutation",
+      "ethnicity": "Select ethnicity"
+    },
+    "salutationOptions": {
+      "mr": "Mr",
+      "mrs": "Mrs",
+      "ms": "Ms",
+      "mx": "Mx"
+    },
+    "ethnicityOptions": {
+      "asian": {
+        "label": "Asian or Asian British",
+        "indian": "Indian",
+        "pakistani": "Pakistani",
+        "bangladeshi": "Bangladeshi",
+        "chinese": "Chinese",
+        "other": "Any other Asian background"
+      },
+      "black": {
+        "label": "Black, Black British, Caribbean or African",
+        "caribbean": "Caribbean",
+        "african": "African",
+        "other": "Any other Black, Black British, or Caribbean background"
+      },
+      "mixed": {
+        "label": "Mixed or multiple ethnic groups",
+        "whiteBlackCaribbean": "White and Black Caribbean",
+        "whiteBlackAfrican": "White and Black African",
+        "whiteAsian": "White and Asian",
+        "other": "Any other Mixed or multiple ethnic background"
+      },
+      "white": {
+        "label": "White",
+        "british": "English, Welsh, Scottish, Northern Irish or British",
+        "irish": "Irish",
+        "gypsy": "Gypsy or Irish Traveller",
+        "roma": "Roma",
+        "other": "Any other White background"
+      },
+      "other": {
+        "label": "Other ethnic group",
+        "arab": "Arab",
+        "anyOther": "Any other ethnic group"
+      }
+    },
+    "buttons": {
+      "create": "Create Patient"
+    },
+    "notifications": {
+      "createSuccess": "Patient created successfully."
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "genderRequired": "Gender is required",
+      "dobRequired": "Date of Birth is required",
+      "dobInvalid": "Date of Birth is invalid",
+      "dobFuture": "Date of Birth must be in the past",
+      "ethnicityRequired": "Ethnicity is required"
+    }
+  },
+  "reportForm": {
+    "title": "Create Report for Patient",
+    "patientInfo": {
+      "title": "Patient Information",
+      "labels": {
+        "name": "Name",
+        "salutation": "Salutation",
+        "dateOfBirth": "Date of Birth",
+        "ethnicity": "Ethnicity",
+        "patientId": "Patient ID"
+      }
+    },
+    "tabs": {
+      "history": "History",
+      "medical": "Medical",
+      "eye": "Eye",
+      "eyeExamination": "Eye Examination",
+      "rightEye": "Right Eye",
+      "leftEye": "Left Eye"
+    },
+    "medicalHistory": {
+      "diseases": {
+        "diabetes": "Diabetes M.",
+        "hypertension": "Hypertension",
+        "rheumatic": "Rheumatic diseases",
+        "thyroid": "Thyroid",
+        "tumours": "Tumours",
+        "genetic": "Genetic"
+      },
+      "placeholders": {
+        "newDisease": "Add new medical disease"
+      },
+      "labels": {
+        "yes": "Yes",
+        "self": "Self",
+        "inFamily": "In Family"
+      },
+      "buttons": {
+        "addDisease": "Add Disease",
+        "next": "Next"
+      }
+    },
+    "eyeHistory": {
+      "diseases": {
+        "cataract": "Cataract",
+        "glaucoma": "Glaucoma",
+        "macularDegeneration": "Age-related macular degeneration"
+      },
+      "placeholders": {
+        "newDisease": "Add new eye disease"
+      },
+      "labels": {
+        "yes": "Yes",
+        "self": "Self",
+        "inFamily": "In Family"
+      },
+      "buttons": {
+        "addDisease": "Add Disease",
+        "next": "Next"
+      }
+    },
+    "eyeExamination": {
+      "labels": {
+        "visusCC": "Visus (CC)",
+        "visusDecimal": "(Decimal)",
+        "previousValue": "Previous Value",
+        "since": "Since",
+        "uploadImages": "Upload Images ({eye})",
+        "imageCaptureDate": "Image Capture Date",
+        "sphere": "Sphere",
+        "cylinder": "Cylinder",
+        "axis": "Axis",
+        "intraocularPressure": "Intraocular Pressure (mmHg)",
+        "cornealThickness": "Corneal Thickness",
+        "chamberAngle": "Anterior Chamber Angle",
+        "amslerTestAbnormal": "Amsler Test Abnormal"
+      },
+      "placeholders": {
+        "visus": "Select Visus",
+        "sphere": "(+/- 0.0 - 25.0)",
+        "cylinder": "(+/-)",
+        "axis": "Axis",
+        "intraocularPressure": "Select",
+        "chamberAngle": "Select an option"
+      },
+      "options": {
+        "visus": [
+          "2.0 (20/10)",
+          "1.6 (20/12)",
+          "1.26 (20/16)",
+          "1.0 (20/20)",
+          "0.8 (20/25)",
+          "0.63 (20/30)",
+          "0.5 (20/40)",
+          "0.4 (20/50)",
+          "0.32 (20/60)",
+          "0.25 (20/80)",
+          "0.2 (20/100)",
+          "0.16 (20/125)",
+          "0.13 (20/160)",
+          "0.1 (20/200)",
+          "0.08 (20/250)",
+          "0.063 (20/300)",
+          "0.05 (20/400)",
+          "0.04 (20/500)",
+          "0.032 (20/600)",
+          "0.025 (20/800)",
+          "0.02 (20/1000)"
+        ],
+        "intraocularPressure": {
+          "notMeasurable": "Not Measurable"
+        },
+        "chamberAngle": {
+          "narrow": "Narrow",
+          "normal": "Within Normal Limits",
+          "wide": "Wide"
+        }
+      },
+      "imageNote": "Please upload high-quality images. Blurry images may affect diagnosis.",
+      "buttons": {
+        "next": "Next",
+        "save": "Save Data"
+      }
+    },
+    "notifications": {
+      "success": "done",
+      "error": "there is problem",
+      "invalidRightEyeImages": "Some right eye images are not valid image files.",
+      "invalidLeftEyeImages": "Some left eye images are not valid image files.",
+      "completeMedicalHistory": "Please complete the Medical History section before proceeding.",
+      "completeEyeHistory": "Please complete the Eye History section before proceeding.",
+      "completeRightEye": "Please complete the Right Eye section before proceeding.",
+      "completeMedicalHistorySwitch": "Please complete the Medical History section before switching.",
+      "completeRightEyeSwitch": "Please complete the Right Eye section before switching."
+    },
+    "validation": {
+      "required": "{label} is required",
+      "invalidNumber": "{label} must be a valid number",
+      "invalidDate": "{label} must be a valid date",
+      "dateInPast": "{label} must be a date in the past",
+      "diseaseSelectSelfOrFamily": "{label}: {disease} - you must select 'Self' or 'In Family'",
+      "diseaseSelectYes": "{label}: {disease} - you must select 'Yes' before choosing '{appliesTo}'",
+      "coreFieldsRequired": "Since you're starting to fill in data, you need to fill in all of the Visus, Sphere, Cylinder, and Axis.",
+      "previousAndSinceTogether": "Both 'Previous Value (Decimal)' and 'Since' must be filled together.",
+      "cornealThicknessRange": "Corneal Thickness must be a number between 350 and 700.",
+      "imageDateRequired": "Please enter 'Image Capture Date' for the uploaded images.",
+      "noImageDateWithoutImage": "You cannot enter 'Image Capture Date' without uploading an image.",
+      "imageDateNotFuture": "Image Capture Date cannot be in the future."
+    }
+  },
+  "reportdata": {
+    "title": "Patient Eye Examination Report",
+    "patientInfo": {
+      "header": "Patient Information",
+      "name": "Name",
+      "salutation": "Salutation",
+      "ethnicity": "Ethnicity",
+      "id": "ID",
+      "dateOfBirth": "Date of Birth",
+      "dateOfExamination": "Date of Examination"
+    },
+    "medicalHistory": {
+      "header": "Medical History",
+      "hasCondition": "Has Condition",
+      "appliesTo": "Applies To"
+    },
+    "eyeHistory": {
+      "header": "Eye History"
+    },
+    "rightEye": {
+      "header": "Right Eye Examination & Analysis",
+      "imageCaptureDate": "Image Capture Date",
+      "noImages": "No images available",
+      "imagePreview": "Image Preview",
+      "visusCC": "Visus (CC)",
+      "previousValue": "Previous Value",
+      "since": "Since",
+      "sphere": "Sphere",
+      "cylinder": "Cylinder",
+      "axis": "Axis",
+      "intraocularPressure": "Intraocular Pressure",
+      "cornealThickness": "Corneal Thickness",
+      "chamberAngle": "Chamber Angle",
+      "amslerTestAbnormal": "Amsler Test Abnormal",
+      "disease": "Disease",
+      "confidence": "Confidence (%)",
+      "noDiseases": "No detected diseases in the right eye.",
+      "badImageQuality": "Bad image quality - can be due to: Media Opacity due to: Corneal opacity, Cataract, vitreous opacities, vitreous hemorrhage/inflammation, tear film issues, etc. OR Optics misalignment (or insufficient pupillary dilation, focus)",
+      "noPredictionData": "No prediction data available for the right eye."
+    },
+    "leftEye": {
+      "header": "Left Eye Examination & Analysis",
+      "noDiseases": "No detected diseases in the left eye.",
+      "noPredictionData": "No prediction data available for the left eye."
+    },
+    "doctorFeedback": {
+      "header": "Doctor Feedback",
+      "predictionAccuracy": "Prediction Accuracy",
+      "comment": "Comment",
+      "diagnosis": "Diagnosis",
+      "recommendedAction": "Recommended Action",
+      "noComment": "No comment provided.",
+      "na": "N/A"
+    },
+    "buttons": {
+      "referToDoctor": "Refer To a Doctor",
+      "downloadReport": "Download Report"
+    },
+    "optician": "Optician"
+  },
+  "doctorpage": {
+    "header": {
+      "title": "Create Report for Patient"
+    },
+    "patientInfo": {
+      "title": "Patient Information",
+      "name": "Name",
+      "salutation": "Salutation",
+      "dateOfBirth": "Date of Birth",
+      "ethnicity": "Ethnicity",
+      "patientId": "Patient ID"
+    },
+    "search": {
+      "placeholder": "Search by name, State, City, Postal Code, or Specialty..."
+    },
+    "doctorCard": {
+      "city": "City",
+      "state": "State",
+      "postalCode": "Postal Code",
+      "fullAddress": "Full Address",
+      "specialty": "Specialty",
+      "sendPatientButton": "Send Patient",
+      "noDoctorsFound": "No doctors found.",
+      "loading": "Loading..."
+    },
+    "notifications": {
+      "success": "Patient successfully sent to doctor",
+      "warn": "This patient is already assigned to this doctor",
+      "error": "There is a problem"
+    }
+  },
+  "profilepage": {
+    "header": {
+      "title": "My Profile"
+    },
+    "fields": {
+      "fullName": "Full Name",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "password": "Password",
+      "address": "Address",
+      "state": "State",
+      "city": "City",
+      "fullAddress": "Full Address",
+      "changeProfileImage": "Change your profile image",
+      "selectGermanState": "Select German State",
+      "selectCity": "Select City",
+      "enterAddress": "Enter your address (street...)"
+    },
+    "buttons": {
+      "edit": "Edit",
+      "save": "Save",
+      "change": "Change",
+      "cancel": "Cancel",
+      "saveImage": "Save Image"
+    },
+    "notifications": {
+      "profileUpdatedSuccess": "Profile updated successfully",
+      "errorUpdatingProfile": "Error updating profile",
+      "fillAllPasswordFields": "Please fill all password fields",
+      "passwordsDoNotMatch": "New password and confirmation do not match",
+      "missingPassword": "Missing stored or entered password",
+      "incorrectCurrentPassword": "Current password is incorrect",
+      "passwordChangedSuccess": "Password changed successfully",
+      "passwordUpdateFailed": "Password update failed",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordsMismatch": "Passwords do not match"
+    }
+  },
+  "pagination": {
+    "next_label": "Next",
+    "previous_label": "Previous"
+  },
+  "reports": {
+    "title": "Patient Reports",
+    "no_reports": "No reports available",
+    "loading": "Loading patient report...",
+    "report_date": "Report Date: {{date}}",
+    "right_eye_visus": "Right Eye VisusCC: {{value}}",
+    "left_eye_visus": "Left Eye VisusCC: {{value}}",
+    "model_prediction": "Model Prediction ",
+    "image_quality": "Image Quality: {{status}} ({{confidence}}%)",
+    "disease_detected": "{{disease}} detected at {{confidence}}%",
+    "no_diseases": "No detected diseases.",
+    "no_prediction": "No model prediction available",
+    "view_details": "View Details",
+    "modal_title": "Confirm Deletion",
+    "modal_body": "Are you sure you want to delete this report?",
+    "modal_cancel": "Cancel",
+    "modal_delete": "Delete",
+    "success_message": "Report deleted successfully",
+    "error_message": "There was a problem with the deletion"
+  }
+}

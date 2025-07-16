@@ -10,8 +10,9 @@ import {
   Tooltip,
 } from "react-bootstrap";
 import { FaGlobe } from "react-icons/fa";
-
+import { useTranslation } from "react-i18next";
 const NavBar = () => {
+  const { t, i18n } = useTranslation();
   const [user, SetUser] = useState("");
   const [token, SetToken] = useState("");
   useEffect(() => {
@@ -29,27 +30,39 @@ const NavBar = () => {
     SetToken("");
   };
 
+  const toggleLanguage = () => {
+    const newLang = i18n.language === "en" ? "de" : "en";
+    i18n.changeLanguage(newLang);
+    localStorage.setItem("i18nextLng", newLang); // تحفظ اللغة
+  };
+
   return (
     <Navbar bg="white" expand="lg" className="shadow-sm">
       <Container>
         <Navbar.Brand href="/">
-          <img src="/logo.png" alt="Eye Care Logo" style={{ height: "40px" }} />
+          <img
+            src="/logo.png"
+            alt={t("navbar.home")}
+            style={{ height: "40px" }}
+          />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <Nav className="align-items-center">
             {user.firstname ? (
               <>
-                <Nav.Link href="/">Home</Nav.Link>
+                <Nav.Link href="/">{t("navbar.home")}</Nav.Link>
 
                 {/* ✅ عرض الروابط فقط إذا لم يكن المستخدم دكتور */}
                 {user.role !== "doctor" && (
                   <>
-                    <Nav.Link href="/PatientPage">New Patient</Nav.Link>
-                    <Nav.Link href="/ArchivedPatients">
-                      Archived Patients
+                    <Nav.Link href="/PatientPage">
+                      {t("navbar.new_patient")}
                     </Nav.Link>
-                    <Nav.Link href="about">About Us</Nav.Link>
+                    <Nav.Link href="/ArchivedPatients">
+                      {t("navbar.archived_patients")}
+                    </Nav.Link>
+                    <Nav.Link href="about">{t("navbar.about_us")}</Nav.Link>
                   </>
                 )}
 
@@ -70,29 +83,28 @@ const NavBar = () => {
                   align="end"
                 >
                   <NavDropdown.Item href="/ProfilePage">
-                    Your Profile
+                    {t("navbar.your_profile")}
                   </NavDropdown.Item>
                   <NavDropdown.Item href="mailto:support@augenarzt.cloud">
-                    Contact Us
+                    {t("navbar.contact_us")}
                   </NavDropdown.Item>
                   <NavDropdown.Divider />
                   <NavDropdown.Item onClick={logOut} href="/">
-                    Logout
+                    {t("navbar.logout")}
                   </NavDropdown.Item>
                 </NavDropdown>
               </>
             ) : (
               <>
-                <Nav.Link href="/">Home</Nav.Link>
-
-                <Nav.Link href="/about">About Us</Nav.Link>
-                <Nav.Link href="/Login">Login</Nav.Link>
-                <Nav.Link href="/Signup">Registration</Nav.Link>
+                <Nav.Link href="/">{t("navbar.home")}</Nav.Link>
+                <Nav.Link href="/about">{t("navbar.about_us")}</Nav.Link>
+                <Nav.Link href="/Login">{t("navbar.login")}</Nav.Link>
+                <Nav.Link href="/Signup">{t("navbar.registration")}</Nav.Link>
                 <OverlayTrigger
                   placement="bottom"
                   overlay={
                     <Tooltip id="fundus-tooltip">
-                      refer for doctor website
+                      {t("navbar.fundus_tooltip")}
                     </Tooltip>
                   }
                 >
@@ -101,14 +113,16 @@ const NavBar = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Refer To Doctor
+                    {t("navbar.for_doctors")}
                   </Nav.Link>
                 </OverlayTrigger>
                 <Button
                   variant="button-color"
                   className="ms-3 d-flex align-items-center gap-1 button-color"
+                  onClick={toggleLanguage}
                 >
-                  <FaGlobe /> Language
+                  <FaGlobe /> {t("navbar.language")} (
+                  {i18n.language.toUpperCase()})
                 </Button>
               </>
             )}
