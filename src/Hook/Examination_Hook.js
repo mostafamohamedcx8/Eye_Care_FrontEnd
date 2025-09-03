@@ -58,6 +58,13 @@ export const Examination_Hook = () => {
     Report?.optician?.city,
     Report?.optician?.fullAddress,
   ];
+  const Email = `${Report?.optician?.email}`;
+  const PhoneNumber = `${Report?.optician?.phoneNumber}`;
+  const defaultLogo = "/upload.png";
+
+  const LogoImage = Report?.optician?.logoimg || defaultLogo;
+
+  console.log("image", Report?.optician?.logoimg);
 
   const opticianAddress = addressParts.join(", ");
 
@@ -113,5 +120,8 @@ export const Examination_Hook = () => {
     displayBoolean,
     opticianName,
     opticianAddress,
+    Email,
+    PhoneNumber,
+    LogoImage,
   ];
 };

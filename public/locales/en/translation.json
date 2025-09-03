@@ -223,6 +223,8 @@
     "last_name": "Last Name",
     "last_name_placeholder": "Enter last name",
     "date_of_birth": "Date of Birth",
+    "phone_number": "Phone Number",
+    "phone_number_placeholder": "Enter your phone number",
     "day": "Day",
     "month": "Month",
     "year": "Year",
@@ -365,7 +367,8 @@
     "notifyStateRequired": "State is required",
     "notifyCityRequired": "City is required",
     "notifyPostalCodeInvalid": "Postal Code must be exactly 5 digits",
-    "notifyFullAddressRequired": "Full address is required"
+    "notifyFullAddressRequired": "Full address is required",
+    "notifyPhoneNumberInvalid": "Phone number must be German (+49...) or US (+1...)"
   },
   "signuphook": {
     "successAccountCreated": "Account created. Please check your email for the verification link.",
@@ -515,6 +518,7 @@
   },
   "reportForm": {
     "title": "Create Report for Patient",
+
     "patientInfo": {
       "title": "Patient Information",
       "labels": {
@@ -553,6 +557,19 @@
       "buttons": {
         "addDisease": "Add Disease",
         "next": "Next"
+      },
+      "diabetes": {
+        "sinceWhen": "Since when?",
+        "hba1cValue": "Last HbA1c value (4-15)?",
+        "hba1cDate": "Date of last HbA1c value?",
+        "treatment": "Treatment of Diabetes",
+        "selectTreatment": "-- Select Treatment --",
+        "treatments": {
+          "tablets": "Tablets",
+          "insulin": "Insulin",
+          "weeklySemaglutide": "Weekly semaglutide injections",
+          "other": "Other"
+        }
       }
     },
     "eyeHistory": {
@@ -660,7 +677,14 @@
       "cornealThicknessRange": "Corneal Thickness must be a number between 350 and 700.",
       "imageDateRequired": "Please enter 'Image Capture Date' for the uploaded images.",
       "noImageDateWithoutImage": "You cannot enter 'Image Capture Date' without uploading an image.",
-      "imageDateNotFuture": "Image Capture Date cannot be in the future."
+      "imageDateNotFuture": "Image Capture Date cannot be in the future.",
+      "sinceWhenRequired": "Please enter the date since you have had diabetes.",
+      "sinceWhenPast": "The date 'Since when' must be in the past.",
+      "hba1cValueRequired": "Please enter the HbA1c value.",
+      "hba1cValueRange": "HbA1c value must be between 4 and 15.",
+      "hba1cDateRequired": "Please enter the date of the last HbA1c value.",
+      "hba1cDatePast": "The date of last HbA1c value cannot be in the future.",
+      "invalidDiabetesTreatment": "Please select a valid treatment for diabetes."
     }
   },
   "reportdata": {
@@ -670,6 +694,8 @@
     "image_quality_bad": "Bad",
     "opticianLabel": "Optician",
     "addressLabel": "Address",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
     "commonValues": {
       "Yes": "Yes",
       "No": "No",
@@ -717,6 +743,10 @@
       "header": "Medical History",
       "hasCondition": "Has Condition",
       "appliesTo": "Applies To",
+      "sinceWhen": "Since when",
+      "hba1cValue": "Last HbA1c value",
+      "hba1cDate": "Last HbA1c date",
+      "diabetesTreatment": "Diabetes treatment",
       "values": {
         "Yes": "Yes",
         "No": "No",

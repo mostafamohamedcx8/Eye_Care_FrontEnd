@@ -223,6 +223,8 @@
     "last_name": "Nachname",
     "last_name_placeholder": "Nachname eingeben",
     "date_of_birth": "Geburtsdatum",
+    "phone_number": "Telefonnummer",
+    "phone_number_placeholder": "Geben Sie Ihre Telefonnummer ein",
     "day": "Tag",
     "month": "Monat",
     "year": "Jahr",
@@ -365,7 +367,8 @@
     "notifyStateRequired": "Bundesland ist erforderlich",
     "notifyCityRequired": "Stadt ist erforderlich",
     "notifyPostalCodeInvalid": "Postleitzahl muss genau 5 Ziffern enthalten",
-    "notifyFullAddressRequired": "Vollständige Adresse ist erforderlich"
+    "notifyFullAddressRequired": "Vollständige Adresse ist erforderlich",
+    "notifyPhoneNumberInvalid": "Telefonnummer muss deutsch (+49...) oder US (+1...) sein"
   },
   "signuphook": {
     "successAccountCreated": "Konto erstellt. Bitte überprüfen Sie Ihre E-Mails auf den Bestätigungslink.",
@@ -553,6 +556,19 @@
       "buttons": {
         "addDisease": "Erkrankung hinzufügen",
         "next": "Weiter"
+      },
+      "diabetes": {
+        "sinceWhen": "Seit wann?",
+        "hba1cValue": "Letzter HbA1c-Wert (4-15)?",
+        "hba1cDate": "Datum des letzten HbA1c-Werts?",
+        "treatment": "Behandlung von Diabetes",
+        "selectTreatment": "-- Behandlung auswählen --",
+        "treatments": {
+          "tablets": "Tabletten",
+          "insulin": "Insulin",
+          "weeklySemaglutide": "Wöchentliche Semaglutid-Injektionen",
+          "other": "Andere"
+        }
       }
     },
     "eyeHistory": {
@@ -660,7 +676,14 @@
       "cornealThicknessRange": "Hornhautdicke muss eine Zahl zwischen 350 und 700 sein.",
       "imageDateRequired": "Bitte geben Sie das 'Aufnahmedatum des Bildes' für die hochgeladenen Bilder ein.",
       "noImageDateWithoutImage": "Sie können kein 'Aufnahmedatum des Bildes' ohne das Hochladen eines Bildes eingeben.",
-      "imageDateNotFuture": "Das Aufnahmedatum des Bildes darf nicht in der Zukunft liegen."
+      "imageDateNotFuture": "Das Aufnahmedatum des Bildes darf nicht in der Zukunft liegen.",
+      "sinceWhenRequired": "Bitte geben Sie das Datum an, seit wann Sie Diabetes haben.",
+      "sinceWhenPast": "Das Datum 'Seit wann' muss in der Vergangenheit liegen.",
+      "hba1cValueRequired": "Bitte geben Sie den HbA1c-Wert ein.",
+      "hba1cValueRange": "Der HbA1c-Wert muss zwischen 4 und 15 liegen.",
+      "hba1cDateRequired": "Bitte geben Sie das Datum des letzten HbA1c-Werts ein.",
+      "hba1cDatePast": "Das Datum des letzten HbA1c-Werts darf nicht in der Zukunft liegen.",
+      "invalidDiabetesTreatment": "Bitte wählen Sie eine gültige Behandlung für Diabetes."
     }
   },
   "reportdata": {
@@ -671,6 +694,8 @@
     "opticianLabel": "Optiker",
     "addressLabel": "Adresse",
     "ethnicity": "Ethnizität",
+    "emailLabel": "E-Mail",
+    "phoneLabel": "Telefon",
     "ethnicityOptions": {
       "White and Asian": "Weiß und Asiatisch",
       "White and Black Caribbean": "Weiß und Schwarz-Karibisch",
@@ -718,6 +743,10 @@
       "header": "Medizinische Vorgeschichte",
       "hasCondition": "Hat Zustand",
       "appliesTo": "Gilt für",
+      "sinceWhen": "Seit wann",
+      "hba1cValue": "Letzter HbA1c-Wert",
+      "hba1cDate": "Letztes HbA1c-Datum",
+      "diabetesTreatment": "Diabetesbehandlung",
       "values": {
         "Yes": "Ja",
         "No": "Nein",

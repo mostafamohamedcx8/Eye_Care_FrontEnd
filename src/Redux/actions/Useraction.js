@@ -8,8 +8,10 @@ import {
   CREATE_NEW_PASSWORD,
   UPDATE_USER_PROFILE,
   UPDATELOGGEDUSERPASSWORD,
+  GETMYDATA,
 } from "../type";
 import { InsertData, InsertDataWithImage } from "../../Hooks/useInsertData";
+import { useGetDataToken } from "../../Hooks/useGetData";
 import {
   updateData,
   UpdateDataWithImage,
@@ -136,6 +138,22 @@ export const updateUserProfileData = (body) => async (dispatch) => {
   } catch (e) {
     dispatch({
       type: UPDATE_USER_PROFILE,
+      payload: e.response,
+    });
+  }
+};
+
+export const getUserData = () => async (dispatch) => {
+  try {
+    const response = await useGetDataToken(`/api/v1/user/getMe`);
+
+    dispatch({
+      type: GETMYDATA,
+      payload: response,
+    });
+  } catch (e) {
+    dispatch({
+      type: GETMYDATA,
       payload: e.response,
     });
   }

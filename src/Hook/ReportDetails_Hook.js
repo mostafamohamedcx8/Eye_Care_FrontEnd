@@ -151,6 +151,12 @@ export const ReportDetails_Hook = () => {
             name: diseaseName,
             hasCondition: field === "hasCondition" ? value : false,
             appliesTo: field === "appliesTo" ? value : null,
+            ...(diseaseName === "Diabetes M." && {
+              sinceWhen: "",
+              hba1cValue: "",
+              hba1cDate: "",
+              diabetesTreatment: "",
+            }),
           };
           eye.push(newDisease);
         }
@@ -416,6 +422,24 @@ export const ReportDetails_Hook = () => {
         `history[medical][${index}][appliesTo]`,
         condition.appliesTo
       );
+      if (condition.name === "Diabetes M." && condition.appliesTo === "Self") {
+        formData.append(
+          `history[medical][${index}][sinceWhen]`,
+          condition.sinceWhen || ""
+        );
+        formData.append(
+          `history[medical][${index}][hba1cValue]`,
+          condition.hba1cValue || ""
+        );
+        formData.append(
+          `history[medical][${index}][hba1cDate]`,
+          condition.hba1cDate || ""
+        );
+        formData.append(
+          `history[medical][${index}][diabetesTreatment]`,
+          condition.diabetesTreatment || ""
+        );
+      }
     });
 
     // Append eye history

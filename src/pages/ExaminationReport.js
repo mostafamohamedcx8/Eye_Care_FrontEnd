@@ -15,10 +15,14 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { Examination_Hook } from "../Hook/Examination_Hook";
 import { useTranslation } from "react-i18next";
+import { updateUserProfileData } from "../Redux/actions/Useraction";
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import notify from "../Hook/useNotification";
 const PatientReport = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-
+  const dispatch = useDispatch();
   const [
     reportRef,
     Report,
@@ -32,12 +36,41 @@ const PatientReport = () => {
     displayBoolean,
     opticianName,
     opticianAddress,
+    Email,
+    PhoneNumber,
+    LogoImage,
   ] = Examination_Hook();
+  const [logoPreview, setLogoPreview] = useState(LogoImage);
+  const [loading, setLoading] = useState(false);
+
+  const handleImageChange = async (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setLogoPreview(URL.createObjectURL(file)); // عرض معاينة الصورة
+      setLoading(true);
+
+      try {
+        const formData = new FormData();
+        formData.append("logoimg", file);
+
+        // إرسال الصورة تلقائيًا للباك إند
+        await dispatch(updateUserProfileData(formData));
+        notify(t("profilepage.notifications.profileUpdatedSuccess"), "success");
+        window.location.reload();
+      } catch (error) {
+        notify(t("profilepage.notifications.errorUpdatingProfile"), "error");
+        setLogoPreview("/logo.png"); // إعادة الصورة الافتراضية في حالة الخطأ
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <>
+      <Header />
+      <NavBar className="no-print" />
       <div ref={reportRef} className="report-content">
-        <Header />
-        <NavBar className="no-print" />
         <Container className="mt-5 mb-5 p-4 border rounded shadow bg-light">
           <div
             className="d-flex justify-content-between align-items-center flex-wrap"
@@ -48,7 +81,44 @@ const PatientReport = () => {
             }}
           >
             {/* Optician Info - left */}
-            <div style={{ fontSize: "0.8rem", textAlign: "left" }}>
+            {/* Left side - Logo upload */}
+            <div>
+              <label
+                htmlFor="logo-upload"
+                style={{ cursor: loading ? "not-allowed" : "pointer" }}
+              >
+                <img
+                  src={LogoImage}
+                  alt="Optician Logo"
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    border: "2px solid #ccc",
+                    opacity: loading ? 0.5 : 1, // تأثير بصري أثناء الرفع
+                  }}
+                />
+              </label>
+              <input
+                type="file"
+                id="logo-upload"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+                disabled={loading} // تعطيل الإدخال أثناء الرفع
+              />
+            </div>
+
+            {/* Center - Title */}
+            <div className="mx-auto text-center">
+              <h2 style={{ fontWeight: "bold", margin: 0 }}>
+                {t("reportdata.title")}
+              </h2>
+            </div>
+
+            {/* Right side - Optician Info */}
+            <div style={{ fontSize: "0.85rem", textAlign: "left" }}>
               <div>
                 <strong>{t("reportdata.opticianLabel")}:</strong> {opticianName}
               </div>
@@ -56,13 +126,12 @@ const PatientReport = () => {
                 <strong>{t("reportdata.addressLabel")}:</strong>{" "}
                 {opticianAddress}
               </div>
-            </div>
-
-            {/* Title - center */}
-            <div className="mx-auto text-center">
-              <h2 style={{ fontWeight: "bold", margin: 0 }}>
-                {t("reportdata.title")}
-              </h2>
+              <div>
+                <strong>{t("reportdata.emailLabel")}:</strong> {Email}
+              </div>
+              <div>
+                <strong>{t("reportdata.phoneLabel")}:</strong> {PhoneNumber}
+              </div>
             </div>
           </div>
 
@@ -120,31 +189,54 @@ const PatientReport = () => {
               <ListGroup>
                 {Report?.history?.medical?.map((disease, idx) => (
                   <ListGroup.Item key={idx}>
-                    <div className="d-flex justify-content-between">
-                      <strong>
-                        {t(`reportdata.medicalHistory.values.${disease.name}`)}
-                      </strong>
-                      <div className="ms-3">
-                        <span>
-                          <strong>
-                            {t("reportdata.medicalHistory.hasCondition")}:
-                          </strong>{" "}
+                    <div className="d-flex flex-column">
+                      <div className="d-flex justify-content-between">
+                        <strong>
                           {t(
-                            `reportdata.medicalHistory.values.${
-                              disease.hasCondition ? "Yes" : "No"
-                            }`
+                            `reportdata.medicalHistory.values.${disease.name}`
                           )}
-                        </span>
-                        <span className="ms-3">
-                          <strong>
-                            {" "}
-                            {t("reportdata.medicalHistory.appliesTo")}:
-                          </strong>{" "}
-                          {t(
-                            `reportdata.medicalHistory.values.${disease.appliesTo}`
-                          )}
-                        </span>
+                        </strong>
+                        <div className="ms-3">
+                          <span>
+                            <strong>
+                              {t("reportdata.medicalHistory.hasCondition")}:
+                            </strong>{" "}
+                            {t(
+                              `reportdata.medicalHistory.values.${
+                                disease.hasCondition ? "Yes" : "No"
+                              }`
+                            )}
+                          </span>
+                          <span className="ms-3">
+                            <strong>
+                              {t("reportdata.medicalHistory.appliesTo")}:
+                            </strong>{" "}
+                            {t(
+                              `reportdata.medicalHistory.values.${disease.appliesTo}`
+                            )}
+                          </span>
+                        </div>
                       </div>
+
+                      {/* ✅ عرض التفاصيل الإضافية لو المرض هو Diabetes M. */}
+                      {disease.name === "Diabetes M." && (
+                        <div className="d-flex flex-wrap mt-2">
+                          <span className="me-3">
+                            <strong>Since When:</strong> {disease.sinceWhen}
+                          </span>
+                          <span className="me-3">
+                            <strong>HbA1c Date:</strong>{" "}
+                            {new Date(disease.hba1cDate).toLocaleDateString()}
+                          </span>
+                          <span className="me-3">
+                            <strong>HbA1c Value:</strong> {disease.hba1cValue}
+                          </span>
+                          <span className="me-3">
+                            <strong>Treatment:</strong>{" "}
+                            {disease.diabetesTreatment}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </ListGroup.Item>
                 ))}
@@ -795,9 +887,8 @@ const PatientReport = () => {
             </span>
           </div>
         </Container>
-
-        <Footer />
       </div>
+      <Footer />
     </>
   );
 };

@@ -11,7 +11,10 @@ import {
 } from "react-bootstrap";
 import { FaGlobe } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserData } from "../Redux/actions/Useraction";
 const NavBar = () => {
+  const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
   const [user, SetUser] = useState("");
   const [token, SetToken] = useState("");
@@ -22,6 +25,11 @@ const NavBar = () => {
       SetToken(token);
     }
   }, []); // يتم التنفيذ مرة واحدة فقط عند تحميل الكومبوننت
+  useEffect(() => {
+    dispatch(getUserData());
+  }, []);
+  const MYData = useSelector((state) => state.alluser.mydata);
+  const userimage = MYData?.data?.imageProfile;
 
   const logOut = () => {
     localStorage.removeItem("user");
@@ -69,9 +77,7 @@ const NavBar = () => {
                 <NavDropdown
                   title={
                     <Image
-                      src={
-                        user?.imageProfile ? user?.imageProfile : "/profile.jpg"
-                      }
+                      src={userimage || "/profile.jpg"}
                       roundedCircle
                       width="40"
                       height="40"

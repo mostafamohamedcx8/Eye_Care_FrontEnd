@@ -32,6 +32,8 @@ export const Signup_Hook = (t) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [countryCode, setCountryCode] = useState("+49");
   const [dateOfBirthDay, setDateOfBirthDay] = useState("");
   const [dateOfBirthMonth, setDateOfBirthMonth] = useState("");
   const [dateOfBirthYear, setDateOfBirthYear] = useState("");
@@ -41,6 +43,7 @@ export const Signup_Hook = (t) => {
   const [loading, setloading] = useState(true);
   const [ispress, setispress] = useState(false);
   const User = useSelector((state) => state.alluser.User);
+  const fullPhoneNumber = countryCode + phoneNumber;
 
   const resetFormFields = () => {
     setFirstname("");
@@ -48,6 +51,7 @@ export const Signup_Hook = (t) => {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
+    setPhoneNumber("");
     setsalutation("");
     setDateOfBirthDay("Day");
     setDateOfBirthMonth("Month");
@@ -68,6 +72,8 @@ export const Signup_Hook = (t) => {
       email,
       password,
       passwordConfirm: confirmPassword,
+      phoneNumber,
+      countryCode,
       dateOfBirthDay,
       dateOfBirthMonth,
       dateOfBirthYear,
@@ -91,6 +97,7 @@ export const Signup_Hook = (t) => {
     e.persist();
     setLastname(e.target.value);
   };
+
   const onChangedateOfBirthDay = (e) => {
     e.persist();
     setDateOfBirthDay(e.target.value);
@@ -118,6 +125,14 @@ export const Signup_Hook = (t) => {
   const onChangeConfirmPassword = (e) => {
     e.persist();
     setConfirmPassword(e.target.value);
+  };
+  const onChangePhoneNumber = (e) => {
+    e.persist();
+    setPhoneNumber(e.target.value);
+  };
+  const onChangeCountryCode = (e) => {
+    e.persist();
+    setCountryCode(e.target.value);
   };
   const onChangedSelectedState = (e) => {
     e.persist();
@@ -157,6 +172,7 @@ export const Signup_Hook = (t) => {
     formData.append("email", email);
     formData.append("password", password);
     formData.append("passwordConfirm", confirmPassword);
+    formData.append("phoneNumber", fullPhoneNumber);
     formData.append("salutation", salutation);
     formData.append("state", stateName);
     formData.append("city", selectedcity);
@@ -175,6 +191,8 @@ export const Signup_Hook = (t) => {
       email,
       password,
       passwordConfirm: confirmPassword,
+      phoneNumber,
+      countryCode,
       dateOfBirthDay,
       dateOfBirthMonth,
       dateOfBirthYear,
@@ -251,5 +269,9 @@ export const Signup_Hook = (t) => {
     onChangedsalutation,
     onChangedPassword,
     onChangeConfirmPassword,
+    onChangePhoneNumber,
+    phoneNumber,
+    onChangeCountryCode,
+    countryCode,
   ];
 };
