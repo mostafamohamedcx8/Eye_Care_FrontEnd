@@ -1,4 +1,5 @@
 import MultiImageInput from "react-multiple-image-input";
+import Barcode from "react-barcode";
 import {
   Container,
   Tabs,
@@ -111,7 +112,13 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.name")}
                 </span>
                 <span className="patient-data">
-                  {patient?.data?.firstname} {patient?.data?.lastname}
+                  {patient?.data?.firstname || patient?.data?.lastname ? (
+                    `${patient?.data?.firstname || ""} ${
+                      patient?.data?.lastname || ""
+                    }`
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
                 </span>
               </div>
               <div className="patient-info-block">
@@ -119,7 +126,11 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.salutation")}
                 </span>
                 <span className="patient-data">
-                  {patient?.data?.salutation}
+                  {patient?.data?.salutation ? (
+                    patient.data.salutation
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
                 </span>
               </div>
               <div className="patient-info-block">
@@ -127,8 +138,12 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.dateOfBirth")}
                 </span>
                 <span className="patient-data">
-                  {new Date(patient?.data?.dateOfBirth).toLocaleDateString(
-                    "de-DE"
+                  {patient?.data?.dateOfBirth ? (
+                    new Date(patient.data.dateOfBirth).toLocaleDateString(
+                      "de-DE"
+                    )
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
                   )}
                 </span>
               </div>
@@ -136,13 +151,37 @@ const ReportDetails = () => {
                 <span className="patient-label">
                   {t("reportForm.patientInfo.labels.ethnicity")}
                 </span>
-                <span className="patient-data">{patient?.data?.ethnicity}</span>
+                <span className="patient-data">
+                  {patient?.data?.ethnicity ? (
+                    patient.data.ethnicity
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
+                </span>
               </div>
               <div className="patient-info-block">
                 <span className="patient-label">
                   {t("reportForm.patientInfo.labels.patientId")}
                 </span>
-                <span className="patient-data">{patient?.data?._id}</span>
+                <span
+                  className="patient-data"
+                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                >
+                  {patient?.data?.patientId ? (
+                    <>
+                      <div style={{ marginTop: "10px" }}>
+                        <Barcode
+                          value={patient.data.patientId.toString()}
+                          height={50}
+                          width={2}
+                          fontSize={14}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
+                </span>
               </div>
             </div>
           </Card.Body>

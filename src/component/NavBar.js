@@ -8,13 +8,23 @@ import {
   NavDropdown,
   OverlayTrigger,
   Tooltip,
+  Dropdown,
+  Badge,
 } from "react-bootstrap";
 import { FaGlobe } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData } from "../Redux/actions/Useraction";
+import {
+  getmynotification,
+  MarkNotifyRead,
+} from "../Redux/actions/Reportaction";
+import { Bell } from "react-bootstrap-icons";
+import { useNavigate } from "react-router-dom";
+
 const NavBar = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [user, SetUser] = useState("");
   const [token, SetToken] = useState("");
@@ -30,6 +40,14 @@ const NavBar = () => {
   }, []);
   const MYData = useSelector((state) => state.alluser.mydata);
   const userimage = MYData?.data?.imageProfile;
+  useEffect(() => {
+    dispatch(getmynotification());
+  }, [dispatch]);
+
+  const MYNotify = useSelector((state) => state.allreport.notify?.data || []);
+  console.log("notify", MYNotify);
+  const unreadCount = MYNotify.filter((n) => !n.read).length;
+  console.log(unreadCount);
 
   const logOut = () => {
     localStorage.removeItem("user");
@@ -43,7 +61,15 @@ const NavBar = () => {
     i18n.changeLanguage(newLang);
     localStorage.setItem("i18nextLng", newLang); // تحفظ اللغة
   };
+  const handleNotificationClick = (notif) => {
+    dispatch(MarkNotifyRead(notif._id));
+    // navigate لصفحة التقرير
 
+    navigate(`/ExaminationReport/${notif.report._id}`);
+
+    // هنا هتزود بعدين dispatch لماركاز ريد
+    // dispatch(markNotificationAsRead(notif._id));
+  };
   return (
     <Navbar bg="white" expand="lg" className="shadow-sm">
       <Container>
@@ -70,7 +96,65 @@ const NavBar = () => {
                     <Nav.Link href="/ArchivedPatients">
                       {t("navbar.archived_patients")}
                     </Nav.Link>
-                    <Nav.Link href="about">{t("navbar.about_us")}</Nav.Link>
+                    <Dropdown align="end">
+                      <Dropdown.Toggle
+                        as="div"
+                        className="no-caret"
+                        style={{ cursor: "pointer", position: "relative" }}
+                      >
+                        <Bell size={22} />
+                        {unreadCount > 0 && (
+                          <Badge
+                            bg="danger"
+                            pill
+                            style={{
+                              position: "absolute",
+                              top: "-5px",
+                              right: "-10px",
+                              fontSize: "0.75rem",
+                            }}
+                          >
+                            {unreadCount}
+                          </Badge>
+                        )}
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu
+                        style={{
+                          minWidth: "320px",
+                          maxHeight: "600px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        <Dropdown.Header>Notifications</Dropdown.Header>
+                        {MYNotify.length > 0 ? (
+                          MYNotify.map((notif, index) => (
+                            <>
+                              <Dropdown.Item
+                                onClick={() => handleNotificationClick(notif)}
+                                className={
+                                  !notif.read
+                                    ? "fw-bold text-dark"
+                                    : "text-muted"
+                                }
+                                style={{ cursor: "pointer" }}
+                              >
+                                {notif.message}
+                              </Dropdown.Item>
+
+                              {/* Divider بين النوتيفيشنات */}
+                              {index < MYNotify.length - 1 && (
+                                <hr
+                                  style={{ margin: "0.25rem 0", opacity: 0.3 }}
+                                />
+                              )}
+                            </>
+                          ))
+                        ) : (
+                          <Dropdown.Item>No notifications</Dropdown.Item>
+                        )}
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </>
                 )}
 
@@ -91,6 +175,9 @@ const NavBar = () => {
                   <NavDropdown.Item href="/ProfilePage">
                     {t("navbar.your_profile")}
                   </NavDropdown.Item>
+                  <NavDropdown.Item href="about">
+                    {t("navbar.about_us")}
+                  </NavDropdown.Item>
                   <NavDropdown.Item href="mailto:support@augenarzt.cloud">
                     {t("navbar.contact_us")}
                   </NavDropdown.Item>
@@ -99,6 +186,14 @@ const NavBar = () => {
                     {t("navbar.logout")}
                   </NavDropdown.Item>
                 </NavDropdown>
+                <Button
+                  variant="button-color"
+                  className="ms-3 d-flex align-items-center gap-1 button-color"
+                  onClick={toggleLanguage}
+                >
+                  <FaGlobe /> {t("navbar.language")} (
+                  {i18n.language.toUpperCase()})
+                </Button>
               </>
             ) : (
               <>

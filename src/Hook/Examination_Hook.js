@@ -16,8 +16,10 @@ export const Examination_Hook = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    dispatch(getSpecificReport(id));
-  }, []);
+    if (id) {
+      dispatch(getSpecificReport(id));
+    }
+  }, [dispatch, id]);
 
   const ReportData = useSelector((state) => state.allreport.specificreport);
   // Add optional chaining for safety

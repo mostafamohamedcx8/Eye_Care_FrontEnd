@@ -44,26 +44,7 @@ const Footer = () => {
               </li>
             </ul>
           </Col>
-          <Col md={4}>
-            <h5 className="no-print">{t("footer.social_media")}</h5>
-            <div className="social-icons no-print">
-              <a href="#">
-                <FaFacebookF />
-              </a>
-              <a href="#">
-                <FaTwitter />
-              </a>
-              <a href="#">
-                <FaGooglePlusG />
-              </a>
-              <a href="#">
-                <FaInstagram />
-              </a>
-              <a href="#">
-                <FaLinkedinIn />
-              </a>
-            </div>
-          </Col>
+          <Col md={4}></Col>
         </Row>
       </Container>
     </div>

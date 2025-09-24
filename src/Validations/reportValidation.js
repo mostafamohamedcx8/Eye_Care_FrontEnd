@@ -79,11 +79,8 @@ const validateDiseaseHistory = (list, label) => {
       item.hasCondition &&
       item.appliesTo === "Self"
     ) {
-      // 1- sinceWhen
-      if (!item.sinceWhen) {
-        notify(t("reportForm.validation.sinceWhenRequired"));
-        return false;
-      } else {
+      // 1- sinceWhen (optional)
+      if (item.sinceWhen) {
         const sinceDate = new Date(item.sinceWhen);
         const today = new Date();
         if (sinceDate >= today) {
@@ -92,20 +89,16 @@ const validateDiseaseHistory = (list, label) => {
         }
       }
 
-      // 2- hba1cValue
-      if (item.hba1cValue === undefined || item.hba1cValue === "") {
-        notify(t("reportForm.validation.hba1cValueRequired"));
-        return false;
-      } else if (item.hba1cValue < 4 || item.hba1cValue > 15) {
-        notify(t("reportForm.validation.hba1cValueRange"));
-        return false;
+      // 2- hba1cValue (optional)
+      if (item.hba1cValue !== undefined && item.hba1cValue !== "") {
+        if (item.hba1cValue < 4 || item.hba1cValue > 15) {
+          notify(t("reportForm.validation.hba1cValueRange"));
+          return false;
+        }
       }
 
-      // 3- hba1cDate
-      if (!item.hba1cDate) {
-        notify(t("reportForm.validation.hba1cDateRequired"));
-        return false;
-      } else {
+      // 3- hba1cDate (optional)
+      if (item.hba1cDate) {
         const hba1cDate = new Date(item.hba1cDate);
         const today = new Date();
         if (hba1cDate > today) {
@@ -114,7 +107,7 @@ const validateDiseaseHistory = (list, label) => {
         }
       }
 
-      // 4- diabetesTreatment
+      // 4- diabetesTreatment (optional but must be valid if provided)
       const allowedTreatments = [
         "tablets",
         "insulin",
@@ -122,7 +115,10 @@ const validateDiseaseHistory = (list, label) => {
         "other",
         "",
       ];
-      if (!allowedTreatments.includes(item.diabetesTreatment)) {
+      if (
+        item.diabetesTreatment &&
+        !allowedTreatments.includes(item.diabetesTreatment)
+      ) {
         notify(t("reportForm.validation.invalidDiabetesTreatment"));
         return false;
       }

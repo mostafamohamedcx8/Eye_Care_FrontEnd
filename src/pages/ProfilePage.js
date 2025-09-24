@@ -451,7 +451,7 @@ const ProfilePage = () => {
           {/* Profile Image */}
           <Col md={4} className="text-center">
             <img
-              src={userimage}
+              src={userimage || "/profile.jpg"}
               alt="Profile"
               className="rounded-circle mb-3"
               style={{ width: "120px", height: "120px", objectFit: "cover" }}

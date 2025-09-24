@@ -82,6 +82,7 @@ export const Signup_Hook = (t) => {
       state: selectedState,
       city: selectedcity,
       fullAddress,
+
       t,
     });
 

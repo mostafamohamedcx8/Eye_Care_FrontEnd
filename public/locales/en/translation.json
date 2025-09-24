@@ -747,6 +747,12 @@
       "hba1cValue": "Last HbA1c value",
       "hba1cDate": "Last HbA1c date",
       "diabetesTreatment": "Diabetes treatment",
+      "diabetes": {
+        "sinceWhen": "Since When",
+        "hba1cDate": "HbA1c Date",
+        "hba1cValue": "HbA1c Value",
+        "treatment": "Treatment"
+      },
       "values": {
         "Yes": "Yes",
         "No": "No",

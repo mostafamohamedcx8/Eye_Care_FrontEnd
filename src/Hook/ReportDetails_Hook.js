@@ -462,6 +462,7 @@ export const ReportDetails_Hook = () => {
 
     setloading(true);
     setispress(true);
+
     const res = await dispatch(CreateReport(formData, id));
 
     console.log("Response:", res);
@@ -472,7 +473,7 @@ export const ReportDetails_Hook = () => {
     if (loading === false && Report) {
       setispress(false);
       if (Report?.status === 201) {
-        Navigate(`/ExaminationReport/${Report?.data?.data?._id}`);
+        Navigate(`/`);
         // resetFormFields();
         notify("done", "success");
       } else {

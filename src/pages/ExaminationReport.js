@@ -7,7 +7,10 @@ import {
   Button,
   Accordion,
   Modal,
+  Badge,
 } from "react-bootstrap";
+import Barcode from "react-barcode";
+import { Fire } from "react-bootstrap-icons";
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
@@ -42,6 +45,7 @@ const PatientReport = () => {
   ] = Examination_Hook();
   const [logoPreview, setLogoPreview] = useState(LogoImage);
   const [loading, setLoading] = useState(false);
+  const [selectedHeatmap, setSelectedHeatmap] = useState(null);
 
   const handleImageChange = async (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -70,8 +74,11 @@ const PatientReport = () => {
     <>
       <Header />
       <NavBar className="no-print" />
-      <div ref={reportRef} className="report-content">
-        <Container className="mt-5 mb-5 p-4 border rounded shadow bg-light">
+      <div>
+        <Container
+          ref={reportRef}
+          className="report-content mt-5 mb-5 p-4 border rounded shadow bg-light"
+        >
           <div
             className="d-flex justify-content-between align-items-center flex-wrap"
             style={{
@@ -143,31 +150,52 @@ const PatientReport = () => {
             <Card.Body>
               <Row>
                 {/* Right Column */}
-                <Col md={6}>
+                <Col md={4}>
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.name")}:</strong>{" "}
-                    {Report?.patient?.firstname} {Report?.patient?.lastname}
+                    {Report?.patient?.firstname || Report?.patient?.lastname ? (
+                      <>
+                        {Report?.patient?.firstname || (
+                          <span style={{ color: "red" }}>---</span>
+                        )}{" "}
+                        {Report?.patient?.lastname || (
+                          <span style={{ color: "red" }}>---</span>
+                        )}
+                      </>
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
                   </div>
+
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.salutation")}:</strong>{" "}
-                    {t(`reportdata.salutations.${Report?.patient?.salutation}`)}
+                    {Report?.patient?.salutation ? (
+                      t(`reportdata.salutations.${Report?.patient?.salutation}`)
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
                   </div>
+
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.ethnicity")}:</strong>{" "}
-                    {t(
-                      `reportdata.ethnicityOptions.${Report?.patient?.ethnicity}`
+                    {Report?.patient?.ethnicity ? (
+                      t(
+                        `reportdata.ethnicityOptions.${Report?.patient?.ethnicity}`
+                      )
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
                     )}
                   </div>
                 </Col>
                 {/* Left Column */}
-                <Col md={6}>
-                  <div className="mb-2">
-                    <strong>{t("reportdata.patientInfo.id")}:</strong>{" "}
-                    {Report?.patient?._id}
-                  </div>
+                <Col md={4}>
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.dateOfBirth")}:</strong>{" "}
-                    {displayDate(Report?.patient?.dateOfBirth)}
+                    {Report?.patient?.dateOfBirth ? (
+                      displayDate(Report.patient.dateOfBirth)
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
                   </div>
                   <div className="mb-2">
                     <strong>
@@ -176,12 +204,27 @@ const PatientReport = () => {
                     {displayDate(Report?.createdAt)}
                   </div>
                 </Col>
+                <Col
+                  md={4}
+                  className="d-flex align-items-center justify-content-center"
+                >
+                  {Report?.patient?.patientId ? (
+                    <Barcode
+                      value={Report.patient.patientId.toString()}
+                      height={60}
+                      width={2}
+                      fontSize={14}
+                    />
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
+                </Col>
               </Row>
             </Card.Body>
           </Card>
 
           {/* Medical History */}
-          <Card className="mb-4">
+          <Card className="avoid-break mb-4 ">
             <Card.Header className="custom-card-header">
               {t("reportdata.medicalHistory.header")}
             </Card.Header>
@@ -193,7 +236,10 @@ const PatientReport = () => {
                       <div className="d-flex justify-content-between">
                         <strong>
                           {t(
-                            `reportdata.medicalHistory.values.${disease.name}`
+                            `reportdata.medicalHistory.values.${disease.name}`,
+                            {
+                              defaultValue: disease.name,
+                            }
                           )}
                         </strong>
                         <div className="ms-3">
@@ -222,18 +268,61 @@ const PatientReport = () => {
                       {disease.name === "Diabetes M." && (
                         <div className="d-flex flex-wrap mt-2">
                           <span className="me-3">
-                            <strong>Since When:</strong> {disease.sinceWhen}
+                            <strong>
+                              {t(
+                                "reportdata.medicalHistory.diabetes.sinceWhen"
+                              )}
+                              :
+                            </strong>{" "}
+                            {disease.sinceWhen ? (
+                              disease.sinceWhen
+                            ) : (
+                              <span style={{ color: "red" }}>---</span>
+                            )}
                           </span>
+
                           <span className="me-3">
-                            <strong>HbA1c Date:</strong>{" "}
-                            {new Date(disease.hba1cDate).toLocaleDateString()}
+                            <strong>
+                              {t(
+                                "reportdata.medicalHistory.diabetes.hba1cDate"
+                              )}
+                              :
+                            </strong>{" "}
+                            {disease.hba1cDate ? (
+                              new Date(disease.hba1cDate).toLocaleDateString(
+                                "de-DE"
+                              )
+                            ) : (
+                              <span style={{ color: "red" }}>---</span>
+                            )}
                           </span>
+
                           <span className="me-3">
-                            <strong>HbA1c Value:</strong> {disease.hba1cValue}
+                            <strong>
+                              {t(
+                                "reportdata.medicalHistory.diabetes.hba1cValue"
+                              )}
+                              :
+                            </strong>{" "}
+                            {disease.hba1cValue ? (
+                              disease.hba1cValue
+                            ) : (
+                              <span style={{ color: "red" }}>---</span>
+                            )}
                           </span>
+
                           <span className="me-3">
-                            <strong>Treatment:</strong>{" "}
-                            {disease.diabetesTreatment}
+                            <strong>
+                              {t(
+                                "reportdata.medicalHistory.diabetes.treatment"
+                              )}
+                              :
+                            </strong>{" "}
+                            {disease.diabetesTreatment ? (
+                              disease.diabetesTreatment
+                            ) : (
+                              <span style={{ color: "red" }}>---</span>
+                            )}
                           </span>
                         </div>
                       )}
@@ -245,7 +334,7 @@ const PatientReport = () => {
           </Card>
 
           {/* Eye Diseases */}
-          <Card className="mb-4">
+          <Card className="avoid-break mb-4">
             <Card.Header className="custom-card-header">
               {t("reportdata.eyeHistory.header")}
             </Card.Header>
@@ -255,7 +344,9 @@ const PatientReport = () => {
                   <ListGroup.Item key={idx}>
                     <div className="d-flex justify-content-between">
                       <strong>
-                        {t(`reportdata.medicalHistory.values.${disease.name}`)}
+                        {t(`reportdata.medicalHistory.values.${disease.name}`, {
+                          defaultValue: disease.name,
+                        })}
                       </strong>
 
                       <div className="ms-3">
@@ -285,7 +376,7 @@ const PatientReport = () => {
             </Card.Body>
           </Card>
 
-          <Card className="mb-4">
+          <Card className="avoid-break mb-4">
             <Card.Header className="custom-card-header">
               {t("reportdata.rightEye.header")}
             </Card.Header>
@@ -304,60 +395,121 @@ const PatientReport = () => {
                 )}
               </div>
 
-              {Report?.eyeExamination?.rightEye?.images?.length > 0 ? (
-                <div className="d-flex flex-wrap gap-3 mb-4">
-                  {Report.eyeExamination.rightEye.images.map((link, idx) => (
-                    <div
-                      key={idx}
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setSelectedImage(link)}
-                    >
-                      <img
-                        src={link}
-                        crossOrigin="anonymous"
-                        loading="lazy"
-                        alt={`${t("reportdata.rightEye.header")} Image ${
-                          idx + 1
-                        }`}
-                        style={{
-                          width: "100%", // أو ممكن تستخدم "auto"
-                          height: "auto",
-                          borderRadius: "8px",
-                          border: "1px solid #ccc",
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p>{t("reportdata.rightEye.noImages")}</p>
-              )}
+              <>
+                {Report?.eyeExamination?.rightEye?.images?.length > 0 ? (
+                  <div className="d-flex flex-wrap gap-3 mb-4">
+                    {Report.eyeExamination.rightEye.images.map((link, idx) => {
+                      // parse modelResults.rightEye JSON string
+                      let rightEyeResults = null;
+                      try {
+                        rightEyeResults = JSON.parse(
+                          Report.modelResults?.rightEye || "{}"
+                        );
+                      } catch (err) {
+                        console.error(
+                          "Invalid JSON in modelResults.rightEye:",
+                          err
+                        );
+                      }
 
-              {/* Modal for showing full image */}
-              <Modal
-                show={!!selectedImage}
-                onHide={() => setSelectedImage(null)}
-                centered
-                size="lg"
-              >
-                <Modal.Header closeButton>
-                  <Modal.Title>
-                    {t("reportdata.rightEye.imagePreview")}
-                  </Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="text-center">
-                  <img
-                    src={selectedImage}
-                    alt="Preview"
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "80vh",
-                      borderRadius: "8px",
-                    }}
-                  />
-                </Modal.Body>
-              </Modal>
+                      const heatmapLink = rightEyeResults?.heatmap_path
+                        ? `https://backend.auge.cloud/heatmaps/${rightEyeResults.heatmap_path}`
+                        : null;
 
+                      return (
+                        <div
+                          key={idx}
+                          style={{ position: "relative", cursor: "pointer" }}
+                        >
+                          <img
+                            src={link}
+                            crossOrigin="anonymous"
+                            loading="lazy"
+                            alt={`${t("reportdata.rightEye.header")} Image ${
+                              idx + 1
+                            }`}
+                            style={{
+                              width: "100%",
+                              height: "auto",
+                              borderRadius: "8px",
+                              border: "1px solid #ccc",
+                            }}
+                            onClick={() => setSelectedImage(link)}
+                          />
+
+                          {heatmapLink && (
+                            <Badge
+                              bg="light"
+                              style={{
+                                position: "absolute",
+                                top: "5px",
+                                right: "5px",
+                                cursor: "pointer",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation(); // يمنع فتح الصورة العادية
+                                setSelectedHeatmap(heatmapLink);
+                              }}
+                            >
+                              <Fire size={14} /> {/* أيقونة Heatmap */}
+                            </Badge>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p>{t("reportdata.rightEye.noImages")}</p>
+                )}
+
+                {/* Modal لعرض الصورة العادية */}
+                <Modal
+                  show={!!selectedImage}
+                  onHide={() => setSelectedImage(null)}
+                  centered
+                  size="lg"
+                >
+                  <Modal.Header closeButton>
+                    <Modal.Title>
+                      {t("reportdata.rightEye.imagePreview")}
+                    </Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body className="text-center">
+                    <img
+                      src={selectedImage}
+                      alt="Preview"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "80vh",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </Modal.Body>
+                </Modal>
+
+                {/* Modal لعرض الهيت ماب */}
+                <Modal
+                  show={!!selectedHeatmap}
+                  onHide={() => setSelectedHeatmap(null)}
+                  centered
+                  size="lg"
+                >
+                  <Modal.Header closeButton>
+                    <Modal.Title>Heatmap Preview</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body className="text-center">
+                    <img
+                      src={selectedHeatmap}
+                      alt="Heatmap Preview"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "80vh",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </Modal.Body>
+                </Modal>
+              </>
               {/* بيانات الفحص */}
               <Row>
                 <Col>
@@ -576,7 +728,7 @@ const PatientReport = () => {
                 )}
             </Card.Body>
           </Card>
-          <Card className="mb-4">
+          <Card className="avoid-break mb-4">
             <Card.Header className="custom-card-header">
               {t("reportdata.leftEye.header")}
             </Card.Header>
@@ -594,37 +746,71 @@ const PatientReport = () => {
                   </span>
                 )}
               </div>
-
               {Report?.eyeExamination?.leftEye?.images?.length > 0 ? (
                 <div className="d-flex flex-wrap gap-3 mb-4">
-                  {Report.eyeExamination.leftEye.images.map((link, idx) => (
-                    <div
-                      key={idx}
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setSelectedImage(link)}
-                    >
-                      <img
-                        src={link}
-                        crossOrigin="anonymous"
-                        loading="lazy"
-                        alt={`${t("reportdata.leftEye.header")} Image ${
-                          idx + 1
-                        }`}
-                        style={{
-                          width: "100%", // أو ممكن تستخدم "auto"
-                          height: "auto",
-                          borderRadius: "8px",
-                          border: "1px solid #ccc",
-                        }}
-                      />
-                    </div>
-                  ))}
+                  {Report.eyeExamination.leftEye.images.map((link, idx) => {
+                    // parse modelResults.leftEye JSON string
+                    let leftEyeResults = null;
+                    try {
+                      leftEyeResults = JSON.parse(
+                        Report.modelResults?.leftEye || "{}"
+                      );
+                    } catch (err) {
+                      console.error(
+                        "Invalid JSON in modelResults.leftEye:",
+                        err
+                      );
+                    }
+
+                    const heatmapLink = leftEyeResults?.heatmap_path
+                      ? `https://backend.auge.cloud/heatmaps/${leftEyeResults.heatmap_path}`
+                      : null;
+
+                    return (
+                      <div
+                        key={idx}
+                        style={{ position: "relative", cursor: "pointer" }}
+                      >
+                        <img
+                          src={link}
+                          crossOrigin="anonymous"
+                          loading="lazy"
+                          alt={`${t("reportdata.leftEye.header")} Image ${
+                            idx + 1
+                          }`}
+                          style={{
+                            width: "100%",
+                            height: "auto",
+                            borderRadius: "8px",
+                            border: "1px solid #ccc",
+                          }}
+                          onClick={() => setSelectedImage(link)}
+                        />
+
+                        {heatmapLink && (
+                          <Badge
+                            bg="light"
+                            style={{
+                              position: "absolute",
+                              top: "5px",
+                              right: "5px",
+                              cursor: "pointer",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation(); // يمنع فتح الصورة العادية
+                              setSelectedHeatmap(heatmapLink);
+                            }}
+                          >
+                            <Fire size={14} /> {/* أيقونة Heatmap */}
+                          </Badge>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
-                <p>{t("reportdata.rightEye.noImages")}</p>
+                <p>{t("reportdata.leftEye.noImages")}</p>
               )}
-
-              {/* Modal for showing full image */}
               <Modal
                 show={!!selectedImage}
                 onHide={() => setSelectedImage(null)}
@@ -633,7 +819,7 @@ const PatientReport = () => {
               >
                 <Modal.Header closeButton>
                   <Modal.Title>
-                    {t("reportdata.rightEye.imagePreview")}
+                    {t("reportdata.leftEye.imagePreview")}
                   </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="text-center">
@@ -648,7 +834,27 @@ const PatientReport = () => {
                   />
                 </Modal.Body>
               </Modal>
-
+              <Modal
+                show={!!selectedHeatmap}
+                onHide={() => setSelectedHeatmap(null)}
+                centered
+                size="lg"
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Heatmap Preview</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-center">
+                  <img
+                    src={selectedHeatmap}
+                    alt="Heatmap Preview"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "80vh",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </Modal.Body>
+              </Modal>
               {/* بيانات الفحص */}
               <Row>
                 <Col>
@@ -718,7 +924,6 @@ const PatientReport = () => {
                   )}
                 </Col>
               </Row>
-
               {/* تحليل النموذج */}
               <div className="mt-4">
                 {Report?.modelResults?.leftEye ? (

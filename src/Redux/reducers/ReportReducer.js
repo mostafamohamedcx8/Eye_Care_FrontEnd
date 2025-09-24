@@ -5,6 +5,8 @@ import {
   GETPPATIENTWITHREPORT,
   DELETEMYREPORT,
   MARKDOCTORFEEDBACKASREAD,
+  GETMYNOTIFCATION,
+  MARKNOTIFYASREAD,
 } from "../type";
 
 const initial = {
@@ -13,6 +15,8 @@ const initial = {
   getpatientwithreport: [],
   deletemyreport: [],
   feedback: [],
+  notifyread: [],
+  notify: [],
   error: null, // أضف حقل للخطأ
   loading: true,
 };
@@ -37,6 +41,12 @@ const reportReducer = (state = initial, action) => {
         feedback: action.payload,
         loading: false,
       };
+    case MARKNOTIFYASREAD:
+      return {
+        ...state,
+        notifyread: action.payload,
+        loading: false,
+      };
     case "CLEAR_PATIENT_REPORT":
       return {
         ...state,
@@ -48,6 +58,12 @@ const reportReducer = (state = initial, action) => {
       return {
         ...state,
         getpatientwithreport: action.payload,
+        loading: false,
+      };
+    case GETMYNOTIFCATION:
+      return {
+        ...state,
+        notify: action.payload,
         loading: false,
       };
     case DELETEMYREPORT:
