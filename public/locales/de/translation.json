@@ -1,5 +1,6 @@
 {
   "navbar": {
+    "communication": "Kommunikation",
     "home": "Startseite",
     "new_patient": "Neuer Patient",
     "archived_patients": "Archivierte Patienten",
@@ -796,7 +797,23 @@
     "leftEye": {
       "header": "Linkes Auge Untersuchung & Analyse",
       "noDiseases": "Keine erkannten Krankheiten im linken Auge.",
-      "noPredictionData": "Keine Vorhersagedaten für das linke Auge verfügbar."
+      "noPredictionData": "Keine Vorhersagedaten für das linke Auge verfügbar.",
+      "imageCaptureDate": "Bildaufnahmedatum",
+      "noImages": "Keine Bilder verfügbar",
+      "imagePreview": "Bildvorschau",
+      "visusCC": "Visus (CC)",
+      "previousValue": "Vorheriger Wert",
+      "since": "Seit",
+      "sphere": "Sphäre",
+      "cylinder": "Zylinder",
+      "axis": "Achse",
+      "intraocularPressure": "Augeninnendruck",
+      "cornealThickness": "Hornhautdicke",
+      "chamberAngle": "Kammerwinkel",
+      "amslerTestAbnormal": "Amsler-Test anormal",
+      "disease": "Krankheit",
+      "confidence": "Konfidenz (%)",
+      "badImageQuality": "Schlechte Bildqualität - kann durch folgendes verursacht werden: Medientrübung durch: Hornhauttrübung, Katarakt, Glaskörpertrübungen, Glaskörperblutung/Entzündung, Tränenfilmprobleme usw. ODER optische Fehlausrichtung (oder unzureichende Pupillenerweiterung, Fokus)"
     },
     "doctorFeedback": {
       "header": "Arzt-Feedback",
@@ -814,6 +831,15 @@
     "optician": "Optiker"
   },
   "doctorpage": {
+    "tableHeaders": {
+      "name": "Name",
+      "city": "Stadt",
+      "state": "Bundesland",
+      "postalCode": "Postleitzahl",
+      "fullAddress": "Vollständige Adresse",
+      "specialty": "Fachgebiet",
+      "tools": "Werkzeuge"
+    },
     "header": {
       "title": "Bericht für Patient erstellen"
     },
@@ -861,9 +887,19 @@
       "changeProfileImage": "Profilbild ändern",
       "selectGermanState": "Deutsches Bundesland auswählen",
       "selectCity": "Stadt auswählen",
-      "enterAddress": "Geben Sie Ihre Adresse ein (Straße...)"
+      "enterAddress": "Geben Sie Ihre Adresse ein (Straße...)",
+      "currentPassword": "Aktuelles Passwort",
+      "newPassword": "Neues Passwort",
+      "confirmNewPassword": "Neues Passwort bestätigen",
+      "changeLogo": "Logo ändern"
+    },
+    "sections": {
+      "personalInfo": "Persönliche Informationen",
+      "profileImage": "Profilbild",
+      "businessInfo": "Geschäftsinformationen"
     },
     "buttons": {
+      "saveLogo": "Logo speichern",
       "edit": "Bearbeiten",
       "save": "Speichern",
       "change": "Ändern",
@@ -888,6 +924,13 @@
     "previous_label": "Zurück"
   },
   "reports": {
+    "tableHeaders": {
+      "report_date": "Berichtsdatum",
+      "right_eye_visus": "Rechtes Auge VisusCC",
+      "left_eye_visus": "Linkes Auge VisusCC",
+      "image_quality": "Bildqualität",
+      "tools": "Werkzeuge"
+    },
     "title": "Patientenberichte",
     "no_reports": "Keine Berichte verfügbar",
     "loading": "Patientenbericht wird geladen...",

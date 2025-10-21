@@ -412,8 +412,14 @@ const PatientReport = () => {
                         );
                       }
 
-                      const heatmapLink = rightEyeResults?.heatmap_path
-                        ? `https://backend.auge.cloud/heatmaps/${rightEyeResults.heatmap_path}`
+                      const heatmapLink = rightEyeResults[
+                        "Main Eye Disease (8 Classes)"
+                      ]?.heatmap_path
+                        ? `https://backend.auge.cloud/heatmaps/${rightEyeResults[
+                            "Main Eye Disease (8 Classes)"
+                          ].heatmap_path
+                            .split("/")
+                            .pop()}`
                         : null;
 
                       return (
@@ -762,8 +768,14 @@ const PatientReport = () => {
                       );
                     }
 
-                    const heatmapLink = leftEyeResults?.heatmap_path
-                      ? `https://backend.auge.cloud/heatmaps/${leftEyeResults.heatmap_path}`
+                    const heatmapLink = leftEyeResults[
+                      "Main Eye Disease (8 Classes)"
+                    ]?.heatmap_path
+                      ? `https://backend.auge.cloud/heatmaps/${leftEyeResults[
+                          "Main Eye Disease (8 Classes)"
+                        ]?.heatmap_path
+                          .split("/")
+                          .pop()}`
                       : null;
 
                     return (

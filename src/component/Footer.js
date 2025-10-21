@@ -44,7 +44,16 @@ const Footer = () => {
               </li>
             </ul>
           </Col>
-          <Col md={4}></Col>
+          <Col md={4}>
+            <h5>{t("navbar.communication")}</h5>
+            <ul>
+              <li>
+                <a href="mailto:support@augenarzt.cloud">
+                  {t("navbar.contact_us")}
+                </a>
+              </li>
+            </ul>
+          </Col>
         </Row>
       </Container>
     </div>

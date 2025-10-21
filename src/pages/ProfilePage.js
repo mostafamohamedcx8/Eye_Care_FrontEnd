@@ -5,6 +5,7 @@ import Header from "../component/Header";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
 import bcrypt from "bcryptjs";
+import { Examination_Hook } from "../Hook/Examination_Hook";
 import {
   updateUserProfileData,
   UpdateLoggedUserPassword,
@@ -24,6 +25,8 @@ const ProfilePage = () => {
   }, []);
   const MYData = useSelector((state) => state.alluser.mydata);
   const userimage = MYData?.data?.imageProfile;
+  const defaultLogo = "/upload.png";
+  const LogoImage = MYData?.data?.logoimg || defaultLogo;
 
   const userFromStorage = JSON.parse(localStorage.getItem("user")) || {};
 
@@ -38,9 +41,9 @@ const ProfilePage = () => {
   const [fullAddress, setFullAddress] = useState(
     userFromStorage.fullAddress || ""
   );
-  const [image, setImage] = useState(
-    userFromStorage.imageProfile || "profile.jpg"
-  );
+  const [previewImage, setPreviewImage] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(LogoImage);
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedState, setSelectedState] = useState("");
   const [cities, setCities] = useState([]);
@@ -66,7 +69,7 @@ const ProfilePage = () => {
 
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
-      setImage(URL.createObjectURL(event.target.files[0]));
+      setPreviewImage(URL.createObjectURL(event.target.files[0]));
       setSelectedFile(event.target.files[0]);
     }
   };
@@ -103,7 +106,7 @@ const ProfilePage = () => {
         state,
         city,
         fullAddress,
-        imageProfile: image,
+        imageProfile: previewImage,
       };
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
@@ -153,6 +156,28 @@ const ProfilePage = () => {
     setloading(false);
   };
 
+  const handleLogoChange = async (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setLogoPreview(URL.createObjectURL(file)); // عرض معاينة الصورة
+      setLoading(true);
+
+      try {
+        const formData = new FormData();
+        formData.append("logoimg", file);
+
+        // إرسال الصورة تلقائيًا للباك إند
+        await dispatch(updateUserProfileData(formData));
+        notify(t("profilepage.notifications.profileUpdatedSuccess"), "success");
+        window.location.reload();
+      } catch (error) {
+        notify(t("profilepage.notifications.errorUpdatingProfile"), "error");
+        setLogoPreview("/logo.png"); // إعادة الصورة الافتراضية في حالة الخطأ
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
   useEffect(() => {
     if (Loading === false) {
       if (res && res.status === 200) {
@@ -177,7 +202,7 @@ const ProfilePage = () => {
       <Container className="mt-5 mb-5">
         <h2 className="mb-4">{t("profilepage.header.title")}</h2>
         <Row>
-          <Col md={8}>
+          <Col md={6}>
             <Card className="p-4 shadow-sm">
               {/* Full Name */}
               <div className="mb-3">
@@ -449,34 +474,79 @@ const ProfilePage = () => {
           </Col>
 
           {/* Profile Image */}
-          <Col md={4} className="text-center">
-            <img
-              src={userimage || "/profile.jpg"}
-              alt="Profile"
-              className="rounded-circle mb-3"
-              style={{ width: "120px", height: "120px", objectFit: "cover" }}
-            />
-            <p
-              className="text-muted"
-              style={{ cursor: "pointer", textDecoration: "underline" }}
-              onClick={handleClick}
-            >
-              {t("profilepage.fields.changeProfileImage")}
-            </p>
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={handleImageChange}
-            />
-            <Button
-              variant="primary"
-              onClick={() => handleSubmit()}
-              disabled={loading}
-            >
-              {t("profilepage.buttons.saveImage")}
-            </Button>
+          <Col md={6}>
+            {/* Profile Image */}
+            <Card className="p-4 shadow-sm mb-4 text-center">
+              <h5>{t("profilepage.sections.profileImage")}</h5>
+              <hr />
+              <img
+                src={previewImage || userimage || "/profile.jpg"}
+                alt="Profile"
+                className="rounded-circle mb-3"
+                style={{ width: "120px", height: "120px", objectFit: "cover" }}
+              />
+              <p
+                className="text-muted"
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+                onClick={handleClick}
+              >
+                {t("profilepage.fields.changeProfileImage")}
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+              />
+              <Button
+                variant="primary"
+                onClick={() => handleSubmit()}
+                disabled={loading}
+              >
+                {t("profilepage.buttons.saveImage")}
+              </Button>
+            </Card>
+
+            {/* Business Info */}
+            <Card className="p-4 shadow-sm text-center">
+              <h5>{t("profilepage.sections.businessInfo")}</h5>
+              <hr />
+              <div>
+                <label
+                  htmlFor="logo-upload"
+                  style={{ cursor: loading ? "not-allowed" : "pointer" }}
+                >
+                  <img
+                    src={LogoImage}
+                    alt="Optician Logo"
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      border: "2px solid #ccc",
+                      opacity: loading ? 0.5 : 1,
+                    }}
+                  />
+                </label>
+                <input
+                  type="file"
+                  id="logo-upload"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={handleLogoChange}
+                  disabled={loading}
+                />
+              </div>
+              <p
+                className="text-muted mt-2"
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+                onClick={() => document.getElementById("logo-upload").click()}
+              >
+                {t("profilepage.fields.changeLogo")}
+              </p>
+            </Card>
           </Col>
         </Row>
       </Container>

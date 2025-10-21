@@ -44,10 +44,14 @@ const NavBar = () => {
     dispatch(getmynotification());
   }, [dispatch]);
 
-  const MYNotify = useSelector((state) => state.allreport.notify?.data || []);
-  console.log("notify", MYNotify);
+  const data = useSelector((state) => state.allreport.notify?.data);
+
+  // تأكد إن data موجودة وهي array
+  const MYNotify = Array.isArray(data) ? data : [];
+
   const unreadCount = MYNotify.filter((n) => !n.read).length;
-  console.log(unreadCount);
+
+  console.log("unreadCount:", unreadCount);
 
   const logOut = () => {
     localStorage.removeItem("user");
@@ -175,12 +179,7 @@ const NavBar = () => {
                   <NavDropdown.Item href="/ProfilePage">
                     {t("navbar.your_profile")}
                   </NavDropdown.Item>
-                  <NavDropdown.Item href="about">
-                    {t("navbar.about_us")}
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="mailto:support@augenarzt.cloud">
-                    {t("navbar.contact_us")}
-                  </NavDropdown.Item>
+
                   <NavDropdown.Divider />
                   <NavDropdown.Item onClick={logOut} href="/">
                     {t("navbar.logout")}

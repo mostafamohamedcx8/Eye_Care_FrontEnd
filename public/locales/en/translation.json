@@ -1,5 +1,6 @@
 {
   "navbar": {
+    "communication": "Communication",
     "home": "Home",
     "new_patient": "New Patient",
     "archived_patients": "Archived Patients",
@@ -796,7 +797,23 @@
     "leftEye": {
       "header": "Left Eye Examination & Analysis",
       "noDiseases": "No detected diseases in the left eye.",
-      "noPredictionData": "No prediction data available for the left eye."
+      "noPredictionData": "No prediction data available for the left eye.",
+      "imageCaptureDate": "Image Capture Date",
+      "noImages": "No images available",
+      "imagePreview": "Image Preview",
+      "visusCC": "Visus (CC)",
+      "previousValue": "Previous Value",
+      "since": "Since",
+      "sphere": "Sphere",
+      "cylinder": "Cylinder",
+      "axis": "Axis",
+      "intraocularPressure": "Intraocular Pressure",
+      "cornealThickness": "Corneal Thickness",
+      "chamberAngle": "Chamber Angle",
+      "amslerTestAbnormal": "Amsler Test Abnormal",
+      "disease": "Disease",
+      "confidence": "Confidence (%)",
+      "badImageQuality": "Bad image quality - can be due to: Media Opacity due to: Corneal opacity, Cataract, vitreous opacities, vitreous hemorrhage/inflammation, tear film issues, etc. OR Optics misalignment (or insufficient pupillary dilation, focus)"
     },
     "doctorFeedback": {
       "header": "Doctor Feedback",
@@ -816,6 +833,15 @@
   "doctorpage": {
     "header": {
       "title": "Create Report for Patient"
+    },
+    "tableHeaders": {
+      "name": "Name",
+      "city": "City",
+      "state": "State",
+      "postalCode": "Postal Code",
+      "fullAddress": "Full Address",
+      "specialty": "Specialty",
+      "tools": "Tools"
     },
     "patientInfo": {
       "title": "Patient Information",
@@ -849,6 +875,9 @@
       "title": "My Profile"
     },
     "fields": {
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
       "fullName": "Full Name",
       "firstName": "First Name",
       "lastName": "Last Name",
@@ -861,14 +890,16 @@
       "changeProfileImage": "Change your profile image",
       "selectGermanState": "Select German State",
       "selectCity": "Select City",
-      "enterAddress": "Enter your address (street...)"
+      "enterAddress": "Enter your address (street...)",
+      "changeLogo": "Change Logo"
     },
     "buttons": {
       "edit": "Edit",
       "save": "Save",
       "change": "Change",
       "cancel": "Cancel",
-      "saveImage": "Save Image"
+      "saveImage": "Save Image",
+      "saveLogo": "Save Logo"
     },
     "notifications": {
       "profileUpdatedSuccess": "Profile updated successfully",
@@ -881,6 +912,11 @@
       "passwordUpdateFailed": "Password update failed",
       "passwordMinLength": "Password must be at least 6 characters",
       "passwordsMismatch": "Passwords do not match"
+    },
+    "sections": {
+      "personalInfo": "Personal Information",
+      "profileImage": "Profile Image",
+      "businessInfo": "Business Info"
     }
   },
   "pagination": {
@@ -888,6 +924,13 @@
     "previous_label": "Previous"
   },
   "reports": {
+    "tableHeaders": {
+      "report_date": "Report Date",
+      "right_eye_visus": "Right Eye VisusCC",
+      "left_eye_visus": "Left Eye VisusCC",
+      "image_quality": "Image Quality",
+      "tools": "Tools"
+    },
     "title": "Patient Reports",
     "no_reports": "No reports available",
     "loading": "Loading patient report...",
