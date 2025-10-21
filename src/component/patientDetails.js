@@ -12,6 +12,7 @@ const PatientTab = () => {
   const dispatch = useDispatch();
 
   const res = useSelector((state) => state.allpatient.patient);
+  console.log(res);
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [salutation, setSalutation] = useState("");
@@ -19,6 +20,12 @@ const PatientTab = () => {
   const [ethnicity, setEthnicity] = useState("");
   const [loading, setloading] = useState(true);
   const [ispress, setispress] = useState(false);
+
+  const removeEmptyFields = (obj) => {
+    return Object.fromEntries(
+      Object.entries(obj).filter(([_, value]) => value !== "")
+    );
+  };
 
   const handelSubmit = async (event) => {
     event.preventDefault();
@@ -33,13 +40,15 @@ const PatientTab = () => {
     });
     if (!isValid) return; // لو في خطأ وقف التنفيذ
 
-    const patientData = {
+    let patientData = {
       firstname,
       lastname,
       salutation,
       dateOfBirth,
       ethnicity,
     };
+
+    patientData = removeEmptyFields(patientData);
 
     setloading(true);
     setispress(true);
@@ -79,7 +88,6 @@ const PatientTab = () => {
               <Form.Label>{t("patientForm.labels.firstName")}</Form.Label>
               <Form.Control
                 placeholder={t("patientForm.placeholders.firstName")}
-                required
                 onChange={(e) => setFirstname(e.target.value)}
                 value={firstname}
               />
@@ -90,7 +98,6 @@ const PatientTab = () => {
               <Form.Label>{t("patientForm.labels.lastName")}</Form.Label>
               <Form.Control
                 placeholder={t("patientForm.placeholders.lastName")}
-                required
                 onChange={(e) => setLastname(e.target.value)}
                 value={lastname}
               />
@@ -100,7 +107,6 @@ const PatientTab = () => {
             <Form.Group className="mb-3">
               <Form.Label>{t("patientForm.labels.salutation")}</Form.Label>
               <Form.Select
-                required
                 onChange={(e) => setSalutation(e.target.value)}
                 value={salutation}
               >
@@ -130,7 +136,6 @@ const PatientTab = () => {
 
               <Form.Control
                 type="date"
-                required
                 onChange={(e) => setDob(e.target.value)}
                 value={dateOfBirth}
               />
@@ -141,7 +146,6 @@ const PatientTab = () => {
               <Form.Label>{t("patientForm.labels.ethnicity")}</Form.Label>
 
               <Form.Select
-                required
                 onChange={(e) => setEthnicity(e.target.value)}
                 value={ethnicity}
               >

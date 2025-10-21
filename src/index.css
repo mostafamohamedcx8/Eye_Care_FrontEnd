@@ -36,8 +36,8 @@
 }
 
 .hero-section {
-  background: url("E:/cv/eyecare/eyecare/public/Untitled.jpeg") center/cover
-    no-repeat;
+  background: url("/home/joe/Eye_Care_FrontEnd/public/Untitled.jpeg")
+    center/cover no-repeat;
   min-height: 30vh; /* بدل 80vh، خليه أصغر */
   position: relative;
   display: flex;
@@ -129,7 +129,7 @@
 }
 .app-promotion-section {
   background-color: #1e90ff;
-  background-image: url("E:\cv\eyecare\eyecare\public\banner-pattern.svg"); /* بإمكانك استبدال هذا بباترن طبي أو صورة SVG */
+  background-image: url("/home/joe/Eye_Care_FrontEnd/public/banner-pattern.svg"); /* بإمكانك استبدال هذا بباترن طبي أو صورة SVG */
   padding: 0px 0;
   color: white;
 }
@@ -349,12 +349,49 @@
   border-radius: 6px;
 }
 
+/* العناصر اللي مش عايز تظهر في الـ PDF */
 .no-print {
   display: block;
 }
 
 @media print {
+  /* اخفاء أي عنصر واخلي بس report-content ظاهر */
+  body * {
+    visibility: hidden;
+  }
+  .avoid-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .report-content,
+  .report-content * {
+    visibility: visible;
+  }
+
+  /* اخفاء عناصر معينة */
   .no-print {
     display: none !important;
   }
+
+  /* التقرير ياخد الصفحة كاملة */
+  .report-content {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 auto !important; /* يخلي المحتوى في النص */
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+}
+
+/* ضبط حجم الصفحة A4 */
+@page {
+  size: A4 landscape; /* يخلي الصفحة أفقية */
+  margin: 8mm; /* تقدر تزود أو تقلل حسب احتياجك */
+}
+
+.no-caret::after {
+  display: none !important;
 }

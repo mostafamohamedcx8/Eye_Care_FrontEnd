@@ -53,6 +53,10 @@ const SignupSection = () => {
     onChangedsalutation,
     onChangedPassword,
     onChangeConfirmPassword,
+    onChangePhoneNumber,
+    phoneNumber,
+    onChangeCountryCode,
+    countryCode,
   ] = Signup_Hook(t);
 
   return (
@@ -193,6 +197,34 @@ const SignupSection = () => {
               value={confirmPassword}
               onChange={onChangeConfirmPassword}
             />
+          </Form.Group>
+
+          <Form.Group className="mb-4">
+            <Form.Label>{t("signup.phone_number")}</Form.Label>
+            <div className="d-flex">
+              {/* ✅ Dropdown لاختيار الدولة */}
+              <Form.Select
+                value={countryCode}
+                onChange={onChangeCountryCode}
+                style={{ maxWidth: "120px", marginRight: "8px" }}
+              >
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+1">🇺🇸 +1</option>
+              </Form.Select>
+
+              {/* ✅ Input لرقم الهاتف */}
+              <Form.Control
+                type="tel"
+                placeholder={t("signup.phone_number_placeholder")}
+                value={phoneNumber}
+                onChange={onChangePhoneNumber}
+              />
+            </div>
+            <Form.Text className="text-muted">
+              {countryCode === "+49"
+                ? "+49XXXXXXXXXX (Germany)"
+                : "+1XXXXXXXXXX (USA)"}
+            </Form.Text>
           </Form.Group>
 
           {/* Address */}

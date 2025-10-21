@@ -7,7 +7,10 @@ import {
   Button,
   Accordion,
   Modal,
+  Badge,
 } from "react-bootstrap";
+import Barcode from "react-barcode";
+import { Fire } from "react-bootstrap-icons";
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
@@ -15,30 +18,129 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { Examination_Hook } from "../Hook/Examination_Hook";
 import { useTranslation } from "react-i18next";
+import { updateUserProfileData } from "../Redux/actions/Useraction";
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import notify from "../Hook/useNotification";
 const PatientReport = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-
+  const dispatch = useDispatch();
   const [
     reportRef,
     Report,
     handleMarkAsRead,
     userFromStorage,
-    handleDownloadPDF,
+    handlePrint,
     setSelectedImage,
     selectedImage,
     displayValue,
     displayDate,
     displayBoolean,
     opticianName,
+    opticianAddress,
+    Email,
+    PhoneNumber,
+    LogoImage,
   ] = Examination_Hook();
+  const [logoPreview, setLogoPreview] = useState(LogoImage);
+  const [loading, setLoading] = useState(false);
+  const [selectedHeatmap, setSelectedHeatmap] = useState(null);
+
+  const handleImageChange = async (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setLogoPreview(URL.createObjectURL(file)); // عرض معاينة الصورة
+      setLoading(true);
+
+      try {
+        const formData = new FormData();
+        formData.append("logoimg", file);
+
+        // إرسال الصورة تلقائيًا للباك إند
+        await dispatch(updateUserProfileData(formData));
+        notify(t("profilepage.notifications.profileUpdatedSuccess"), "success");
+        window.location.reload();
+      } catch (error) {
+        notify(t("profilepage.notifications.errorUpdatingProfile"), "error");
+        setLogoPreview("/logo.png"); // إعادة الصورة الافتراضية في حالة الخطأ
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <>
-      <div ref={reportRef}>
-        <Header />
-        <NavBar className="no-print" />
-        <Container className="mt-5 mb-5 p-4 border rounded shadow bg-light">
-          <h2 className="mb-4 text-center">{t("reportdata.title")}</h2>
+      <Header />
+      <NavBar className="no-print" />
+      <div>
+        <Container
+          ref={reportRef}
+          className="report-content mt-5 mb-5 p-4 border rounded shadow bg-light"
+        >
+          <div
+            className="d-flex justify-content-between align-items-center flex-wrap"
+            style={{
+              padding: "10px 20px",
+              borderBottom: "2px solid #ccc",
+              marginBottom: "20px",
+            }}
+          >
+            {/* Optician Info - left */}
+            {/* Left side - Logo upload */}
+            <div>
+              <label
+                htmlFor="logo-upload"
+                style={{ cursor: loading ? "not-allowed" : "pointer" }}
+              >
+                <img
+                  src={LogoImage}
+                  alt="Optician Logo"
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    border: "2px solid #ccc",
+                    opacity: loading ? 0.5 : 1, // تأثير بصري أثناء الرفع
+                  }}
+                />
+              </label>
+              <input
+                type="file"
+                id="logo-upload"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+                disabled={loading} // تعطيل الإدخال أثناء الرفع
+              />
+            </div>
+
+            {/* Center - Title */}
+            <div className="mx-auto text-center">
+              <h2 style={{ fontWeight: "bold", margin: 0 }}>
+                {t("reportdata.title")}
+              </h2>
+            </div>
+
+            {/* Right side - Optician Info */}
+            <div style={{ fontSize: "0.85rem", textAlign: "left" }}>
+              <div>
+                <strong>{t("reportdata.opticianLabel")}:</strong> {opticianName}
+              </div>
+              <div>
+                <strong>{t("reportdata.addressLabel")}:</strong>{" "}
+                {opticianAddress}
+              </div>
+              <div>
+                <strong>{t("reportdata.emailLabel")}:</strong> {Email}
+              </div>
+              <div>
+                <strong>{t("reportdata.phoneLabel")}:</strong> {PhoneNumber}
+              </div>
+            </div>
+          </div>
 
           {/* Patient Info */}
           <Card className="mb-4 shadow rounded-2">
@@ -48,29 +150,52 @@ const PatientReport = () => {
             <Card.Body>
               <Row>
                 {/* Right Column */}
-                <Col md={6}>
+                <Col md={4}>
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.name")}:</strong>{" "}
-                    {Report?.patient?.firstname} {Report?.patient?.lastname}
+                    {Report?.patient?.firstname || Report?.patient?.lastname ? (
+                      <>
+                        {Report?.patient?.firstname || (
+                          <span style={{ color: "red" }}>---</span>
+                        )}{" "}
+                        {Report?.patient?.lastname || (
+                          <span style={{ color: "red" }}>---</span>
+                        )}
+                      </>
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
                   </div>
+
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.salutation")}:</strong>{" "}
-                    {Report?.patient?.salutation}
+                    {Report?.patient?.salutation ? (
+                      t(`reportdata.salutations.${Report?.patient?.salutation}`)
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
                   </div>
+
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.ethnicity")}:</strong>{" "}
-                    {Report?.patient?.ethnicity}
+                    {Report?.patient?.ethnicity ? (
+                      t(
+                        `reportdata.ethnicityOptions.${Report?.patient?.ethnicity}`
+                      )
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
                   </div>
                 </Col>
                 {/* Left Column */}
-                <Col md={6}>
-                  <div className="mb-2">
-                    <strong>{t("reportdata.patientInfo.id")}:</strong>{" "}
-                    {Report?.patient?._id}
-                  </div>
+                <Col md={4}>
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.dateOfBirth")}:</strong>{" "}
-                    {displayDate(Report?.patient?.dateOfBirth)}
+                    {Report?.patient?.dateOfBirth ? (
+                      displayDate(Report.patient.dateOfBirth)
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
                   </div>
                   <div className="mb-2">
                     <strong>
@@ -79,12 +204,27 @@ const PatientReport = () => {
                     {displayDate(Report?.createdAt)}
                   </div>
                 </Col>
+                <Col
+                  md={4}
+                  className="d-flex align-items-center justify-content-center"
+                >
+                  {Report?.patient?.patientId ? (
+                    <Barcode
+                      value={Report.patient.patientId.toString()}
+                      height={60}
+                      width={2}
+                      fontSize={14}
+                    />
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
+                </Col>
               </Row>
             </Card.Body>
           </Card>
 
           {/* Medical History */}
-          <Card className="mb-4">
+          <Card className="avoid-break mb-4 ">
             <Card.Header className="custom-card-header">
               {t("reportdata.medicalHistory.header")}
             </Card.Header>
@@ -92,23 +232,100 @@ const PatientReport = () => {
               <ListGroup>
                 {Report?.history?.medical?.map((disease, idx) => (
                   <ListGroup.Item key={idx}>
-                    <div className="d-flex justify-content-between">
-                      <strong>{disease.name}</strong>
-                      <div className="ms-3">
-                        <span>
-                          <strong>
-                            {t("reportdata.medicalHistory.hasCondition")}:
-                          </strong>{" "}
-                          {disease.hasCondition ? "Yes" : "No"}
-                        </span>
-                        <span className="ms-3">
-                          <strong>
-                            {" "}
-                            {t("reportdata.medicalHistory.appliesTo")}:
-                          </strong>{" "}
-                          {disease.appliesTo}
-                        </span>
+                    <div className="d-flex flex-column">
+                      <div className="d-flex justify-content-between">
+                        <strong>
+                          {t(
+                            `reportdata.medicalHistory.values.${disease.name}`,
+                            {
+                              defaultValue: disease.name,
+                            }
+                          )}
+                        </strong>
+                        <div className="ms-3">
+                          <span>
+                            <strong>
+                              {t("reportdata.medicalHistory.hasCondition")}:
+                            </strong>{" "}
+                            {t(
+                              `reportdata.medicalHistory.values.${
+                                disease.hasCondition ? "Yes" : "No"
+                              }`
+                            )}
+                          </span>
+                          <span className="ms-3">
+                            <strong>
+                              {t("reportdata.medicalHistory.appliesTo")}:
+                            </strong>{" "}
+                            {t(
+                              `reportdata.medicalHistory.values.${disease.appliesTo}`
+                            )}
+                          </span>
+                        </div>
                       </div>
+
+                      {/* ✅ عرض التفاصيل الإضافية لو المرض هو Diabetes M. */}
+                      {disease.name === "Diabetes M." && (
+                        <div className="d-flex flex-wrap mt-2">
+                          <span className="me-3">
+                            <strong>
+                              {t(
+                                "reportdata.medicalHistory.diabetes.sinceWhen"
+                              )}
+                              :
+                            </strong>{" "}
+                            {disease.sinceWhen ? (
+                              disease.sinceWhen
+                            ) : (
+                              <span style={{ color: "red" }}>---</span>
+                            )}
+                          </span>
+
+                          <span className="me-3">
+                            <strong>
+                              {t(
+                                "reportdata.medicalHistory.diabetes.hba1cDate"
+                              )}
+                              :
+                            </strong>{" "}
+                            {disease.hba1cDate ? (
+                              new Date(disease.hba1cDate).toLocaleDateString(
+                                "de-DE"
+                              )
+                            ) : (
+                              <span style={{ color: "red" }}>---</span>
+                            )}
+                          </span>
+
+                          <span className="me-3">
+                            <strong>
+                              {t(
+                                "reportdata.medicalHistory.diabetes.hba1cValue"
+                              )}
+                              :
+                            </strong>{" "}
+                            {disease.hba1cValue ? (
+                              disease.hba1cValue
+                            ) : (
+                              <span style={{ color: "red" }}>---</span>
+                            )}
+                          </span>
+
+                          <span className="me-3">
+                            <strong>
+                              {t(
+                                "reportdata.medicalHistory.diabetes.treatment"
+                              )}
+                              :
+                            </strong>{" "}
+                            {disease.diabetesTreatment ? (
+                              disease.diabetesTreatment
+                            ) : (
+                              <span style={{ color: "red" }}>---</span>
+                            )}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </ListGroup.Item>
                 ))}
@@ -117,7 +334,7 @@ const PatientReport = () => {
           </Card>
 
           {/* Eye Diseases */}
-          <Card className="mb-4">
+          <Card className="avoid-break mb-4">
             <Card.Header className="custom-card-header">
               {t("reportdata.eyeHistory.header")}
             </Card.Header>
@@ -126,19 +343,30 @@ const PatientReport = () => {
                 {Report?.history?.eye?.map((disease, idx) => (
                   <ListGroup.Item key={idx}>
                     <div className="d-flex justify-content-between">
-                      <strong>{disease.name}</strong>
+                      <strong>
+                        {t(`reportdata.medicalHistory.values.${disease.name}`, {
+                          defaultValue: disease.name,
+                        })}
+                      </strong>
+
                       <div className="ms-3">
                         <span>
                           <strong>
                             {t("reportdata.medicalHistory.hasCondition")}:
                           </strong>{" "}
-                          {disease.hasCondition ? "Yes" : "No"}
+                          {t(
+                            `reportdata.medicalHistory.values.${
+                              disease.hasCondition ? "Yes" : "No"
+                            }`
+                          )}
                         </span>
                         <span className="ms-3">
                           <strong>
                             {t("reportdata.medicalHistory.appliesTo")}:
                           </strong>{" "}
-                          {disease.appliesTo}
+                          {t(
+                            `reportdata.medicalHistory.values.${disease.appliesTo}`
+                          )}
                         </span>
                       </div>
                     </div>
@@ -148,7 +376,7 @@ const PatientReport = () => {
             </Card.Body>
           </Card>
 
-          <Card className="mb-4">
+          <Card className="avoid-break mb-4">
             <Card.Header className="custom-card-header">
               {t("reportdata.rightEye.header")}
             </Card.Header>
@@ -167,61 +395,121 @@ const PatientReport = () => {
                 )}
               </div>
 
-              {Report?.eyeExamination?.rightEye?.images?.length > 0 ? (
-                <div className="d-flex flex-wrap gap-3 mb-4">
-                  {Report.eyeExamination.rightEye.images.map((link, idx) => (
-                    <div
-                      key={idx}
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setSelectedImage(link)}
-                    >
-                      <img
-                        src={link}
-                        crossOrigin="anonymous"
-                        loading="lazy"
-                        alt={`${t("reportdata.rightEye.header")} Image ${
-                          idx + 1
-                        }`}
-                        style={{
-                          width: "160px",
-                          height: "160px",
-                          objectFit: "cover",
-                          borderRadius: "8px",
-                          border: "1px solid #ccc",
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p>{t("reportdata.rightEye.noImages")}</p>
-              )}
+              <>
+                {Report?.eyeExamination?.rightEye?.images?.length > 0 ? (
+                  <div className="d-flex flex-wrap gap-3 mb-4">
+                    {Report.eyeExamination.rightEye.images.map((link, idx) => {
+                      // parse modelResults.rightEye JSON string
+                      let rightEyeResults = null;
+                      try {
+                        rightEyeResults = JSON.parse(
+                          Report.modelResults?.rightEye || "{}"
+                        );
+                      } catch (err) {
+                        console.error(
+                          "Invalid JSON in modelResults.rightEye:",
+                          err
+                        );
+                      }
 
-              {/* Modal for showing full image */}
-              <Modal
-                show={!!selectedImage}
-                onHide={() => setSelectedImage(null)}
-                centered
-                size="lg"
-              >
-                <Modal.Header closeButton>
-                  <Modal.Title>
-                    {t("reportdata.rightEye.imagePreview")}
-                  </Modal.Title>
-                </Modal.Header>
-                <Modal.Body className="text-center">
-                  <img
-                    src={selectedImage}
-                    alt="Preview"
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "80vh",
-                      borderRadius: "8px",
-                    }}
-                  />
-                </Modal.Body>
-              </Modal>
+                      const heatmapLink = rightEyeResults?.heatmap_path
+                        ? `https://backend.auge.cloud/heatmaps/${rightEyeResults.heatmap_path}`
+                        : null;
 
+                      return (
+                        <div
+                          key={idx}
+                          style={{ position: "relative", cursor: "pointer" }}
+                        >
+                          <img
+                            src={link}
+                            crossOrigin="anonymous"
+                            loading="lazy"
+                            alt={`${t("reportdata.rightEye.header")} Image ${
+                              idx + 1
+                            }`}
+                            style={{
+                              width: "100%",
+                              height: "auto",
+                              borderRadius: "8px",
+                              border: "1px solid #ccc",
+                            }}
+                            onClick={() => setSelectedImage(link)}
+                          />
+
+                          {heatmapLink && (
+                            <Badge
+                              bg="light"
+                              style={{
+                                position: "absolute",
+                                top: "5px",
+                                right: "5px",
+                                cursor: "pointer",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation(); // يمنع فتح الصورة العادية
+                                setSelectedHeatmap(heatmapLink);
+                              }}
+                            >
+                              <Fire size={14} /> {/* أيقونة Heatmap */}
+                            </Badge>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p>{t("reportdata.rightEye.noImages")}</p>
+                )}
+
+                {/* Modal لعرض الصورة العادية */}
+                <Modal
+                  show={!!selectedImage}
+                  onHide={() => setSelectedImage(null)}
+                  centered
+                  size="lg"
+                >
+                  <Modal.Header closeButton>
+                    <Modal.Title>
+                      {t("reportdata.rightEye.imagePreview")}
+                    </Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body className="text-center">
+                    <img
+                      src={selectedImage}
+                      alt="Preview"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "80vh",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </Modal.Body>
+                </Modal>
+
+                {/* Modal لعرض الهيت ماب */}
+                <Modal
+                  show={!!selectedHeatmap}
+                  onHide={() => setSelectedHeatmap(null)}
+                  centered
+                  size="lg"
+                >
+                  <Modal.Header closeButton>
+                    <Modal.Title>Heatmap Preview</Modal.Title>
+                  </Modal.Header>
+                  <Modal.Body className="text-center">
+                    <img
+                      src={selectedHeatmap}
+                      alt="Heatmap Preview"
+                      style={{
+                        maxWidth: "100%",
+                        maxHeight: "80vh",
+                        borderRadius: "8px",
+                      }}
+                    />
+                  </Modal.Body>
+                </Modal>
+              </>
               {/* بيانات الفحص */}
               <Row>
                 <Col>
@@ -270,7 +558,13 @@ const PatientReport = () => {
                 </Col>
                 <Col>
                   <strong>{t("reportdata.rightEye.chamberAngle")}:</strong>{" "}
-                  {displayValue(Report?.eyeExamination?.rightEye?.chamberAngle)}
+                  {Report?.eyeExamination?.rightEye?.chamberAngle ? (
+                    t(
+                      `reportdata.commonValues.${Report.eyeExamination.rightEye.chamberAngle}`
+                    )
+                  ) : (
+                    <span style={{ color: "red" }}>--</span>
+                  )}
                 </Col>
               </Row>
               <Row className="mt-2">
@@ -278,8 +572,12 @@ const PatientReport = () => {
                   <strong>
                     {t("reportdata.rightEye.amslerTestAbnormal")}:
                   </strong>{" "}
-                  {displayBoolean(
-                    Report?.eyeExamination?.rightEye?.amslerTestAbnormal
+                  {t(
+                    `reportdata.commonValues.${
+                      Report?.eyeExamination?.rightEye?.amslerTestAbnormal
+                        ? "Yes"
+                        : "No"
+                    }`
                   )}
                 </Col>
               </Row>
@@ -301,6 +599,18 @@ const PatientReport = () => {
 
                     return (
                       <>
+                        <p>
+                          <strong>{t("reportdata.image_quality")} : </strong>
+                          <span
+                            style={{
+                              color: isImageQualityBad ? "red" : "green",
+                            }}
+                          >
+                            {isImageQualityBad
+                              ? t("reportdata.image_quality_bad")
+                              : t("reportdata.image_quality_good")}
+                          </span>
+                        </p>
                         {filteredDiseases.length > 0 ? (
                           <table className="table table-bordered mt-2">
                             <thead>
@@ -346,76 +656,79 @@ const PatientReport = () => {
                   <p>{t("reportdata.rightEye.noPredictionData")}</p>
                 )}
               </div>
-              {Report?.doctorFeedbacks?.length > 0 && (
-                <>
-                  <h5 className="mt-4 text-success">
-                    {t("reportdata.doctorFeedback.header")}
-                  </h5>
+              {Report?.eyeExamination?.rightEye?.images?.length > 0 &&
+                Report?.doctorFeedbacks?.length > 0 && (
+                  <>
+                    <h5 className="mt-4 text-success no-print">
+                      {t("reportdata.doctorFeedback.header")}
+                    </h5>
 
-                  <Accordion>
-                    {Report.doctorFeedbacks.map((feedback, index) => (
-                      <Accordion.Item
-                        eventKey={index.toString()}
-                        key={feedback._id}
-                        onClick={() => handleMarkAsRead(feedback)}
-                      >
-                        <Accordion.Header>
-                          Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
-                          {feedback.doctor?.lastname || ""} –{" "}
-                          {moment(feedback.createdAt).format(
-                            "DD MMM YYYY, h:mm A"
-                          )}
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <p>
-                            <strong>
-                              {t(
-                                "reportdata.doctorFeedback.predictionAccuracy"
-                              )}
-                              :
-                            </strong>{" "}
-                            <span
-                              className={`badge ${
-                                feedback.rightEyeFeedback
-                                  ?.aiPredictionCorrect === "correct"
-                                  ? "bg-success"
-                                  : "bg-danger"
-                              }`}
-                            >
-                              {feedback.rightEyeFeedback?.aiPredictionCorrect ||
+                    <Accordion className="no-print">
+                      {Report.doctorFeedbacks.map((feedback, index) => (
+                        <Accordion.Item
+                          eventKey={index.toString()}
+                          key={feedback._id}
+                          onClick={() => handleMarkAsRead(feedback)}
+                        >
+                          <Accordion.Header>
+                            Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
+                            {feedback.doctor?.lastname || ""} –{" "}
+                            {moment(feedback.createdAt).format(
+                              "DD MMM YYYY, h:mm A"
+                            )}
+                          </Accordion.Header>
+                          <Accordion.Body>
+                            <p>
+                              <strong>
+                                {t(
+                                  "reportdata.doctorFeedback.predictionAccuracy"
+                                )}
+                                :
+                              </strong>{" "}
+                              <span
+                                className={`badge ${
+                                  feedback.rightEyeFeedback
+                                    ?.aiPredictionCorrect === "correct"
+                                    ? "bg-success"
+                                    : "bg-danger"
+                                }`}
+                              >
+                                {feedback.rightEyeFeedback
+                                  ?.aiPredictionCorrect || "N/A"}
+                              </span>
+                            </p>
+                            <p>
+                              <strong>
+                                {t("reportdata.doctorFeedback.comment")}:
+                              </strong>{" "}
+                              {feedback.rightEyeFeedback?.comment ||
+                                t("reportdata.doctorFeedback.noComment")}
+                            </p>
+                            <p>
+                              <strong>
+                                {t("reportdata.doctorFeedback.diagnosis")}:
+                              </strong>{" "}
+                              {feedback.rightEyeFeedback?.diagnosis || "N/A"}
+                            </p>
+                            <p>
+                              <strong>
+                                {t(
+                                  "reportdata.doctorFeedback.recommendedAction"
+                                )}
+                                :
+                              </strong>{" "}
+                              {feedback.rightEyeFeedback?.recommendedAction ||
                                 "N/A"}
-                            </span>
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.comment")}:
-                            </strong>{" "}
-                            {feedback.rightEyeFeedback?.comment ||
-                              "No comment provided."}
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.diagnosis")}:
-                            </strong>{" "}
-                            {feedback.rightEyeFeedback?.diagnosis || "N/A"}
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.recommendedAction")}
-                              :
-                            </strong>{" "}
-                            {feedback.rightEyeFeedback?.recommendedAction ||
-                              "N/A"}
-                          </p>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                    ))}
-                  </Accordion>
-                </>
-              )}
+                            </p>
+                          </Accordion.Body>
+                        </Accordion.Item>
+                      ))}
+                    </Accordion>
+                  </>
+                )}
             </Card.Body>
           </Card>
-          <Card className="mb-4">
+          <Card className="avoid-break mb-4">
             <Card.Header className="custom-card-header">
               {t("reportdata.leftEye.header")}
             </Card.Header>
@@ -433,38 +746,71 @@ const PatientReport = () => {
                   </span>
                 )}
               </div>
-
               {Report?.eyeExamination?.leftEye?.images?.length > 0 ? (
                 <div className="d-flex flex-wrap gap-3 mb-4">
-                  {Report.eyeExamination.leftEye.images.map((link, idx) => (
-                    <div
-                      key={idx}
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setSelectedImage(link)}
-                    >
-                      <img
-                        src={link}
-                        crossOrigin="anonymous"
-                        loading="lazy"
-                        alt={`${t("reportdata.leftEye.header")} Image ${
-                          idx + 1
-                        }`}
-                        style={{
-                          width: "160px",
-                          height: "160px",
-                          objectFit: "cover",
-                          borderRadius: "8px",
-                          border: "1px solid #ccc",
-                        }}
-                      />
-                    </div>
-                  ))}
+                  {Report.eyeExamination.leftEye.images.map((link, idx) => {
+                    // parse modelResults.leftEye JSON string
+                    let leftEyeResults = null;
+                    try {
+                      leftEyeResults = JSON.parse(
+                        Report.modelResults?.leftEye || "{}"
+                      );
+                    } catch (err) {
+                      console.error(
+                        "Invalid JSON in modelResults.leftEye:",
+                        err
+                      );
+                    }
+
+                    const heatmapLink = leftEyeResults?.heatmap_path
+                      ? `https://backend.auge.cloud/heatmaps/${leftEyeResults.heatmap_path}`
+                      : null;
+
+                    return (
+                      <div
+                        key={idx}
+                        style={{ position: "relative", cursor: "pointer" }}
+                      >
+                        <img
+                          src={link}
+                          crossOrigin="anonymous"
+                          loading="lazy"
+                          alt={`${t("reportdata.leftEye.header")} Image ${
+                            idx + 1
+                          }`}
+                          style={{
+                            width: "100%",
+                            height: "auto",
+                            borderRadius: "8px",
+                            border: "1px solid #ccc",
+                          }}
+                          onClick={() => setSelectedImage(link)}
+                        />
+
+                        {heatmapLink && (
+                          <Badge
+                            bg="light"
+                            style={{
+                              position: "absolute",
+                              top: "5px",
+                              right: "5px",
+                              cursor: "pointer",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation(); // يمنع فتح الصورة العادية
+                              setSelectedHeatmap(heatmapLink);
+                            }}
+                          >
+                            <Fire size={14} /> {/* أيقونة Heatmap */}
+                          </Badge>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
-                <p>{t("reportdata.rightEye.noImages")}</p>
+                <p>{t("reportdata.leftEye.noImages")}</p>
               )}
-
-              {/* Modal for showing full image */}
               <Modal
                 show={!!selectedImage}
                 onHide={() => setSelectedImage(null)}
@@ -473,7 +819,7 @@ const PatientReport = () => {
               >
                 <Modal.Header closeButton>
                   <Modal.Title>
-                    {t("reportdata.rightEye.imagePreview")}
+                    {t("reportdata.leftEye.imagePreview")}
                   </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="text-center">
@@ -488,7 +834,27 @@ const PatientReport = () => {
                   />
                 </Modal.Body>
               </Modal>
-
+              <Modal
+                show={!!selectedHeatmap}
+                onHide={() => setSelectedHeatmap(null)}
+                centered
+                size="lg"
+              >
+                <Modal.Header closeButton>
+                  <Modal.Title>Heatmap Preview</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-center">
+                  <img
+                    src={selectedHeatmap}
+                    alt="Heatmap Preview"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "80vh",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </Modal.Body>
+              </Modal>
               {/* بيانات الفحص */}
               <Row>
                 <Col>
@@ -535,7 +901,13 @@ const PatientReport = () => {
                 </Col>
                 <Col>
                   <strong>{t("reportdata.rightEye.chamberAngle")}:</strong>{" "}
-                  {displayValue(Report?.eyeExamination?.leftEye?.chamberAngle)}
+                  {Report?.eyeExamination?.leftEye?.chamberAngle ? (
+                    t(
+                      `reportdata.commonValues.${Report.eyeExamination.leftEye.chamberAngle}`
+                    )
+                  ) : (
+                    <span style={{ color: "red" }}>--</span>
+                  )}
                 </Col>
               </Row>
               <Row className="mt-2">
@@ -543,12 +915,15 @@ const PatientReport = () => {
                   <strong>
                     {t("reportdata.rightEye.amslerTestAbnormal")}:
                   </strong>{" "}
-                  {displayBoolean(
-                    Report?.eyeExamination?.leftEye?.amslerTestAbnormal
+                  {t(
+                    `reportdata.commonValues.${
+                      Report?.eyeExamination?.leftEye?.amslerTestAbnormal
+                        ? "Yes"
+                        : "No"
+                    }`
                   )}
                 </Col>
               </Row>
-
               {/* تحليل النموذج */}
               <div className="mt-4">
                 {Report?.modelResults?.leftEye ? (
@@ -566,6 +941,18 @@ const PatientReport = () => {
 
                     return (
                       <>
+                        <p>
+                          <strong>{t("reportdata.image_quality")} : </strong>
+                          <span
+                            style={{
+                              color: isImageQualityBad ? "red" : "green",
+                            }}
+                          >
+                            {isImageQualityBad
+                              ? t("reportdata.image_quality_bad")
+                              : t("reportdata.image_quality_good")}
+                          </span>
+                        </p>
                         {filteredDiseases.length > 0 ? (
                           <table className="table table-bordered mt-2">
                             <thead>
@@ -611,72 +998,75 @@ const PatientReport = () => {
                   <p>{t("reportdata.leftEye.noPredictionData")}</p>
                 )}
               </div>
-              {Report?.doctorFeedbacks?.length > 0 && (
-                <>
-                  <h5 className="mt-4 text-success">
-                    {t("reportdata.doctorFeedback.header")}
-                  </h5>
+              {Report?.eyeExamination?.leftEye?.images?.length > 0 &&
+                Report?.doctorFeedbacks?.length > 0 && (
+                  <>
+                    <h5 className="mt-4 text-success no-print">
+                      {t("reportdata.doctorFeedback.header")}
+                    </h5>
 
-                  <Accordion>
-                    {Report.doctorFeedbacks.map((feedback, index) => (
-                      <Accordion.Item
-                        eventKey={index.toString()}
-                        key={feedback._id}
-                        onClick={() => handleMarkAsRead(feedback)}
-                      >
-                        <Accordion.Header>
-                          Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
-                          {feedback.doctor?.lastname || ""} –{" "}
-                          {moment(feedback.createdAt).format(
-                            "DD MMM YYYY, h:mm A"
-                          )}
-                        </Accordion.Header>
-                        <Accordion.Body>
-                          <p>
-                            <strong>
-                              {t(
-                                "reportdata.doctorFeedback.predictionAccuracy"
-                              )}
-                            </strong>{" "}
-                            <span
-                              className={`badge ${
-                                feedback.leftEyeFeedback
-                                  ?.aiPredictionCorrect === "correct"
-                                  ? "bg-success"
-                                  : "bg-danger"
-                              }`}
-                            >
-                              {feedback.leftEyeFeedback?.aiPredictionCorrect ||
+                    <Accordion className="no-print">
+                      {Report.doctorFeedbacks.map((feedback, index) => (
+                        <Accordion.Item
+                          eventKey={index.toString()}
+                          key={feedback._id}
+                          onClick={() => handleMarkAsRead(feedback)}
+                        >
+                          <Accordion.Header>
+                            Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
+                            {feedback.doctor?.lastname || ""} –{" "}
+                            {moment(feedback.createdAt).format(
+                              "DD MMM YYYY, h:mm A"
+                            )}
+                          </Accordion.Header>
+                          <Accordion.Body>
+                            <p>
+                              <strong>
+                                {t(
+                                  "reportdata.doctorFeedback.predictionAccuracy"
+                                )}
+                              </strong>{" "}
+                              <span
+                                className={`badge ${
+                                  feedback.leftEyeFeedback
+                                    ?.aiPredictionCorrect === "correct"
+                                    ? "bg-success"
+                                    : "bg-danger"
+                                }`}
+                              >
+                                {feedback.leftEyeFeedback
+                                  ?.aiPredictionCorrect || "N/A"}
+                              </span>
+                            </p>
+                            <p>
+                              <strong>
+                                {t("reportdata.doctorFeedback.comment")}:
+                              </strong>{" "}
+                              {feedback.leftEyeFeedback?.comment ||
+                                t("reportdata.doctorFeedback.noComment")}
+                            </p>
+                            <p>
+                              <strong>
+                                {t("reportdata.doctorFeedback.diagnosis")}:
+                              </strong>{" "}
+                              {feedback.leftEyeFeedback?.diagnosis || "N/A"}
+                            </p>
+                            <p>
+                              <strong>
+                                {t(
+                                  "reportdata.doctorFeedback.recommendedAction"
+                                )}
+                                :
+                              </strong>{" "}
+                              {feedback.leftEyeFeedback?.recommendedAction ||
                                 "N/A"}
-                            </span>
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.comment")}:
-                            </strong>{" "}
-                            {feedback.leftEyeFeedback?.comment ||
-                              "No comment provided."}
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.diagnosis")}:
-                            </strong>{" "}
-                            {feedback.leftEyeFeedback?.diagnosis || "N/A"}
-                          </p>
-                          <p>
-                            <strong>
-                              {t("reportdata.doctorFeedback.recommendedAction")}
-                              :
-                            </strong>{" "}
-                            {feedback.leftEyeFeedback?.recommendedAction ||
-                              "N/A"}
-                          </p>
-                        </Accordion.Body>
-                      </Accordion.Item>
-                    ))}
-                  </Accordion>
-                </>
-              )}
+                            </p>
+                          </Accordion.Body>
+                        </Accordion.Item>
+                      ))}
+                    </Accordion>
+                  </>
+                )}
             </Card.Body>
           </Card>
 
@@ -685,12 +1075,13 @@ const PatientReport = () => {
               <Button
                 onClick={() => navigate(`/DoctorCard/${Report?.patient?._id}`)}
                 variant="primary"
+                className="no-print"
               >
                 {t("reportdata.buttons.referToDoctor")}
               </Button>
             )}
 
-            <Button onClick={handleDownloadPDF} variant="danger">
+            <Button onClick={handlePrint} variant="danger" className="no-print">
               {t("reportdata.buttons.downloadReport")}
             </Button>
           </div>
@@ -701,9 +1092,8 @@ const PatientReport = () => {
             </span>
           </div>
         </Container>
-
-        <Footer />
       </div>
+      <Footer />
     </>
   );
 };

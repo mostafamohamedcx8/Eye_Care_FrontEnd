@@ -11,7 +11,8 @@
     "registration": "Registrierung",
     "for_doctors": "Für Ärzte",
     "fundus_tooltip": "Verweis auf die Ärzte-Website",
-    "language": "Sprache"
+    "language": "Sprache",
+    "user_avatar": "Benutzerbild"
   },
   "hero": {
     "subtitle": "STÄRKUNG VON OPTIKERN ZUR SCHNELLEREN ERKENNUNG VON AUGENPROBLEMEN",
@@ -222,6 +223,8 @@
     "last_name": "Nachname",
     "last_name_placeholder": "Nachname eingeben",
     "date_of_birth": "Geburtsdatum",
+    "phone_number": "Telefonnummer",
+    "phone_number_placeholder": "Geben Sie Ihre Telefonnummer ein",
     "day": "Tag",
     "month": "Monat",
     "year": "Jahr",
@@ -364,7 +367,8 @@
     "notifyStateRequired": "Bundesland ist erforderlich",
     "notifyCityRequired": "Stadt ist erforderlich",
     "notifyPostalCodeInvalid": "Postleitzahl muss genau 5 Ziffern enthalten",
-    "notifyFullAddressRequired": "Vollständige Adresse ist erforderlich"
+    "notifyFullAddressRequired": "Vollständige Adresse ist erforderlich",
+    "notifyPhoneNumberInvalid": "Telefonnummer muss deutsch (+49...) oder US (+1...) sein"
   },
   "signuphook": {
     "successAccountCreated": "Konto erstellt. Bitte überprüfen Sie Ihre E-Mails auf den Bestätigungslink.",
@@ -552,6 +556,19 @@
       "buttons": {
         "addDisease": "Erkrankung hinzufügen",
         "next": "Weiter"
+      },
+      "diabetes": {
+        "sinceWhen": "Seit wann?",
+        "hba1cValue": "Letzter HbA1c-Wert (4-15)?",
+        "hba1cDate": "Datum des letzten HbA1c-Werts?",
+        "treatment": "Behandlung von Diabetes",
+        "selectTreatment": "-- Behandlung auswählen --",
+        "treatments": {
+          "tablets": "Tabletten",
+          "insulin": "Insulin",
+          "weeklySemaglutide": "Wöchentliche Semaglutid-Injektionen",
+          "other": "Andere"
+        }
       }
     },
     "eyeHistory": {
@@ -659,11 +676,60 @@
       "cornealThicknessRange": "Hornhautdicke muss eine Zahl zwischen 350 und 700 sein.",
       "imageDateRequired": "Bitte geben Sie das 'Aufnahmedatum des Bildes' für die hochgeladenen Bilder ein.",
       "noImageDateWithoutImage": "Sie können kein 'Aufnahmedatum des Bildes' ohne das Hochladen eines Bildes eingeben.",
-      "imageDateNotFuture": "Das Aufnahmedatum des Bildes darf nicht in der Zukunft liegen."
+      "imageDateNotFuture": "Das Aufnahmedatum des Bildes darf nicht in der Zukunft liegen.",
+      "sinceWhenRequired": "Bitte geben Sie das Datum an, seit wann Sie Diabetes haben.",
+      "sinceWhenPast": "Das Datum 'Seit wann' muss in der Vergangenheit liegen.",
+      "hba1cValueRequired": "Bitte geben Sie den HbA1c-Wert ein.",
+      "hba1cValueRange": "Der HbA1c-Wert muss zwischen 4 und 15 liegen.",
+      "hba1cDateRequired": "Bitte geben Sie das Datum des letzten HbA1c-Werts ein.",
+      "hba1cDatePast": "Das Datum des letzten HbA1c-Werts darf nicht in der Zukunft liegen.",
+      "invalidDiabetesTreatment": "Bitte wählen Sie eine gültige Behandlung für Diabetes."
     }
   },
   "reportdata": {
     "title": "Bericht über die Augenuntersuchung des Patienten",
+    "image_quality": "Bildqualität",
+    "image_quality_good": "Gut",
+    "image_quality_bad": "Schlecht",
+    "opticianLabel": "Optiker",
+    "addressLabel": "Adresse",
+    "ethnicity": "Ethnizität",
+    "emailLabel": "E-Mail",
+    "phoneLabel": "Telefon",
+    "ethnicityOptions": {
+      "White and Asian": "Weiß und Asiatisch",
+      "White and Black Caribbean": "Weiß und Schwarz-Karibisch",
+      "White and Black African": "Weiß und Schwarz-Afrikanisch",
+      "Indian": "Indisch",
+      "Pakistani": "Pakistanisch",
+      "Bangladeshi": "Bangladeschisch",
+      "Chinese": "Chinesisch",
+      "Caribbean": "Karibisch",
+      "African": "Afrikanisch",
+      "English, Welsh, Scottish, Northern Irish or British": "Englisch, Walisisch, Schottisch, Nordirisch oder Britisch",
+      "Irish": "Irisch",
+      "Gypsy or Irish Traveller": "Zigeuner oder Irischer Reisender",
+      "Roma": "Roma",
+      "Arab": "Arabisch",
+      "Any other Asian background": "Andere asiatische Herkunft",
+      "Any other Black, Black British, or Caribbean background": "Andere Schwarze, Britisch-Schwarze oder Karibische Herkunft",
+      "Any other Mixed or multiple ethnic background": "Andere gemischte oder mehrere ethnische Herkunft",
+      "Any other White background": "Andere weiße Herkunft",
+      "Any other ethnic group": "Andere ethnische Gruppe"
+    },
+    "salutations": {
+      "Mr": "Herr",
+      "Mrs": "Frau",
+      "Ms": "Fräulein",
+      "Mx": "Divers"
+    },
+    "commonValues": {
+      "Yes": "Ja",
+      "No": "Nein",
+      "Narrow": "Eng",
+      "Within Normal Limits": "Im normalen Bereich",
+      "wide": "Weit"
+    },
     "patientInfo": {
       "header": "Patienteninformationen",
       "name": "Name",
@@ -676,7 +742,32 @@
     "medicalHistory": {
       "header": "Medizinische Vorgeschichte",
       "hasCondition": "Hat Zustand",
-      "appliesTo": "Gilt für"
+      "appliesTo": "Gilt für",
+      "sinceWhen": "Seit wann",
+      "hba1cValue": "Letzter HbA1c-Wert",
+      "hba1cDate": "Letztes HbA1c-Datum",
+      "diabetesTreatment": "Diabetesbehandlung",
+      "diabetes": {
+        "sinceWhen": "Seit wann",
+        "hba1cDate": "HbA1c-Datum",
+        "hba1cValue": "HbA1c-Wert",
+        "treatment": "Behandlung"
+      },
+      "values": {
+        "Yes": "Ja",
+        "No": "Nein",
+        "Self": "Selbst",
+        "In Family": "In der Familie",
+        "Diabetes M.": "Diabetes mellitus",
+        "Hypertension": "Bluthochdruck",
+        "Rheumatic diseases": "Rheumatische Erkrankungen",
+        "Thyroid": "Schilddrüse",
+        "Tumours": "Tumore",
+        "Genetic": "Genetisch",
+        "Cataract": "Katarakt (Grauer Star)",
+        "Glaucoma": "Grüner Star (Glaukom)",
+        "Age-related macular degeneration": "Altersbedingte Makuladegeneration"
+      }
     },
     "eyeHistory": {
       "header": "Augengeschichte"
@@ -718,7 +809,7 @@
     },
     "buttons": {
       "referToDoctor": "An einen Arzt überweisen",
-      "downloadReport": "Bericht herunterladen"
+      "downloadReport": "Bericht drucken"
     },
     "optician": "Optiker"
   },

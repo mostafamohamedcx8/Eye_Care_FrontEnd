@@ -5,6 +5,8 @@ import {
   GETPPATIENTWITHREPORT,
   DELETEMYREPORT,
   MARKDOCTORFEEDBACKASREAD,
+  GETMYNOTIFCATION,
+  MARKNOTIFYASREAD,
 } from "../type";
 import { InsertDataWithImage } from "../../Hooks/useInsertData";
 import { useGetDataToken } from "../../Hooks/useGetData";
@@ -41,6 +43,21 @@ export const getSpecificReport = (id) => async (dispatch) => {
   } catch (e) {
     dispatch({
       type: GET_SPECIFIC_REPORT,
+      payload: e.response,
+    });
+  }
+};
+export const getmynotification = (id) => async (dispatch) => {
+  try {
+    const response = await useGetDataToken(`/api/v1/report/mynotify`);
+
+    dispatch({
+      type: GETMYNOTIFCATION,
+      payload: response,
+    });
+  } catch (e) {
+    dispatch({
+      type: GETMYNOTIFCATION,
       payload: e.response,
     });
   }
@@ -96,6 +113,24 @@ export const MarkDocotrFeedback = (id, body) => async (dispatch) => {
   } catch (e) {
     dispatch({
       type: MARKDOCTORFEEDBACKASREAD,
+      payload: e.response,
+    });
+  }
+};
+
+export const MarkNotifyRead = (id) => async (dispatch) => {
+  try {
+    const response = await updateDataWithToken(
+      `/api/v1/report/notifications/${id}`
+    );
+    dispatch({
+      type: MARKNOTIFYASREAD,
+      payload: response,
+      loading: true,
+    });
+  } catch (e) {
+    dispatch({
+      type: MARKNOTIFYASREAD,
       payload: e.response,
     });
   }

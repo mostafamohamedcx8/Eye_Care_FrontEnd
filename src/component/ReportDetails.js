@@ -1,4 +1,5 @@
 import MultiImageInput from "react-multiple-image-input";
+import Barcode from "react-barcode";
 import {
   Container,
   Tabs,
@@ -111,7 +112,13 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.name")}
                 </span>
                 <span className="patient-data">
-                  {patient?.data?.firstname} {patient?.data?.lastname}
+                  {patient?.data?.firstname || patient?.data?.lastname ? (
+                    `${patient?.data?.firstname || ""} ${
+                      patient?.data?.lastname || ""
+                    }`
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
                 </span>
               </div>
               <div className="patient-info-block">
@@ -119,7 +126,11 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.salutation")}
                 </span>
                 <span className="patient-data">
-                  {patient?.data?.salutation}
+                  {patient?.data?.salutation ? (
+                    patient.data.salutation
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
                 </span>
               </div>
               <div className="patient-info-block">
@@ -127,8 +138,12 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.dateOfBirth")}
                 </span>
                 <span className="patient-data">
-                  {new Date(patient?.data?.dateOfBirth).toLocaleDateString(
-                    "de-DE"
+                  {patient?.data?.dateOfBirth ? (
+                    new Date(patient.data.dateOfBirth).toLocaleDateString(
+                      "de-DE"
+                    )
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
                   )}
                 </span>
               </div>
@@ -136,13 +151,37 @@ const ReportDetails = () => {
                 <span className="patient-label">
                   {t("reportForm.patientInfo.labels.ethnicity")}
                 </span>
-                <span className="patient-data">{patient?.data?.ethnicity}</span>
+                <span className="patient-data">
+                  {patient?.data?.ethnicity ? (
+                    patient.data.ethnicity
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
+                </span>
               </div>
               <div className="patient-info-block">
                 <span className="patient-label">
                   {t("reportForm.patientInfo.labels.patientId")}
                 </span>
-                <span className="patient-data">{patient?.data?._id}</span>
+                <span
+                  className="patient-data"
+                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                >
+                  {patient?.data?.patientId ? (
+                    <>
+                      <div style={{ marginTop: "10px" }}>
+                        <Barcode
+                          value={patient.data.patientId.toString()}
+                          height={50}
+                          width={2}
+                          fontSize={14}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <span style={{ color: "red" }}>---</span>
+                  )}
+                </span>
               </div>
             </div>
           </Card.Body>
@@ -167,60 +206,171 @@ const ReportDetails = () => {
                     historyData.medical.find((item) => item.name === disease) ||
                     {};
                   return (
-                    <Row key={index} className="mb-2 align-items-center">
-                      <Col md={4}>
-                        <Form.Label>
-                          {t(
-                            `reportForm.medicalHistory.diseases.${disease
-                              .toLowerCase()
-                              .replace(/[\s.]/g, "")}`,
-                            { defaultValue: disease }
-                          )}
-                        </Form.Label>
-                      </Col>
-                      <Col>
-                        <Form.Check
-                          type="checkbox"
-                          label={t("reportForm.medicalHistory.labels.yes")}
-                          checked={existing.hasCondition || false}
-                          onChange={(e) =>
-                            updateMedicalData(
-                              disease,
-                              "hasCondition",
-                              e.target.checked
-                            )
-                          }
-                        />
-                      </Col>
-                      <Col>
-                        <Form.Check
-                          type="checkbox"
-                          label={t("reportForm.medicalHistory.labels.self")}
-                          checked={existing.appliesTo === "Self"}
-                          onChange={(e) =>
-                            updateMedicalData(
-                              disease,
-                              "appliesTo",
-                              e.target.checked ? "Self" : null
-                            )
-                          }
-                        />
-                      </Col>
-                      <Col>
-                        <Form.Check
-                          type="checkbox"
-                          label={t("reportForm.medicalHistory.labels.inFamily")}
-                          checked={existing.appliesTo === "In Family"}
-                          onChange={(e) =>
-                            updateMedicalData(
-                              disease,
-                              "appliesTo",
-                              e.target.checked ? "In Family" : null
-                            )
-                          }
-                        />
-                      </Col>
-                    </Row>
+                    <>
+                      <Row key={index} className="mb-2 align-items-center">
+                        <Col md={4}>
+                          <Form.Label>
+                            {t(
+                              `reportForm.medicalHistory.diseases.${disease
+                                .toLowerCase()
+                                .replace(/[\s.]/g, "")}`,
+                              { defaultValue: disease }
+                            )}
+                          </Form.Label>
+                        </Col>
+                        <Col>
+                          <Form.Check
+                            type="checkbox"
+                            label={t("reportForm.medicalHistory.labels.yes")}
+                            checked={existing.hasCondition || false}
+                            onChange={(e) =>
+                              updateMedicalData(
+                                disease,
+                                "hasCondition",
+                                e.target.checked
+                              )
+                            }
+                          />
+                        </Col>
+                        <Col>
+                          <Form.Check
+                            type="checkbox"
+                            label={t("reportForm.medicalHistory.labels.self")}
+                            checked={existing.appliesTo === "Self"}
+                            onChange={(e) =>
+                              updateMedicalData(
+                                disease,
+                                "appliesTo",
+                                e.target.checked ? "Self" : null
+                              )
+                            }
+                          />
+                        </Col>
+                        <Col>
+                          <Form.Check
+                            type="checkbox"
+                            label={t(
+                              "reportForm.medicalHistory.labels.inFamily"
+                            )}
+                            checked={existing.appliesTo === "In Family"}
+                            onChange={(e) =>
+                              updateMedicalData(
+                                disease,
+                                "appliesTo",
+                                e.target.checked ? "In Family" : null
+                              )
+                            }
+                          />
+                        </Col>
+                      </Row>
+                      {disease === "Diabetes M." &&
+                        existing.hasCondition &&
+                        existing.appliesTo === "Self" && (
+                          <Row className="mb-3 ps-4">
+                            <Col md={6}>
+                              <Form.Label>
+                                {t(
+                                  "reportForm.medicalHistory.diabetes.sinceWhen"
+                                )}
+                              </Form.Label>
+                              <Form.Control
+                                type="date"
+                                value={existing?.sinceWhen || ""}
+                                onChange={(e) =>
+                                  updateMedicalData(
+                                    "Diabetes M.",
+                                    "sinceWhen",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </Col>
+                            <Col md={6}>
+                              <Form.Label>
+                                {" "}
+                                {t(
+                                  "reportForm.medicalHistory.diabetes.hba1cValue"
+                                )}
+                              </Form.Label>
+                              <Form.Control
+                                type="number"
+                                step="0.1"
+                                min="4"
+                                max="15"
+                                value={existing?.hba1cValue || ""}
+                                onChange={(e) =>
+                                  updateMedicalData(
+                                    "Diabetes M.",
+                                    "hba1cValue",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </Col>
+                            <Col md={6} className="mt-2">
+                              <Form.Label>
+                                {t(
+                                  "reportForm.medicalHistory.diabetes.hba1cDate"
+                                )}
+                              </Form.Label>
+                              <Form.Control
+                                type="date"
+                                value={existing?.hba1cDate || ""}
+                                onChange={(e) =>
+                                  updateMedicalData(
+                                    "Diabetes M.",
+                                    "hba1cDate",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </Col>
+                            <Col md={6} className="mt-2">
+                              <Form.Label>
+                                {t(
+                                  "reportForm.medicalHistory.diabetes.treatment"
+                                )}
+                              </Form.Label>
+                              <Form.Select
+                                value={existing?.diabetesTreatment || ""}
+                                onChange={(e) =>
+                                  updateMedicalData(
+                                    "Diabetes M.",
+                                    "diabetesTreatment",
+                                    e.target.value
+                                  )
+                                }
+                              >
+                                <option value="">
+                                  {t(
+                                    "reportForm.medicalHistory.diabetes.selectTreatment"
+                                  )}
+                                </option>
+                                <option value="tablets">
+                                  {t(
+                                    "reportForm.medicalHistory.diabetes.treatments.tablets"
+                                  )}
+                                </option>
+                                <option value="insulin">
+                                  {t(
+                                    "reportForm.medicalHistory.diabetes.treatments.insulin"
+                                  )}
+                                </option>
+                                <option value="weeklySemaglutide">
+                                  {t(
+                                    "reportForm.medicalHistory.diabetes.treatments.weeklySemaglutide"
+                                  )}
+                                </option>
+                                <option value="other">
+                                  {t(
+                                    "reportForm.medicalHistory.diabetes.treatments.other"
+                                  )}
+                                </option>
+                              </Form.Select>
+                            </Col>
+                          </Row>
+                        )}
+                    </>
                   );
                 })}
                 <Row className="mt-3">

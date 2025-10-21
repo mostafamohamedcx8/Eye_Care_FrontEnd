@@ -72,7 +72,59 @@ const validateDiseaseHistory = (list, label) => {
       );
       return false;
     }
+
+    // ✅ Special case for Diabetes M.
+    if (
+      item.name === "Diabetes M." &&
+      item.hasCondition &&
+      item.appliesTo === "Self"
+    ) {
+      // 1- sinceWhen (optional)
+      if (item.sinceWhen) {
+        const sinceDate = new Date(item.sinceWhen);
+        const today = new Date();
+        if (sinceDate >= today) {
+          notify(t("reportForm.validation.sinceWhenPast"));
+          return false;
+        }
+      }
+
+      // 2- hba1cValue (optional)
+      if (item.hba1cValue !== undefined && item.hba1cValue !== "") {
+        if (item.hba1cValue < 4 || item.hba1cValue > 15) {
+          notify(t("reportForm.validation.hba1cValueRange"));
+          return false;
+        }
+      }
+
+      // 3- hba1cDate (optional)
+      if (item.hba1cDate) {
+        const hba1cDate = new Date(item.hba1cDate);
+        const today = new Date();
+        if (hba1cDate > today) {
+          notify(t("reportForm.validation.hba1cDatePast"));
+          return false;
+        }
+      }
+
+      // 4- diabetesTreatment (optional but must be valid if provided)
+      const allowedTreatments = [
+        "tablets",
+        "insulin",
+        "weeklySemaglutide",
+        "other",
+        "",
+      ];
+      if (
+        item.diabetesTreatment &&
+        !allowedTreatments.includes(item.diabetesTreatment)
+      ) {
+        notify(t("reportForm.validation.invalidDiabetesTreatment"));
+        return false;
+      }
+    }
   }
+
   return true;
 };
 

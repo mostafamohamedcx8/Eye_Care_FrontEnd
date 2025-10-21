@@ -6,7 +6,10 @@ import {
   Col,
   Modal,
   Button,
+  OverlayTrigger,
+  Tooltip,
 } from "react-bootstrap";
+import Barcode from "react-barcode";
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
@@ -125,10 +128,38 @@ const PatientTableUI = () => {
                     })()}
                   </td>
                   <td>
-                    {patient.salutation}.{patient.firstname} {patient.lastname}
+                    {patient.salutation ||
+                    patient.firstname ||
+                    patient.lastname ? (
+                      <>
+                        {patient.salutation ? (
+                          patient.salutation
+                        ) : (
+                          <span style={{ color: "red" }}>---</span>
+                        )}
+                        .
+                        {patient.firstname ? (
+                          patient.firstname
+                        ) : (
+                          <span style={{ color: "red" }}>---</span>
+                        )}{" "}
+                        {patient.lastname ? (
+                          patient.lastname
+                        ) : (
+                          <span style={{ color: "red" }}>---</span>
+                        )}
+                      </>
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
                   </td>
+
                   <td>
-                    {new Date(patient.dateOfBirth).toLocaleDateString("de-DE")}
+                    {patient.dateOfBirth ? (
+                      new Date(patient.dateOfBirth).toLocaleDateString("de-DE")
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
                   </td>
                   <td>{patient.report?.length || 0}</td>
                   <td>
@@ -180,12 +211,29 @@ const PatientTableUI = () => {
                       <i className="bi bi-journal-plus"></i>
                     </button>
                     <button
-                      className="btn btn-sm btn-outline-secondary"
+                      className="btn btn-sm btn-outline-secondary me-2 "
                       onClick={(e) => handleToggleArchive(patient._id, e)}
                       disabled={archiveLoading[patient._id]}
                     >
                       <i className="bi bi-archive"></i>
                     </button>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id={`tooltip-barcode-${patient._id}`}>
+                          <Barcode
+                            value={patient.patientId?.toString() || "---"}
+                            height={40}
+                            width={2}
+                            fontSize={12}
+                          />
+                        </Tooltip>
+                      }
+                    >
+                      <button className="btn btn-sm btn-outline-dark">
+                        <i className="bi bi-upc"></i>
+                      </button>
+                    </OverlayTrigger>
                   </td>
                 </tr>
               ))
