@@ -452,13 +452,18 @@
       "lastName": "Nachname",
       "salutation": "Anrede",
       "dateOfBirth": "Geburtsdatum",
-      "ethnicity": "Ethnische Zugehörigkeit"
+      "ethnicity": "Ethnische Zugehörigkeit",
+      "email": "E-Mail"
+    },
+    "messages": {
+      "emailHelp": "Die Zugangsdaten werden an diese E-Mail-Adresse gesendet. Bitte überprüfen Sie, ob sie korrekt ist."
     },
     "placeholders": {
       "firstName": "Vornamen eingeben",
       "lastName": "Nachnamen eingeben",
       "salutation": "Anrede auswählen",
-      "ethnicity": "Ethnische Zugehörigkeit auswählen"
+      "ethnicity": "Ethnische Zugehörigkeit auswählen",
+      "email": "E-Mail-Adresse eingeben"
     },
     "salutationOptions": {
       "mr": "Herr",

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getSpecificpatient } from "../Redux/actions/Patientaction";
+import { getPatientWithReport } from "./../Redux/actions/Reportaction";
 import notify from "../Hook/useNotification";
 import { CreateReport } from "../Redux/actions/Reportaction";
 import { useNavigate, useParams } from "react-router-dom";
@@ -56,6 +57,30 @@ export const ReportDetails_Hook = () => {
   const [loading, setloading] = useState(true);
   const [ispress, setispress] = useState(false);
   const Report = useSelector((state) => state.allreport.Report);
+
+  useEffect(() => {
+    dispatch(getPatientWithReport(id));
+  }, []);
+
+  const ReportData = useSelector(
+    (state) => state.allreport.getpatientwithreport,
+  );
+
+  const GetLastReport = ReportData?.data?.reports || [];
+  const lastReport = GetLastReport.length
+    ? GetLastReport[GetLastReport.length - 1]
+    : null;
+
+  useEffect(() => {
+    if (lastReport?.history) {
+      setHistoryData({
+        medical:
+          lastReport.history.medical?.map(({ _id, ...rest }) => rest) || [],
+        eye: lastReport.history.eye?.map(({ _id, ...rest }) => rest) || [],
+      });
+    }
+  }, [lastReport]);
+  console.log("سييشس", lastReport);
 
   const defaultDiseases = [
     "Diabetes M.",
@@ -174,7 +199,7 @@ export const ReportDetails_Hook = () => {
       // أضف إلى historyData.eye
       setHistoryData((prev) => {
         const exists = prev.eye.find(
-          (item) => item.name.toLowerCase() === trimmed.toLowerCase()
+          (item) => item.name.toLowerCase() === trimmed.toLowerCase(),
         );
         if (!exists) {
           return {
@@ -201,7 +226,7 @@ export const ReportDetails_Hook = () => {
     if (!trimmed) return;
 
     const exists = historyData.medical.find(
-      (d) => d.name.toLowerCase() === trimmed.toLowerCase()
+      (d) => d.name.toLowerCase() === trimmed.toLowerCase(),
     );
 
     if (!exists) {
@@ -297,15 +322,15 @@ export const ReportDetails_Hook = () => {
   const HandelSendingData = async (e) => {
     e.preventDefault();
     const ItemRightImages = Array.from(
-      Array(Object.keys(Rightimages).length).keys()
+      Array(Object.keys(Rightimages).length).keys(),
     ).map((item, index) =>
-      dataURLtoFile(Rightimages[index], Math.random() + ".png")
+      dataURLtoFile(Rightimages[index], Math.random() + ".png"),
     );
 
     const ItemLeftImages = Array.from(
-      Array(Object.keys(Leftimages).length).keys()
+      Array(Object.keys(Leftimages).length).keys(),
     ).map((item, index) =>
-      dataURLtoFile(Leftimages[index], Math.random() + ".png")
+      dataURLtoFile(Leftimages[index], Math.random() + ".png"),
     );
 
     // التحقق من أن كل الملفات صور
@@ -356,58 +381,58 @@ export const ReportDetails_Hook = () => {
     formData.append("eyeExamination.rightEye.visusCC", rightVisusCC);
     formData.append(
       "eyeExamination.rightEye.previousValue",
-      rightPreviousValue
+      rightPreviousValue,
     );
     formData.append(
       "eyeExamination.rightEye.since",
-      rightSince === "" ? "" : rightSince
+      rightSince === "" ? "" : rightSince,
     );
     formData.append("eyeExamination.rightEye.sphere", rightSphere);
     formData.append("eyeExamination.rightEye.cylinder", rightCylinder);
     formData.append("eyeExamination.rightEye.axis", rightAxis);
     formData.append(
       "eyeExamination.rightEye.intraocularPressure",
-      rightIntraocularPressure
+      rightIntraocularPressure,
     );
     formData.append(
       "eyeExamination.rightEye.imageCaptureDate",
-      rightImageCaptureDate
+      rightImageCaptureDate,
     );
     formData.append(
       "eyeExamination.rightEye.cornealThickness",
-      rightCornealThickness
+      rightCornealThickness,
     );
     formData.append("eyeExamination.rightEye.chamberAngle", rightChamberAngle);
     formData.append(
       "eyeExamination.rightEye.amslerTestAbnormal",
-      rightAmslerTestAbnormal
+      rightAmslerTestAbnormal,
     );
 
     formData.append("eyeExamination.leftEye.visusCC", leftVisusCC);
     formData.append("eyeExamination.leftEye.previousValue", leftPreviousValue);
     formData.append(
       "eyeExamination.leftEye.since",
-      leftSince === "" ? "" : leftSince
+      leftSince === "" ? "" : leftSince,
     );
     formData.append("eyeExamination.leftEye.sphere", leftSphere);
     formData.append("eyeExamination.leftEye.cylinder", leftCylinder);
     formData.append("eyeExamination.leftEye.axis", leftAxis);
     formData.append(
       "eyeExamination.leftEye.intraocularPressure",
-      leftIntraocularPressure
+      leftIntraocularPressure,
     );
     formData.append(
       "eyeExamination.leftEye.imageCaptureDate",
-      leftImageCaptureDate
+      leftImageCaptureDate,
     );
     formData.append(
       "eyeExamination.leftEye.cornealThickness",
-      leftCornealThickness
+      leftCornealThickness,
     );
     formData.append("eyeExamination.leftEye.chamberAngle", leftChamberAngle);
     formData.append(
       "eyeExamination.leftEye.amslerTestAbnormal",
-      leftAmslerTestAbnormal
+      leftAmslerTestAbnormal,
     );
 
     // Append medical history
@@ -416,28 +441,28 @@ export const ReportDetails_Hook = () => {
       formData.append(`history[medical][${index}][name]`, condition.name);
       formData.append(
         `history[medical][${index}][hasCondition]`,
-        condition.hasCondition
+        condition.hasCondition,
       );
       formData.append(
         `history[medical][${index}][appliesTo]`,
-        condition.appliesTo
+        condition.appliesTo,
       );
       if (condition.name === "Diabetes M." && condition.appliesTo === "Self") {
         formData.append(
           `history[medical][${index}][sinceWhen]`,
-          condition.sinceWhen || ""
+          condition.sinceWhen || "",
         );
         formData.append(
           `history[medical][${index}][hba1cValue]`,
-          condition.hba1cValue || ""
+          condition.hba1cValue || "",
         );
         formData.append(
           `history[medical][${index}][hba1cDate]`,
-          condition.hba1cDate || ""
+          condition.hba1cDate || "",
         );
         formData.append(
           `history[medical][${index}][diabetesTreatment]`,
-          condition.diabetesTreatment || ""
+          condition.diabetesTreatment || "",
         );
       }
     });
@@ -447,7 +472,7 @@ export const ReportDetails_Hook = () => {
       formData.append(`history[eye][${index}][name]`, condition.name);
       formData.append(
         `history[eye][${index}][hasCondition]`,
-        condition.hasCondition
+        condition.hasCondition,
       );
       formData.append(`history[eye][${index}][appliesTo]`, condition.appliesTo);
     });
@@ -521,7 +546,7 @@ export const ReportDetails_Hook = () => {
       if (!isValid) {
         notify(
           t("reportForm.notifications.completeMedicalHistorySwitch"),
-          "warn"
+          "warn",
         );
         return;
       }

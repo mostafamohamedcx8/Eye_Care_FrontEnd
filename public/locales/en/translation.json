@@ -452,13 +452,18 @@
       "lastName": "Last Name",
       "salutation": "Salutation",
       "dateOfBirth": "Date of Birth",
-      "ethnicity": "Ethnicity"
+      "ethnicity": "Ethnicity",
+      "email": "Email"
     },
     "placeholders": {
       "firstName": "Enter First Name",
       "lastName": "Enter Last Name",
       "salutation": "Select Salutation",
-      "ethnicity": "Select ethnicity"
+      "ethnicity": "Select ethnicity",
+      "email": "Enter Email Address"
+    },
+    "messages": {
+      "emailHelp": "Credentials will be sent to this email. Make sure it's correct."
     },
     "salutationOptions": {
       "mr": "Mr",

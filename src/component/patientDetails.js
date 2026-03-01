@@ -20,10 +20,11 @@ const PatientTab = () => {
   const [ethnicity, setEthnicity] = useState("");
   const [loading, setloading] = useState(true);
   const [ispress, setispress] = useState(false);
+  const [email, setEmail] = useState("");
 
   const removeEmptyFields = (obj) => {
     return Object.fromEntries(
-      Object.entries(obj).filter(([_, value]) => value !== "")
+      Object.entries(obj).filter(([_, value]) => value !== ""),
     );
   };
 
@@ -37,6 +38,7 @@ const PatientTab = () => {
       salutation,
       dateOfBirth,
       ethnicity,
+      email,
     });
     if (!isValid) return; // لو في خطأ وقف التنفيذ
 
@@ -46,6 +48,7 @@ const PatientTab = () => {
       salutation,
       dateOfBirth,
       ethnicity,
+      email,
     };
 
     patientData = removeEmptyFields(patientData);
@@ -67,6 +70,7 @@ const PatientTab = () => {
       setLastname("");
       setSalutation("");
       setDob("");
+      setEmail("");
       setEthnicity("");
       setloading(true);
       setispress(false);
@@ -132,6 +136,27 @@ const PatientTab = () => {
         <Row>
           <Col>
             <Form.Group>
+              <Form.Label>
+                {t("patientForm.labels.email")}{" "}
+                <span className="text-danger ms-1">*</span>
+              </Form.Label>
+              <Form.Control
+                type="email"
+                placeholder={
+                  t("patientForm.placeholders.email") || "Enter patient email"
+                }
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                required // تفعيل خاصية الـ HTML5 validation
+              />
+              <Form.Text className="text-muted">
+                {t("patientForm.messages.emailHelp") ||
+                  "Credentials will be sent to this email."}
+              </Form.Text>
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group>
               <Form.Label>{t("patientForm.labels.dateOfBirth")}</Form.Label>
 
               <Form.Control
@@ -183,7 +208,7 @@ const PatientTab = () => {
                 <optgroup label={t("patientForm.ethnicityOptions.mixed.label")}>
                   <option value="White and Black Caribbean">
                     {t(
-                      "patientForm.ethnicityOptions.mixed.whiteBlackCaribbean"
+                      "patientForm.ethnicityOptions.mixed.whiteBlackCaribbean",
                     )}
                   </option>
                   <option value="White and Black African">
@@ -225,7 +250,7 @@ const PatientTab = () => {
             </Form.Group>
           </Col>
         </Row>
-
+        <Row></Row>
         <Row className="mt-4">
           <Col>
             <Button type="submit" variant="primary">

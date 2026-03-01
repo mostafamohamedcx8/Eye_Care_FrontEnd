@@ -11,6 +11,7 @@ import {
   Button,
   Spinner,
 } from "react-bootstrap";
+
 import {
   validateEyeHistory,
   validateMedicalHistory,
@@ -140,7 +141,7 @@ const ReportDetails = () => {
                 <span className="patient-data">
                   {patient?.data?.dateOfBirth ? (
                     new Date(patient.data.dateOfBirth).toLocaleDateString(
-                      "de-DE"
+                      "de-DE",
                     )
                   ) : (
                     <span style={{ color: "red" }}>---</span>
@@ -214,7 +215,7 @@ const ReportDetails = () => {
                               `reportForm.medicalHistory.diseases.${disease
                                 .toLowerCase()
                                 .replace(/[\s.]/g, "")}`,
-                              { defaultValue: disease }
+                              { defaultValue: disease },
                             )}
                           </Form.Label>
                         </Col>
@@ -227,7 +228,7 @@ const ReportDetails = () => {
                               updateMedicalData(
                                 disease,
                                 "hasCondition",
-                                e.target.checked
+                                e.target.checked,
                               )
                             }
                           />
@@ -241,7 +242,7 @@ const ReportDetails = () => {
                               updateMedicalData(
                                 disease,
                                 "appliesTo",
-                                e.target.checked ? "Self" : null
+                                e.target.checked ? "Self" : null,
                               )
                             }
                           />
@@ -250,14 +251,14 @@ const ReportDetails = () => {
                           <Form.Check
                             type="checkbox"
                             label={t(
-                              "reportForm.medicalHistory.labels.inFamily"
+                              "reportForm.medicalHistory.labels.inFamily",
                             )}
                             checked={existing.appliesTo === "In Family"}
                             onChange={(e) =>
                               updateMedicalData(
                                 disease,
                                 "appliesTo",
-                                e.target.checked ? "In Family" : null
+                                e.target.checked ? "In Family" : null,
                               )
                             }
                           />
@@ -270,7 +271,7 @@ const ReportDetails = () => {
                             <Col md={6}>
                               <Form.Label>
                                 {t(
-                                  "reportForm.medicalHistory.diabetes.sinceWhen"
+                                  "reportForm.medicalHistory.diabetes.sinceWhen",
                                 )}
                               </Form.Label>
                               <Form.Control
@@ -280,7 +281,7 @@ const ReportDetails = () => {
                                   updateMedicalData(
                                     "Diabetes M.",
                                     "sinceWhen",
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                               />
@@ -289,7 +290,7 @@ const ReportDetails = () => {
                               <Form.Label>
                                 {" "}
                                 {t(
-                                  "reportForm.medicalHistory.diabetes.hba1cValue"
+                                  "reportForm.medicalHistory.diabetes.hba1cValue",
                                 )}
                               </Form.Label>
                               <Form.Control
@@ -302,7 +303,7 @@ const ReportDetails = () => {
                                   updateMedicalData(
                                     "Diabetes M.",
                                     "hba1cValue",
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                               />
@@ -310,7 +311,7 @@ const ReportDetails = () => {
                             <Col md={6} className="mt-2">
                               <Form.Label>
                                 {t(
-                                  "reportForm.medicalHistory.diabetes.hba1cDate"
+                                  "reportForm.medicalHistory.diabetes.hba1cDate",
                                 )}
                               </Form.Label>
                               <Form.Control
@@ -320,7 +321,7 @@ const ReportDetails = () => {
                                   updateMedicalData(
                                     "Diabetes M.",
                                     "hba1cDate",
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                               />
@@ -328,7 +329,7 @@ const ReportDetails = () => {
                             <Col md={6} className="mt-2">
                               <Form.Label>
                                 {t(
-                                  "reportForm.medicalHistory.diabetes.treatment"
+                                  "reportForm.medicalHistory.diabetes.treatment",
                                 )}
                               </Form.Label>
                               <Form.Select
@@ -337,33 +338,33 @@ const ReportDetails = () => {
                                   updateMedicalData(
                                     "Diabetes M.",
                                     "diabetesTreatment",
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                               >
                                 <option value="">
                                   {t(
-                                    "reportForm.medicalHistory.diabetes.selectTreatment"
+                                    "reportForm.medicalHistory.diabetes.selectTreatment",
                                   )}
                                 </option>
                                 <option value="tablets">
                                   {t(
-                                    "reportForm.medicalHistory.diabetes.treatments.tablets"
+                                    "reportForm.medicalHistory.diabetes.treatments.tablets",
                                   )}
                                 </option>
                                 <option value="insulin">
                                   {t(
-                                    "reportForm.medicalHistory.diabetes.treatments.insulin"
+                                    "reportForm.medicalHistory.diabetes.treatments.insulin",
                                   )}
                                 </option>
                                 <option value="weeklySemaglutide">
                                   {t(
-                                    "reportForm.medicalHistory.diabetes.treatments.weeklySemaglutide"
+                                    "reportForm.medicalHistory.diabetes.treatments.weeklySemaglutide",
                                   )}
                                 </option>
                                 <option value="other">
                                   {t(
-                                    "reportForm.medicalHistory.diabetes.treatments.other"
+                                    "reportForm.medicalHistory.diabetes.treatments.other",
                                   )}
                                 </option>
                               </Form.Select>
@@ -377,7 +378,7 @@ const ReportDetails = () => {
                   <Col md={6}>
                     <Form.Control
                       placeholder={t(
-                        "reportForm.medicalHistory.placeholders.newDisease"
+                        "reportForm.medicalHistory.placeholders.newDisease",
                       )}
                       value={newMedicalDisease}
                       onChange={onChangeMedicalDisease}
@@ -417,7 +418,7 @@ const ReportDetails = () => {
                             `reportForm.eyeHistory.diseases.${disease
                               .toLowerCase()
                               .replace(/[\s-]/g, "")}`,
-                            { defaultValue: disease }
+                            { defaultValue: disease },
                           )}
                         </Form.Label>
                       </Col>
@@ -430,7 +431,7 @@ const ReportDetails = () => {
                             updateEyeData(
                               disease,
                               "hasCondition",
-                              e.target.checked
+                              e.target.checked,
                             )
                           }
                         />
@@ -444,7 +445,7 @@ const ReportDetails = () => {
                             updateEyeData(
                               disease,
                               "appliesTo",
-                              e.target.checked ? "Self" : null
+                              e.target.checked ? "Self" : null,
                             )
                           }
                         />
@@ -458,7 +459,7 @@ const ReportDetails = () => {
                             updateEyeData(
                               disease,
                               "appliesTo",
-                              e.target.checked ? "In Family" : null
+                              e.target.checked ? "In Family" : null,
                             )
                           }
                         />
@@ -471,7 +472,7 @@ const ReportDetails = () => {
                   <Col md={6}>
                     <Form.Control
                       placeholder={t(
-                        "reportForm.eyeHistory.placeholders.newDisease"
+                        "reportForm.eyeHistory.placeholders.newDisease",
                       )}
                       value={newEyeDisease}
                       onChange={onChangeEyeDisease}
@@ -522,6 +523,7 @@ const ReportDetails = () => {
                           <span className="text-muted">
                             {t("reportForm.eyeExamination.labels.visusDecimal")}
                           </span>
+                          <span className="text-danger ms-1">*</span>
                         </Form.Label>
                         <Form.Select
                           value={rightVisusCC}
@@ -596,7 +598,7 @@ const ReportDetails = () => {
                       <Form.Group>
                         <Form.Label>
                           {t(
-                            "reportForm.eyeExamination.labels.imageCaptureDate"
+                            "reportForm.eyeExamination.labels.imageCaptureDate",
                           )}
                         </Form.Label>
                         <Form.Control
@@ -611,10 +613,11 @@ const ReportDetails = () => {
                     <Col md={4}>
                       <Form.Label>
                         {t("reportForm.eyeExamination.labels.sphere")}
+                        <span className="text-danger ms-1">*</span>
                       </Form.Label>
                       <Form.Control
                         placeholder={t(
-                          "reportForm.eyeExamination.placeholders.sphere"
+                          "reportForm.eyeExamination.placeholders.sphere",
                         )}
                         type="number"
                         step="0.25"
@@ -627,10 +630,11 @@ const ReportDetails = () => {
                     <Col md={4}>
                       <Form.Label>
                         {t("reportForm.eyeExamination.labels.cylinder")}
+                        <span className="text-danger ms-1">*</span>
                       </Form.Label>
                       <Form.Control
                         placeholder={t(
-                          "reportForm.eyeExamination.placeholders.cylinder"
+                          "reportForm.eyeExamination.placeholders.cylinder",
                         )}
                         type="number"
                         step="0.25"
@@ -641,10 +645,11 @@ const ReportDetails = () => {
                     <Col md={4}>
                       <Form.Label>
                         {t("reportForm.eyeExamination.labels.axis")}
+                        <span className="text-danger ms-1">*</span>
                       </Form.Label>
                       <Form.Control
                         placeholder={t(
-                          "reportForm.eyeExamination.placeholders.axis"
+                          "reportForm.eyeExamination.placeholders.axis",
                         )}
                         type="number"
                         min="0"
@@ -659,7 +664,7 @@ const ReportDetails = () => {
                     <Col>
                       <Form.Label>
                         {t(
-                          "reportForm.eyeExamination.labels.intraocularPressure"
+                          "reportForm.eyeExamination.labels.intraocularPressure",
                         )}
                       </Form.Label>
                       <Form.Select
@@ -668,7 +673,7 @@ const ReportDetails = () => {
                       >
                         <option value="">
                           {t(
-                            "reportForm.eyeExamination.placeholders.intraocularPressure"
+                            "reportForm.eyeExamination.placeholders.intraocularPressure",
                           )}
                         </option>
                         {[...Array(91)].map((_, i) => (
@@ -676,7 +681,7 @@ const ReportDetails = () => {
                         ))}
                         <option>
                           {t(
-                            "reportForm.eyeExamination.options.intraocularPressure.notMeasurable"
+                            "reportForm.eyeExamination.options.intraocularPressure.notMeasurable",
                           )}
                         </option>
                       </Form.Select>
@@ -701,22 +706,22 @@ const ReportDetails = () => {
                       >
                         <option value="">
                           {t(
-                            "reportForm.eyeExamination.placeholders.chamberAngle"
+                            "reportForm.eyeExamination.placeholders.chamberAngle",
                           )}
                         </option>
                         <option value="Narrow">
                           {t(
-                            "reportForm.eyeExamination.options.chamberAngle.narrow"
+                            "reportForm.eyeExamination.options.chamberAngle.narrow",
                           )}
                         </option>
                         <option value="Within Normal Limits">
                           {t(
-                            "reportForm.eyeExamination.options.chamberAngle.normal"
+                            "reportForm.eyeExamination.options.chamberAngle.normal",
                           )}
                         </option>
                         <option value="wide">
                           {t(
-                            "reportForm.eyeExamination.options.chamberAngle.wide"
+                            "reportForm.eyeExamination.options.chamberAngle.wide",
                           )}
                         </option>
                       </Form.Select>
@@ -727,7 +732,7 @@ const ReportDetails = () => {
                     className="mt-2"
                     type="checkbox"
                     label={t(
-                      "reportForm.eyeExamination.labels.amslerTestAbnormal"
+                      "reportForm.eyeExamination.labels.amslerTestAbnormal",
                     )}
                     checked={rightAmslerTestAbnormal}
                     onChange={onChangeRightAmslerTestAbnormal}
@@ -760,6 +765,7 @@ const ReportDetails = () => {
                           <span className="text-muted">
                             {t("reportForm.eyeExamination.labels.visusDecimal")}
                           </span>
+                          <span className="text-danger ms-1">*</span>
                         </Form.Label>
                         <Form.Select
                           value={leftVisusCC}
@@ -837,7 +843,7 @@ const ReportDetails = () => {
                       <Form.Group>
                         <Form.Label>
                           {t(
-                            "reportForm.eyeExamination.labels.imageCaptureDate"
+                            "reportForm.eyeExamination.labels.imageCaptureDate",
                           )}
                         </Form.Label>
                         <Form.Control
@@ -853,10 +859,11 @@ const ReportDetails = () => {
                     <Col md={4}>
                       <Form.Label>
                         {t("reportForm.eyeExamination.labels.sphere")}
+                        <span className="text-danger ms-1">*</span>
                       </Form.Label>
                       <Form.Control
                         placeholder={t(
-                          "reportForm.eyeExamination.placeholders.sphere"
+                          "reportForm.eyeExamination.placeholders.sphere",
                         )}
                         type="number"
                         step="0.25"
@@ -869,10 +876,11 @@ const ReportDetails = () => {
                     <Col md={4}>
                       <Form.Label>
                         {t("reportForm.eyeExamination.labels.cylinder")}
+                        <span className="text-danger ms-1">*</span>
                       </Form.Label>
                       <Form.Control
                         placeholder={t(
-                          "reportForm.eyeExamination.placeholders.cylinder"
+                          "reportForm.eyeExamination.placeholders.cylinder",
                         )}
                         type="number"
                         step="0.25"
@@ -883,10 +891,11 @@ const ReportDetails = () => {
                     <Col md={4}>
                       <Form.Label>
                         {t("reportForm.eyeExamination.labels.axis")}
+                        <span className="text-danger ms-1">*</span>
                       </Form.Label>
                       <Form.Control
                         placeholder={t(
-                          "reportForm.eyeExamination.placeholders.axis"
+                          "reportForm.eyeExamination.placeholders.axis",
                         )}
                         type="number"
                         min="0"
@@ -901,7 +910,7 @@ const ReportDetails = () => {
                     <Col>
                       <Form.Label>
                         {t(
-                          "reportForm.eyeExamination.labels.intraocularPressure"
+                          "reportForm.eyeExamination.labels.intraocularPressure",
                         )}
                       </Form.Label>
                       <Form.Select
@@ -910,7 +919,7 @@ const ReportDetails = () => {
                       >
                         <option value="">
                           {t(
-                            "reportForm.eyeExamination.placeholders.intraocularPressure"
+                            "reportForm.eyeExamination.placeholders.intraocularPressure",
                           )}
                         </option>
                         {[...Array(91)].map((_, i) => (
@@ -918,7 +927,7 @@ const ReportDetails = () => {
                         ))}
                         <option>
                           {t(
-                            "reportForm.eyeExamination.options.intraocularPressure.notMeasurable"
+                            "reportForm.eyeExamination.options.intraocularPressure.notMeasurable",
                           )}
                         </option>
                       </Form.Select>
@@ -943,22 +952,22 @@ const ReportDetails = () => {
                       >
                         <option value="">
                           {t(
-                            "reportForm.eyeExamination.placeholders.chamberAngle"
+                            "reportForm.eyeExamination.placeholders.chamberAngle",
                           )}
                         </option>
                         <option value="Narrow">
                           {t(
-                            "reportForm.eyeExamination.options.chamberAngle.narrow"
+                            "reportForm.eyeExamination.options.chamberAngle.narrow",
                           )}
                         </option>
                         <option value="Within Normal Limits">
                           {t(
-                            "reportForm.eyeExamination.options.chamberAngle.normal"
+                            "reportForm.eyeExamination.options.chamberAngle.normal",
                           )}
                         </option>
                         <option value="wide">
                           {t(
-                            "reportForm.eyeExamination.options.chamberAngle.wide"
+                            "reportForm.eyeExamination.options.chamberAngle.wide",
                           )}
                         </option>
                       </Form.Select>
@@ -969,7 +978,7 @@ const ReportDetails = () => {
                     className="mt-2"
                     type="checkbox"
                     label={t(
-                      "reportForm.eyeExamination.labels.amslerTestAbnormal"
+                      "reportForm.eyeExamination.labels.amslerTestAbnormal",
                     )}
                     checked={leftAmslerTestAbnormal}
                     onChange={onChangeLeftAmslerTestAbnormal}
