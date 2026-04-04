@@ -599,6 +599,8 @@
     },
     "eyeExamination": {
       "labels": {
+        "uploadDicom": "Upload DICOM File ({{eye}})",
+        "selectedFile": "Selected file: ",
         "visusCC": "Visus (CC)",
         "visusDecimal": "(Decimal)",
         "previousValue": "Previous Value",
@@ -619,8 +621,10 @@
         "cylinder": "(+/-)",
         "axis": "Axis",
         "intraocularPressure": "Select",
-        "chamberAngle": "Select an option"
+        "chamberAngle": "Select an option",
+        "dicomFile": "Choose .dcm file"
       },
+      "dicomNote": "Please upload the DICOM file for advanced diagnostic analysis.",
       "options": {
         "visus": [
           "2.0 (20/10)",
@@ -778,7 +782,14 @@
     "eyeHistory": {
       "header": "Eye History"
     },
+    "dicomViewer": {
+      "title": "DICOM Image Viewer",
+      "close": "Close"
+    },
     "rightEye": {
+      "dicomFiles": "DICOM Scans",
+      "viewDicom": "View DICOM Image",
+      "noDicom": "No DICOM files available",
       "header": "Right Eye Examination & Analysis",
       "imageCaptureDate": "Image Capture Date",
       "noImages": "No images available",
@@ -800,6 +811,9 @@
       "noPredictionData": "No prediction data available for the right eye."
     },
     "leftEye": {
+      "dicomFiles": "DICOM Scans",
+      "viewDicom": "View DICOM Image",
+      "noDicom": "No DICOM files available",
       "header": "Left Eye Examination & Analysis",
       "noDiseases": "No detected diseases in the left eye.",
       "noPredictionData": "No prediction data available for the left eye.",

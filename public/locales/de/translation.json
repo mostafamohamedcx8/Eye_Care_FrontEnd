@@ -598,6 +598,8 @@
     },
     "eyeExamination": {
       "labels": {
+        "uploadDicom": "DICOM-Datei hochladen ({{eye}})",
+        "selectedFile": "Ausgewählte Datei: ",
         "visusCC": "Visus (CC)",
         "visusDecimal": "(Dezimal)",
         "previousValue": "Vorheriger Wert",
@@ -618,8 +620,10 @@
         "cylinder": "(+/-)",
         "axis": "Achse",
         "intraocularPressure": "Auswählen",
-        "chamberAngle": "Option auswählen"
+        "chamberAngle": "Option auswählen",
+        "dicomFile": ".dcm Datei auswählen"
       },
+      "dicomNote": "Bitte laden Sie die DICOM-Datei für die erweiterte diagnostische Analyse hoch.",
       "options": {
         "visus": [
           "2.0 (20/10)",
@@ -779,6 +783,9 @@
       "header": "Augengeschichte"
     },
     "rightEye": {
+      "dicomFiles": "DICOM-Scans",
+      "viewDicom": "DICOM-Bild anzeigen",
+      "noDicom": "Keine DICOM-Dateien verfügbar",
       "header": "Rechtes Auge Untersuchung & Analyse",
       "imageCaptureDate": "Bildaufnahmedatum",
       "noImages": "Keine Bilder verfügbar",
@@ -799,7 +806,14 @@
       "badImageQuality": "Schlechte Bildqualität - kann durch folgendes verursacht werden: Medientrübung durch: Hornhauttrübung, Katarakt, Glaskörpertrübungen, Glaskörperblutung/Entzündung, Tränenfilmprobleme usw. ODER optische Fehlausrichtung (oder unzureichende Pupillenerweiterung, Fokus)",
       "noPredictionData": "Keine Vorhersagedaten für das rechte Auge verfügbar."
     },
+    "dicomViewer": {
+      "title": "DICOM-Bildbetrachter",
+      "close": "Schließen"
+    },
     "leftEye": {
+      "dicomFiles": "DICOM-Scans",
+      "viewDicom": "DICOM-Bild anzeigen",
+      "noDicom": "Keine DICOM-Dateien verfügbar",
       "header": "Linkes Auge Untersuchung & Analyse",
       "noDiseases": "Keine erkannten Krankheiten im linken Auge.",
       "noPredictionData": "Keine Vorhersagedaten für das linke Auge verfügbar.",

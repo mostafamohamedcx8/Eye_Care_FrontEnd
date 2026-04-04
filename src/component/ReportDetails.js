@@ -94,6 +94,10 @@ const ReportDetails = () => {
     onChangeRightPreviousValue,
     onChangeRightVisusCC,
     updateEyeData,
+    RightDic,
+    onChangeRightDic,
+    LeftDic,
+    onChangeLeftDic,
   ] = ReportDetails_Hook();
 
   return (
@@ -593,6 +597,29 @@ const ReportDetails = () => {
                   <Form.Text className="text-muted">
                     {t("reportForm.eyeExamination.imageNote")}
                   </Form.Text>
+                  <Row>
+                    <Col md={6}>
+                      <Form.Group>
+                        <Form.Control
+                          type="file"
+                          accept=".dcm" // عشان يحدد نوع الملفات DICOM فقط
+                          onChange={onChangeRightDic}
+                          className="mb-2"
+                        />
+                        {/* عرض اسم الملف المختار حالياً للتأكيد للمستخدم */}
+                        {RightDic && (
+                          <div className="text-success small">
+                            <i className="fa fa-file-medical me-1"></i>
+                            {RightDic.name}
+                          </div>
+                        )}
+                        <Form.Text className="text-muted">
+                          {t("reportForm.eyeExamination.dicomNote") ||
+                            "Upload DICOM files (.dcm) for professional analysis."}
+                        </Form.Text>
+                      </Form.Group>
+                    </Col>
+                  </Row>
                   <Row className="mt-3">
                     <Col md={4}>
                       <Form.Group>
@@ -838,6 +865,35 @@ const ReportDetails = () => {
                     {t("reportForm.eyeExamination.imageNote")}
                     diagnosis.
                   </Form.Text>
+                  <div className="text-form pb-2 pt-4">
+                    {t("reportForm.eyeExamination.labels.uploadDicom", {
+                      eye: t("reportForm.tabs.leftEye"),
+                    })}
+                  </div>
+
+                  <Row>
+                    <Col md={6}>
+                      <Form.Group>
+                        <Form.Control
+                          type="file"
+                          accept=".dcm" // عشان يحدد نوع الملفات DICOM فقط
+                          onChange={onChangeLeftDic}
+                          className="mb-2"
+                        />
+                        {/* عرض اسم الملف المختار حالياً للتأكيد للمستخدم */}
+                        {LeftDic && (
+                          <div className="text-success small">
+                            <i className="fa fa-file-medical me-1"></i>
+                            {LeftDic.name}
+                          </div>
+                        )}
+                        <Form.Text className="text-muted">
+                          {t("reportForm.eyeExamination.dicomNote") ||
+                            "Upload DICOM files (.dcm) for professional analysis."}
+                        </Form.Text>
+                      </Form.Group>
+                    </Col>
+                  </Row>
                   <Row className="mt-3">
                     <Col md={4}>
                       <Form.Group>

@@ -46,7 +46,7 @@ const PatientReport = () => {
   const [logoPreview, setLogoPreview] = useState(LogoImage);
   const [loading, setLoading] = useState(false);
   const [selectedHeatmap, setSelectedHeatmap] = useState(null);
-
+  const [selectedDicom, setSelectedDicom] = useState(null);
   const handleImageChange = async (event) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
@@ -180,7 +180,7 @@ const PatientReport = () => {
                     <strong>{t("reportdata.patientInfo.ethnicity")}:</strong>{" "}
                     {Report?.patient?.ethnicity ? (
                       t(
-                        `reportdata.ethnicityOptions.${Report?.patient?.ethnicity}`
+                        `reportdata.ethnicityOptions.${Report?.patient?.ethnicity}`,
                       )
                     ) : (
                       <span style={{ color: "red" }}>---</span>
@@ -239,7 +239,7 @@ const PatientReport = () => {
                             `reportdata.medicalHistory.values.${disease.name}`,
                             {
                               defaultValue: disease.name,
-                            }
+                            },
                           )}
                         </strong>
                         <div className="ms-3">
@@ -250,7 +250,7 @@ const PatientReport = () => {
                             {t(
                               `reportdata.medicalHistory.values.${
                                 disease.hasCondition ? "Yes" : "No"
-                              }`
+                              }`,
                             )}
                           </span>
                           <span className="ms-3">
@@ -258,7 +258,7 @@ const PatientReport = () => {
                               {t("reportdata.medicalHistory.appliesTo")}:
                             </strong>{" "}
                             {t(
-                              `reportdata.medicalHistory.values.${disease.appliesTo}`
+                              `reportdata.medicalHistory.values.${disease.appliesTo}`,
                             )}
                           </span>
                         </div>
@@ -270,7 +270,7 @@ const PatientReport = () => {
                           <span className="me-3">
                             <strong>
                               {t(
-                                "reportdata.medicalHistory.diabetes.sinceWhen"
+                                "reportdata.medicalHistory.diabetes.sinceWhen",
                               )}
                               :
                             </strong>{" "}
@@ -284,13 +284,13 @@ const PatientReport = () => {
                           <span className="me-3">
                             <strong>
                               {t(
-                                "reportdata.medicalHistory.diabetes.hba1cDate"
+                                "reportdata.medicalHistory.diabetes.hba1cDate",
                               )}
                               :
                             </strong>{" "}
                             {disease.hba1cDate ? (
                               new Date(disease.hba1cDate).toLocaleDateString(
-                                "de-DE"
+                                "de-DE",
                               )
                             ) : (
                               <span style={{ color: "red" }}>---</span>
@@ -300,7 +300,7 @@ const PatientReport = () => {
                           <span className="me-3">
                             <strong>
                               {t(
-                                "reportdata.medicalHistory.diabetes.hba1cValue"
+                                "reportdata.medicalHistory.diabetes.hba1cValue",
                               )}
                               :
                             </strong>{" "}
@@ -314,7 +314,7 @@ const PatientReport = () => {
                           <span className="me-3">
                             <strong>
                               {t(
-                                "reportdata.medicalHistory.diabetes.treatment"
+                                "reportdata.medicalHistory.diabetes.treatment",
                               )}
                               :
                             </strong>{" "}
@@ -357,7 +357,7 @@ const PatientReport = () => {
                           {t(
                             `reportdata.medicalHistory.values.${
                               disease.hasCondition ? "Yes" : "No"
-                            }`
+                            }`,
                           )}
                         </span>
                         <span className="ms-3">
@@ -365,7 +365,7 @@ const PatientReport = () => {
                             {t("reportdata.medicalHistory.appliesTo")}:
                           </strong>{" "}
                           {t(
-                            `reportdata.medicalHistory.values.${disease.appliesTo}`
+                            `reportdata.medicalHistory.values.${disease.appliesTo}`,
                           )}
                         </span>
                       </div>
@@ -389,7 +389,7 @@ const PatientReport = () => {
                   <span className="text-muted">
                     {t("reportdata.rightEye.imageCaptureDate")}:{" "}
                     {new Date(
-                      Report.eyeExamination.rightEye.imageCaptureDate
+                      Report.eyeExamination.rightEye.imageCaptureDate,
                     ).toLocaleDateString("de-DE")}
                   </span>
                 )}
@@ -403,12 +403,12 @@ const PatientReport = () => {
                       let rightEyeResults = null;
                       try {
                         rightEyeResults = JSON.parse(
-                          Report.modelResults?.rightEye || "{}"
+                          Report.modelResults?.rightEye || "{}",
                         );
                       } catch (err) {
                         console.error(
                           "Invalid JSON in modelResults.rightEye:",
-                          err
+                          err,
                         );
                       }
 
@@ -515,6 +515,30 @@ const PatientReport = () => {
                     />
                   </Modal.Body>
                 </Modal>
+                {Report?.eyeExamination?.rightEye?.dicom?.length > 0 && (
+                  <div className="mt-3 no-print">
+                    {Report.eyeExamination.rightEye.dicom.map(
+                      (dicomUrl, idx) => (
+                        <Button
+                          key={idx}
+                          variant="outline-primary"
+                          size="sm"
+                          // التعديل هنا: بنفتح Tab جديد ونبعت الرابط كمعامل (Param)
+                          onClick={() =>
+                            window.open(
+                              `/view-dicom?dicomUrl=${encodeURIComponent(dicomUrl)}`,
+                              "_blank",
+                            )
+                          }
+                          className="d-flex align-items-center gap-2"
+                        >
+                          <i className="bi bi-eye"></i>{" "}
+                          {t("reportdata.rightEye.viewDicom")}
+                        </Button>
+                      ),
+                    )}
+                  </div>
+                )}
               </>
               {/* بيانات الفحص */}
               <Row>
@@ -525,7 +549,7 @@ const PatientReport = () => {
                 <Col>
                   <strong>{t("reportdata.rightEye.previousValue")}:</strong>{" "}
                   {displayValue(
-                    Report?.eyeExamination?.rightEye?.previousValue
+                    Report?.eyeExamination?.rightEye?.previousValue,
                   )}
                 </Col>
                 <Col>
@@ -553,20 +577,20 @@ const PatientReport = () => {
                     {t("reportdata.rightEye.intraocularPressure")}:
                   </strong>{" "}
                   {displayValue(
-                    Report?.eyeExamination?.rightEye?.intraocularPressure
+                    Report?.eyeExamination?.rightEye?.intraocularPressure,
                   )}
                 </Col>
                 <Col>
                   <strong>{t("reportdata.rightEye.cornealThickness")}:</strong>{" "}
                   {displayValue(
-                    Report?.eyeExamination?.rightEye?.cornealThickness
+                    Report?.eyeExamination?.rightEye?.cornealThickness,
                   )}
                 </Col>
                 <Col>
                   <strong>{t("reportdata.rightEye.chamberAngle")}:</strong>{" "}
                   {Report?.eyeExamination?.rightEye?.chamberAngle ? (
                     t(
-                      `reportdata.commonValues.${Report.eyeExamination.rightEye.chamberAngle}`
+                      `reportdata.commonValues.${Report.eyeExamination.rightEye.chamberAngle}`,
                     )
                   ) : (
                     <span style={{ color: "red" }}>--</span>
@@ -583,7 +607,7 @@ const PatientReport = () => {
                       Report?.eyeExamination?.rightEye?.amslerTestAbnormal
                         ? "Yes"
                         : "No"
-                    }`
+                    }`,
                   )}
                 </Col>
               </Row>
@@ -600,7 +624,7 @@ const PatientReport = () => {
                       ([key, value]) =>
                         key !== "image_quality" &&
                         key !== "eye_side" &&
-                        value.status === "Detected"
+                        value.status === "Detected",
                     );
 
                     return (
@@ -680,14 +704,14 @@ const PatientReport = () => {
                             Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
                             {feedback.doctor?.lastname || ""} –{" "}
                             {moment(feedback.createdAt).format(
-                              "DD MMM YYYY, h:mm A"
+                              "DD MMM YYYY, h:mm A",
                             )}
                           </Accordion.Header>
                           <Accordion.Body>
                             <p>
                               <strong>
                                 {t(
-                                  "reportdata.doctorFeedback.predictionAccuracy"
+                                  "reportdata.doctorFeedback.predictionAccuracy",
                                 )}
                                 :
                               </strong>{" "}
@@ -719,7 +743,7 @@ const PatientReport = () => {
                             <p>
                               <strong>
                                 {t(
-                                  "reportdata.doctorFeedback.recommendedAction"
+                                  "reportdata.doctorFeedback.recommendedAction",
                                 )}
                                 :
                               </strong>{" "}
@@ -747,7 +771,7 @@ const PatientReport = () => {
                   <span className="text-muted">
                     {t("reportdata.rightEye.imageCaptureDate")}:{" "}
                     {new Date(
-                      Report.eyeExamination.leftEye.imageCaptureDate
+                      Report.eyeExamination.leftEye.imageCaptureDate,
                     ).toLocaleDateString("de-DE")}
                   </span>
                 )}
@@ -759,12 +783,12 @@ const PatientReport = () => {
                     let leftEyeResults = null;
                     try {
                       leftEyeResults = JSON.parse(
-                        Report.modelResults?.leftEye || "{}"
+                        Report.modelResults?.leftEye || "{}",
                       );
                     } catch (err) {
                       console.error(
                         "Invalid JSON in modelResults.leftEye:",
-                        err
+                        err,
                       );
                     }
 
@@ -867,10 +891,34 @@ const PatientReport = () => {
                   />
                 </Modal.Body>
               </Modal>
+
+              {Report?.eyeExamination?.leftEye?.dicom?.length > 0 && (
+                <div className="mt-3 no-print">
+                  {Report.eyeExamination.leftEye.dicom.map((dicomUrl, idx) => (
+                    <Button
+                      key={idx}
+                      variant="outline-primary"
+                      size="sm"
+                      // التعديل هنا: بنفتح Tab جديد ونبعت الرابط كمعامل (Param)
+                      onClick={() =>
+                        window.open(
+                          `/view-dicom?dicomUrl=${encodeURIComponent(dicomUrl)}`,
+                          "_blank",
+                        )
+                      }
+                      className="d-flex align-items-center gap-2"
+                    >
+                      <i className="bi bi-eye"></i>{" "}
+                      {t("reportdata.leftEye.viewDicom")}
+                    </Button>
+                  ))}
+                </div>
+              )}
+
               {/* بيانات الفحص */}
               <Row>
                 <Col>
-                  <strong>{t("reportdata.rightEye.visusCC")}:</strong>{" "}
+                  <strong>{t("reportdata.leftEye.visusCC")}:</strong>{" "}
                   {displayValue(Report?.eyeExamination?.leftEye?.visusCC)}
                 </Col>
                 <Col>
@@ -902,20 +950,20 @@ const PatientReport = () => {
                     {t("reportdata.rightEye.intraocularPressure")}:
                   </strong>{" "}
                   {displayValue(
-                    Report?.eyeExamination?.leftEye?.intraocularPressure
+                    Report?.eyeExamination?.leftEye?.intraocularPressure,
                   )}
                 </Col>
                 <Col>
                   <strong>{t("reportdata.rightEye.cornealThickness")}:</strong>{" "}
                   {displayValue(
-                    Report?.eyeExamination?.leftEye?.cornealThickness
+                    Report?.eyeExamination?.leftEye?.cornealThickness,
                   )}
                 </Col>
                 <Col>
                   <strong>{t("reportdata.rightEye.chamberAngle")}:</strong>{" "}
                   {Report?.eyeExamination?.leftEye?.chamberAngle ? (
                     t(
-                      `reportdata.commonValues.${Report.eyeExamination.leftEye.chamberAngle}`
+                      `reportdata.commonValues.${Report.eyeExamination.leftEye.chamberAngle}`,
                     )
                   ) : (
                     <span style={{ color: "red" }}>--</span>
@@ -932,7 +980,7 @@ const PatientReport = () => {
                       Report?.eyeExamination?.leftEye?.amslerTestAbnormal
                         ? "Yes"
                         : "No"
-                    }`
+                    }`,
                   )}
                 </Col>
               </Row>
@@ -948,7 +996,7 @@ const PatientReport = () => {
                       ([key, value]) =>
                         key !== "image_quality" &&
                         key !== "eye_side" &&
-                        value.status === "Detected"
+                        value.status === "Detected",
                     );
 
                     return (
@@ -1028,14 +1076,14 @@ const PatientReport = () => {
                             Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
                             {feedback.doctor?.lastname || ""} –{" "}
                             {moment(feedback.createdAt).format(
-                              "DD MMM YYYY, h:mm A"
+                              "DD MMM YYYY, h:mm A",
                             )}
                           </Accordion.Header>
                           <Accordion.Body>
                             <p>
                               <strong>
                                 {t(
-                                  "reportdata.doctorFeedback.predictionAccuracy"
+                                  "reportdata.doctorFeedback.predictionAccuracy",
                                 )}
                               </strong>{" "}
                               <span
@@ -1066,7 +1114,7 @@ const PatientReport = () => {
                             <p>
                               <strong>
                                 {t(
-                                  "reportdata.doctorFeedback.recommendedAction"
+                                  "reportdata.doctorFeedback.recommendedAction",
                                 )}
                                 :
                               </strong>{" "}

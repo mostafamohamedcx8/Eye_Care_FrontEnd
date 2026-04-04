@@ -21,6 +21,8 @@ export const ReportDetails_Hook = () => {
   const [innerTab, setInnerTab] = useState("medical");
   const [Rightimages, setRightImages] = useState([]);
   const [Leftimages, setLeftImages] = useState([]);
+  const [RightDic, setRightDic] = useState([]);
+  const [LeftDic, setLeftDic] = useState([]);
   const [rightImageCaptureDate, setRightImageCaptureDate] = useState("");
   const [leftImageCaptureDate, setLeftImageCaptureDate] = useState("");
 
@@ -258,39 +260,6 @@ export const ReportDetails_Hook = () => {
     return new File([u8arr], filename, { type: mime });
   }
 
-  const resetFormFields = () => {
-    setActiveTab("patient");
-    setInnerTab("medical");
-    setRightImages([]);
-    setLeftImages([]);
-
-    setRightVisusCC("");
-    setRightPreviousValue("");
-    setRightSince("");
-    setRightSphere("");
-    setRightCylinder("");
-    setRightAxis("");
-    setRightIntraocularPressure("");
-    setRightCornealThickness("");
-    setRightChamberAngle("");
-    setRightAmslerTestAbnormal(false);
-
-    setLeftVisusCC("");
-    setLeftPreviousValue("");
-    setLeftSince("");
-    setLeftSphere("");
-    setLeftCylinder("");
-    setLeftAxis("");
-    setLeftIntraocularPressure("");
-    setLeftCornealThickness("");
-    setLeftChamberAngle("");
-    setLeftAmslerTestAbnormal(false);
-    setHistoryData({
-      medical: [],
-      eye: [],
-    });
-  };
-
   const rightEyeData = {
     rightVisusCC,
     rightSphere,
@@ -303,6 +272,7 @@ export const ReportDetails_Hook = () => {
     rightCornealThickness,
     rightAmslerTestAbnormal,
     Rightimages,
+    RightDic,
     rightImageCaptureDate,
   };
   const leftEyeData = {
@@ -317,6 +287,7 @@ export const ReportDetails_Hook = () => {
     leftCornealThickness,
     leftAmslerTestAbnormal,
     Leftimages,
+    LeftDic,
     leftImageCaptureDate,
   };
   const HandelSendingData = async (e) => {
@@ -434,6 +405,14 @@ export const ReportDetails_Hook = () => {
       "eyeExamination.leftEye.amslerTestAbnormal",
       leftAmslerTestAbnormal,
     );
+    if (RightDic) {
+      formData.append("rightEyeDic", RightDic);
+    }
+
+    // Append DICOM files (Left Eye)
+    if (LeftDic) {
+      formData.append("leftEyeDic", LeftDic);
+    }
 
     // Append medical history
 
@@ -642,6 +621,17 @@ export const ReportDetails_Hook = () => {
     setLeftChamberAngle(e.target.value);
   };
 
+  const onChangeRightDic = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setRightDic(e.target.files[0]); // بنخزن الملف نفسه مش Base64
+    }
+  };
+
+  const onChangeLeftDic = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setLeftDic(e.target.files[0]);
+    }
+  };
   return [
     patient,
     activeTab,
@@ -714,5 +704,9 @@ export const ReportDetails_Hook = () => {
     onChangeRightPreviousValue,
     onChangeRightVisusCC,
     updateEyeData,
+    RightDic,
+    onChangeRightDic,
+    LeftDic,
+    onChangeLeftDic,
   ];
 };

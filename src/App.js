@@ -9,7 +9,7 @@ import OtpCode from "./pages/OTP";
 import Newpassword from "./pages/NewPassword";
 import ExaminationReport from "./pages/ExaminationReport";
 import DoctorCard from "./pages/DoctorPage";
-// import DoctorDetailes from "./pages/DoctorDetailes";
+import DicomViewerPage from "./pages/ViewDicomPage";
 import ProfilePage from "./pages/ProfilePage";
 import PatientPage from "../src/pages/PatientPage";
 import { ToastContainer } from "react-toastify";
@@ -99,6 +99,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/view-dicom"
+            element={
+              <ProtectedRoute>
+                <DicomViewerPage />
               </ProtectedRoute>
             }
           />
