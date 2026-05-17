@@ -284,7 +284,9 @@
     "modal_title": "Ärztliche Lizenz oder Geschäfts Lizenz",
     "modal_label": "Ärztliche Lizenz oder Geschäfts Lizenz hochladen",
     "modal_cancel_button": "Abbrechen",
-    "modal_confirm_button": "Bestätigen & Registrieren"
+    "modal_confirm_button": "Bestätigen & Registrieren",
+    "fill_all_fields": "Bitte füllen Sie alle Felder aus",
+    "loading": "Registrierung läuft..."
   },
   "login": {
     "breadcrumbHome": "Startseite",
@@ -508,7 +510,8 @@
       }
     },
     "buttons": {
-      "create": "Patient anlegen"
+      "create": "Patient anlegen",
+      "creating": "Anlegen läuft..."
     },
     "notifications": {
       "createSuccess": "Patient erfolgreich angelegt."

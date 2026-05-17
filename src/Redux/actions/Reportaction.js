@@ -15,8 +15,8 @@ import { updateDataWithToken } from "../../Hooks/useUpdateData";
 export const CreateReport = (FormatData, id) => async (dispatch) => {
   try {
     const response = await InsertDataWithImage(
-      `/api/v1/report/${id}`,
-      FormatData
+      `/api/v1/reports/${id}`,
+      FormatData,
     );
     dispatch({
       type: CREATEREPORT,
@@ -32,9 +32,11 @@ export const CreateReport = (FormatData, id) => async (dispatch) => {
   }
 };
 
-export const getSpecificReport = (id) => async (dispatch) => {
+export const getSpecificReport = (patientId, reportId) => async (dispatch) => {
   try {
-    const response = await useGetDataToken(`/api/v1/report/myreport/${id}`);
+    const response = await useGetDataToken(
+      `/api/v1/reports/${patientId}/${reportId}`,
+    );
 
     dispatch({
       type: GET_SPECIFIC_REPORT,
@@ -49,7 +51,7 @@ export const getSpecificReport = (id) => async (dispatch) => {
 };
 export const getmynotification = (id) => async (dispatch) => {
   try {
-    const response = await useGetDataToken(`/api/v1/report/mynotify`);
+    const response = await useGetDataToken(`/api/v1/reports/notifications`);
 
     dispatch({
       type: GETMYNOTIFCATION,
@@ -67,9 +69,7 @@ export const getPatientWithReport = (id) => async (dispatch) => {
     // امسح الداتا القديمة وفعل حالة التحميل
     dispatch({ type: "CLEAR_PATIENT_REPORT" });
 
-    const response = await useGetDataToken(
-      `/api/v1/patient/myPatientwithreport/${id}`
-    );
+    const response = await useGetDataToken(`/api/v1/reports/${id}`);
 
     dispatch({
       type: GETPPATIENTWITHREPORT,
@@ -83,9 +83,11 @@ export const getPatientWithReport = (id) => async (dispatch) => {
   }
 };
 
-export const deleteMyReport = (id) => async (dispatch) => {
+export const deleteMyReport = (patientId, reportId) => async (dispatch) => {
   try {
-    const response = await DeleteData(`/api/v1/report/myreport/${id}`);
+    const response = await DeleteData(
+      `/api/v1/reports/${patientId}/${reportId}`,
+    );
 
     dispatch({
       type: DELETEMYREPORT,
@@ -102,8 +104,8 @@ export const deleteMyReport = (id) => async (dispatch) => {
 export const MarkDocotrFeedback = (id, body) => async (dispatch) => {
   try {
     const response = await updateDataWithToken(
-      `/api/v1/report/feedback/${id}`,
-      body
+      `/api/v1/reports/feedback/${id}`,
+      body,
     );
     dispatch({
       type: MARKDOCTORFEEDBACKASREAD,
@@ -120,13 +122,10 @@ export const MarkDocotrFeedback = (id, body) => async (dispatch) => {
 
 export const MarkNotifyRead = (id) => async (dispatch) => {
   try {
-    const response = await updateDataWithToken(
-      `/api/v1/report/notifications/${id}`
-    );
+    const response = await updateDataWithToken(`/api/v1/reports/${id}/read`);
     dispatch({
       type: MARKNOTIFYASREAD,
       payload: response,
-      loading: true,
     });
   } catch (e) {
     dispatch({

@@ -1,7 +1,6 @@
 import baseUrl from "../Api/baseurl";
 
 const DeleteData = async (url, params) => {
-  console.log(localStorage.getItem("token"));
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   };

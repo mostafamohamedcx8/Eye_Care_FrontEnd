@@ -8,24 +8,15 @@ import { useNavigate } from "react-router-dom";
 
 export const Signup_Hook = (t) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // --- States ---
   const [states, setStates] = useState([]);
   const [selectedState, setSelectedState] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [imagemedicallicense, setimagemedicallicense] = useState(null);
   const [cities, setCities] = useState([]);
   const [selectedcity, setSelectedcity] = useState("");
-  useEffect(() => {
-    const germanStates = State.getStatesOfCountry("DE"); // DE = Germany
-    setStates(germanStates);
-  }, []);
-  useEffect(() => {
-    if (selectedState) {
-      const foundCities = City.getCitiesOfState("DE", selectedState);
-      setCities(foundCities);
-    }
-  }, [selectedState]);
-
-  const dispatch = useDispatch();
+  const [showModal, setShowModal] = useState(false);
+  const [imagemedicallicense, setimagemedicallicense] = useState(null);
 
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -40,11 +31,29 @@ export const Signup_Hook = (t) => {
   const [postalCode, setPostalCode] = useState("");
   const [salutation, setsalutation] = useState("");
   const [fullAddress, setFullAddress] = useState("");
+
   const [loading, setloading] = useState(true);
   const [ispress, setispress] = useState(false);
+
   const User = useSelector((state) => state.alluser.User);
+
+  // --- Helpers ---
   const fullPhoneNumber = countryCode + phoneNumber;
 
+  // --- Effects ---
+  useEffect(() => {
+    const germanStates = State.getStatesOfCountry("DE");
+    setStates(germanStates);
+  }, []);
+
+  useEffect(() => {
+    if (selectedState) {
+      const foundCities = City.getCitiesOfState("DE", selectedState);
+      setCities(foundCities);
+    }
+  }, [selectedState]);
+
+  // --- Handlers ---
   const resetFormFields = () => {
     setFirstname("");
     setLastname("");
@@ -53,15 +62,18 @@ export const Signup_Hook = (t) => {
     setConfirmPassword("");
     setPhoneNumber("");
     setsalutation("");
-    setDateOfBirthDay("Day");
-    setDateOfBirthMonth("Month");
-    setDateOfBirthYear("Year");
+    setDateOfBirthDay("");
+    setDateOfBirthMonth("");
+    setDateOfBirthYear("");
     setSelectedState("");
     setSelectedcity("");
     setFullAddress("");
+    setPostalCode("");
+    setimagemedicallicense(null);
     setloading(true);
     setispress(false);
   };
+
   const handleCloseModal = () => setShowModal(false);
 
   const handleShowModal = (e) => {
@@ -82,94 +94,45 @@ export const Signup_Hook = (t) => {
       state: selectedState,
       city: selectedcity,
       fullAddress,
-
       t,
     });
 
-    if (!isValid) return; // لو فيه خطأ ميفتحش المودال
-
-    setShowModal(true); // لو البيانات صحيحة افتح المودال
-  };
-  const onChangefirstname = (e) => {
-    e.persist();
-    setFirstname(e.target.value);
-  };
-  const onChangelastname = (e) => {
-    e.persist();
-    setLastname(e.target.value);
+    if (!isValid) return;
+    setShowModal(true);
   };
 
-  const onChangedateOfBirthDay = (e) => {
-    e.persist();
-    setDateOfBirthDay(e.target.value);
-  };
-  const onChangedateOfBirthMonth = (e) => {
-    e.persist();
-    setDateOfBirthMonth(e.target.value);
-  };
-  const onChangedateOfBirthYear = (e) => {
-    e.persist();
-    setDateOfBirthYear(e.target.value);
-  };
-  const onChangedsalutation = (e) => {
-    e.persist();
-    setsalutation(e.target.value);
-  };
-  const onChangeEmail = (e) => {
-    e.persist();
-    setEmail(e.target.value);
-  };
-  const onChangedPassword = (e) => {
-    e.persist();
-    setPassword(e.target.value);
-  };
-  const onChangeConfirmPassword = (e) => {
-    e.persist();
-    setConfirmPassword(e.target.value);
-  };
-  const onChangePhoneNumber = (e) => {
-    e.persist();
-    setPhoneNumber(e.target.value);
-  };
-  const onChangeCountryCode = (e) => {
-    e.persist();
-    setCountryCode(e.target.value);
-  };
-  const onChangedSelectedState = (e) => {
-    e.persist();
-    setSelectedState(e.target.value);
-  };
-  const onChangedSelectedcity = (e) => {
-    e.persist();
-    setSelectedcity(e.target.value);
-  };
-  const onChangedPostalCode = (e) => {
-    e.persist();
-    setPostalCode(e.target.value);
-  };
-  const onChangedFullAddress = (e) => {
-    e.persist();
-    setFullAddress(e.target.value);
-  };
-  const onChangedimagemedicallicense = (e) => {
-    e.persist();
+  // --- Inputs Handlers ---
+  const onChangefirstname = (e) => setFirstname(e.target.value);
+  const onChangelastname = (e) => setLastname(e.target.value);
+  const onChangeEmail = (e) => setEmail(e.target.value);
+  const onChangedPassword = (e) => setPassword(e.target.value);
+  const onChangeConfirmPassword = (e) => setConfirmPassword(e.target.value);
+  const onChangePhoneNumber = (e) => setPhoneNumber(e.target.value);
+  const onChangeCountryCode = (e) => setCountryCode(e.target.value);
+  const onChangedSelectedState = (e) => setSelectedState(e.target.value);
+  const onChangedSelectedcity = (e) => setSelectedcity(e.target.value);
+  const onChangedateOfBirthDay = (e) => setDateOfBirthDay(e.target.value);
+  const onChangedateOfBirthMonth = (e) => setDateOfBirthMonth(e.target.value);
+  const onChangedateOfBirthYear = (e) => setDateOfBirthYear(e.target.value);
+  const onChangedsalutation = (e) => setsalutation(e.target.value);
+  const onChangedPostalCode = (e) => setPostalCode(e.target.value);
+  const onChangedFullAddress = (e) => setFullAddress(e.target.value);
+  const onChangedimagemedicallicense = (e) =>
     setimagemedicallicense(e.target.files[0]);
-  };
 
-  const handelSubmit = async (event) => {
-    event.preventDefault();
+  // --- Submit Logic ---
+  const handelSubmit = async () => {
+    // ✅ إزالة event parameter — مش محتاجينه
+    const formattedMonth = dateOfBirthMonth.toString().padStart(2, "0");
+    const formattedDay = dateOfBirthDay.toString().padStart(2, "0");
+    const dateOfBirthString = `${dateOfBirthYear}-${formattedMonth}-${formattedDay}`;
 
-    const monthNames = t("signup.englishMonths", { returnObjects: true });
-    const monthName = monthNames[parseInt(dateOfBirthMonth) - 1];
     const stateObject = states.find((state) => state.isoCode === selectedState);
     const stateName = stateObject ? stateObject.name : selectedState;
 
-    // 1. Create FormData object
     const formData = new FormData();
-
-    // 2. Append normal fields
-    formData.append("firstname", firstname);
-    formData.append("lastname", lastname);
+    formData.append("firstName", firstname);
+    formData.append("lastName", lastname);
     formData.append("email", email);
     formData.append("password", password);
     formData.append("passwordConfirm", confirmPassword);
@@ -180,58 +143,38 @@ export const Signup_Hook = (t) => {
     formData.append("fullAddress", fullAddress);
     formData.append("role", "optician");
     formData.append("postalCode", postalCode);
-    // Append nested dateOfBirth fields
-    formData.append("dateOfBirth.day", Number(dateOfBirthDay));
-    formData.append("dateOfBirth.month", monthName);
-    formData.append("dateOfBirth.year", Number(dateOfBirthYear));
-    formData.append("imagemedicallicense", imagemedicallicense); // أضف الصورة
+    formData.append("dateOfBirth", dateOfBirthString);
 
-    const isValid = validateSignupForm({
-      firstname,
-      lastname,
-      email,
-      password,
-      passwordConfirm: confirmPassword,
-      phoneNumber,
-      countryCode,
-      dateOfBirthDay,
-      dateOfBirthMonth,
-      dateOfBirthYear,
-      salutation,
-      postalCode,
-      state: selectedState,
-      city: selectedcity,
-      fullAddress,
-      t,
-    });
-
-    if (!isValid) return;
+    if (imagemedicallicense) {
+      formData.append("medicalLicenseImage", imagemedicallicense);
+    }
 
     setloading(true);
     setispress(true);
 
-    const res = await dispatch(CreateUser(formData)); // ← خزن النتيجة هنا
-    console.log("Response from backend:", res); // send FormData object
+    const res = await dispatch(CreateUser(formData));
+    console.log(res);
+
     setloading(false);
   };
 
+  // --- Response Effect ---
   useEffect(() => {
     if (loading === false && User) {
-      setispress(false);
       if (User?.status === 201) {
         resetFormFields();
         notify(t("signuphook.successAccountCreated"), "success");
-        navigate("/Login");
+        setTimeout(() => navigate("/Login"), 1500);
       } else if (User?.data?.errors?.[0]?.msg === "Email already exists") {
         notify(t("signuphook.emailExists"), "warn");
       } else {
         notify(User?.data?.message || t("signuphook.errorOccurred"), "error");
       }
-      setTimeout(() => {
-        setloading(true);
-      }, 1500);
+
+      setispress(false); // ✅ هنا بعد اللوجيك
+      setloading(true);
     }
-  }, [loading, User]);
+  }, [loading, User, t, navigate]);
 
   return [
     handleShowModal,

@@ -19,7 +19,7 @@ const initial = {
   userpassword: [],
   mydata: [],
   error: null, // أضف حقل للخطأ
-  loading: true,
+  loading: false,
 };
 
 const userReducer = (state = initial, action) => {

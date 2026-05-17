@@ -12,54 +12,56 @@ import { useTranslation } from "react-i18next";
 
 const NewPasswordSection = () => {
   const dispatch = useDispatch();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const [newpassword, setnewpassword] = useState("");
   const [confirmnewPassword, setConfirmnewPassword] = useState("");
-  const [email, setemail] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [ispress, setispress] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isPress, setIsPress] = useState(false);
   const { t } = useTranslation();
 
-  const HandelSubmit = async (e) => {
+  const res = useSelector((state) => state.alluser.createNewPassword);
+  console.log(res);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const isValid = validationResetPassword({
       newpassword,
       confirmnewPassword,
       t,
     });
+
     if (!isValid) return;
+
     setLoading(true);
-    setispress(true);
+    setIsPress(true);
 
     await dispatch(
       Create_New_Password({
         newpassword,
         email: localStorage.getItem("user-email"),
-      })
+      }),
     );
+
     setLoading(false);
-    setispress(false);
   };
 
-  const res = useSelector((state) => state.alluser.createNewPassword);
-  console.log(res.data);
   useEffect(() => {
-    if (loading === false) {
-      if (res) {
-        if (res.message === "Password reset successfully") {
-          notify(t("newPassword.notifySuccess"), "success");
-          setTimeout(() => {
-            Navigate("/login");
-          }, 1000);
-        } else if (res.data.message === "Reset code is not verified") {
-          notify(t("newPassword.notifyErrorNotVerified"), "error");
-        } else {
-          notify(t("newPassword.notifyErrorRequestNew"), "error");
-        }
-        setLoading(true);
+    // نتحقق إن التحميل خلص وإن فيه محاولة إرسال فعلية حصلت
+    if (!loading && isPress && res) {
+      if (res.message === "Password reset successfully") {
+        notify(t("newPassword.notifySuccess"), "success");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      } else if (res.data?.message === "Reset code is not verified") {
+        notify(t("newPassword.notifyErrorNotVerified"), "error");
+      } else {
+        notify(t("newPassword.notifyErrorRequestNew"), "error");
       }
+      setIsPress(false); // تصفير الحالة للمحاولة التالية
     }
-  }, [loading, t]);
+  }, [loading, res, navigate, t, isPress]);
 
   return (
     <>
@@ -85,24 +87,24 @@ const NewPasswordSection = () => {
 
       {/* New Password Form Section */}
       <Container
-        className="d-flex justify-content-center align-items-center"
+        className="d-flex flex-column justify-content-center align-items-center"
         style={{ minHeight: "80vh" }}
       >
         <Card style={{ width: "100%", maxWidth: "400px" }}>
           <Card.Body>
-            <h4 className="text-center mb-3">
-              {" "}
-              {t("newPassword.formHeading")}
-            </h4>
+            <h4 className="text-center mb-3">{t("newPassword.formHeading")}</h4>
             <p className="text-center text-muted mb-4">
               {t("newPassword.instructionText")}
             </p>
 
-            <Form>
+            <Form onSubmit={handleSubmit}>
+              {" "}
+              {/* استخدم onSubmit هنا */}
               <Form.Group className="mb-3">
                 <Form.Label>{t("newPassword.newPasswordLabel")}</Form.Label>
                 <Form.Control
                   type="password"
+                  required
                   placeholder={t("newPassword.newPasswordPlaceholder")}
                   value={newpassword}
                   onChange={(e) => setnewpassword(e.target.value)}
@@ -112,28 +114,31 @@ const NewPasswordSection = () => {
                 <Form.Label>{t("newPassword.confirmPasswordLabel")}</Form.Label>
                 <Form.Control
                   type="password"
+                  required
                   placeholder={t("newPassword.confirmPasswordPlaceholder")}
                   value={confirmnewPassword}
                   onChange={(e) => setConfirmnewPassword(e.target.value)}
                 />
               </Form.Group>
               <Button
-                onClick={HandelSubmit}
+                type="submit"
                 variant="primary"
                 className="w-100"
+                disabled={loading}
               >
-                {t("newPassword.resetButton")}
+                {loading ? (
+                  <Spinner size="sm" animation="border" />
+                ) : (
+                  t("newPassword.resetButton")
+                )}
               </Button>
             </Form>
           </Card.Body>
         </Card>
-        {ispress ? (
-          loading ? (
-            <Spinner animation="border" variant="primary" />
-          ) : (
-            <h4> {t("newPassword.done")} </h4>
-          )
-        ) : null}
+
+        {isPress && !loading && res?.status === 200 && (
+          <h4 className="mt-3"> {t("newPassword.done")} </h4>
+        )}
       </Container>
     </>
   );

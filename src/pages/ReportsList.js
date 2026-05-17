@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Button,
-  Modal,
-  Spinner,
-  Table,
-} from "react-bootstrap";
+import { Container, Button, Modal, Spinner, Table } from "react-bootstrap";
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
@@ -20,66 +11,49 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import notify from "../Hook/useNotification";
 import { useTranslation } from "react-i18next";
+
 const ReportsList = () => {
   const { t } = useTranslation();
   const [isNavigating, setIsNavigating] = useState(false);
   const userFromStorage = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { id } = useParams();
+  const { id } = useParams(); // ✅ ده الـ patientId
 
   const [show, setShow] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  const ReportData = useSelector(
+    (state) => state.allreport.getpatientwithreport,
+  );
+  const Report = ReportData?.data || [];
 
   useEffect(() => {
     dispatch(getPatientWithReport(id));
-  }, []);
-
-  useEffect(() => {
-    if (loading === false) {
-      if (res === "") {
-        notify(t("reports.success_message"), "success");
-        setTimeout(() => {
-          window.location.reload(false);
-        }, 1000);
-      } else {
-        notify(t("reports.error_message"), "error");
-      }
-    }
-  }, [loading]);
+  }, [id, dispatch]);
 
   const handleClose = () => {
     setShow(false);
     setDeleteId(null);
   };
-  const handleShow = (reportid) => {
-    setDeleteId(reportid);
+
+  const handleShow = (reportId) => {
+    setDeleteId(reportId);
     setShow(true);
   };
 
-  const ReportData = useSelector(
-    (state) => state.allreport.getpatientwithreport
-  );
-  const res = useSelector((state) => state.allreport.deletemyreport);
-
-  const Report = ReportData?.data || [];
-  console.log(Report?.reports);
-
+  // ✅ بعت الـ patientId والـ reportId
   const handleDeleteConfirmed = async () => {
-    setLoading(true);
-    await dispatch(deleteMyReport(deleteId));
-    setLoading(false);
+    await dispatch(deleteMyReport(id, deleteId));
     handleClose();
+    notify(t("reports.success_message"), "success");
+    dispatch(getPatientWithReport(id)); // ✅ جيب الداتا من جديد بدل reload
   };
 
   const handleViewDetails = (reportId) => {
-    setIsNavigating(true);
-    setTimeout(() => {
-      navigate(`/ExaminationReport/${reportId}`);
-      setIsNavigating(false);
-    }, 1000);
+    navigate(`/ExaminationReport/${id}/${reportId}`); // ✅ شيل الـ setTimeout
   };
+
   if (!ReportData?.data) {
     return (
       <div className="text-center my-5">
@@ -89,7 +63,6 @@ const ReportsList = () => {
     );
   }
 
-  // بيانات وهمية للتجريب
   return (
     <>
       <Header />
@@ -126,11 +99,6 @@ const ReportsList = () => {
 
                 const predictionsToShow =
                   rightEyePredictions || leftEyePredictions;
-                const predictionLabel = rightEyePredictions
-                  ? "Right Eye"
-                  : leftEyePredictions
-                  ? "Left Eye"
-                  : null;
 
                 return (
                   <tr key={report._id}>
@@ -160,7 +128,7 @@ const ReportsList = () => {
                               ([key, value]) =>
                                 key !== "image_quality" &&
                                 key !== "eye_side" &&
-                                value.status === "Detected"
+                                value.status === "Detected",
                             )
                             .map(([diseaseName, details]) => (
                               <div key={diseaseName}>
@@ -174,7 +142,7 @@ const ReportsList = () => {
                             ([key, value]) =>
                               key !== "image_quality" &&
                               key !== "eye_side" &&
-                              value.status === "Detected"
+                              value.status === "Detected",
                           ).length === 0 && (
                             <div>{t("reports.no_diseases")}</div>
                           )}
@@ -185,7 +153,7 @@ const ReportsList = () => {
                     </td>
                     <td className="py-2 px-3">
                       <div className="d-flex align-items-center">
-                        {userFromStorage?.role !== "doctor" && (
+                        {userFromStorage?._id === report?.createdBy?._id && (
                           <button
                             className="btn btn-sm btn-outline-danger me-2"
                             onClick={() => handleShow(report?._id)}
@@ -208,11 +176,8 @@ const ReportsList = () => {
             </tbody>
           </Table>
         )}
-
-        {isNavigating ? <Spinner animation="border" variant="primary" /> : null}
       </Container>
 
-      {/* Modal */}
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>{t("reports.modal_title")}</Modal.Title>

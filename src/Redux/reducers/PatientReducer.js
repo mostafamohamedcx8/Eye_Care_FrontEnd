@@ -10,18 +10,21 @@ import {
   GET_MY_ARCHIVEDPATIENT,
 } from "../type";
 
-const inital = {
+const initialState = {
+  // تصحيح الاسم
   patient: [],
   getpatient: [],
   getspecificpatient: [],
   mypatient: [],
-  deletpatient: [],
+  deletpatient: [], // يفضل تسميتها deleteResult
   sendpatient: [],
   archivedpatient: [],
   unarchivedpatient: [],
   loading: true,
+  error: null, // إضافة حقل للخطأ
 };
-const patientReducer = (state = inital, action) => {
+
+const patientReducer = (state = initialState, action) => {
   switch (action.type) {
     case CREATEPATIENT:
       return {
@@ -37,26 +40,31 @@ const patientReducer = (state = inital, action) => {
       };
     case GETPATIENT:
       return {
+        ...state, // إضافة الـ spread operator هنا
         getpatient: action.payload,
         loading: false,
       };
     case GET_MY_PATIENT:
       return {
+        ...state, // مهم جداً
         mypatient: action.payload,
         loading: false,
       };
     case GET_MY_ARCHIVEDPATIENT:
       return {
+        ...state,
         archivedpatient: action.payload,
         loading: false,
       };
     case GETSPECIFICPATIENT:
       return {
+        ...state,
         getspecificpatient: action.payload,
         loading: false,
       };
     case ARCHIVEDPATIENT:
       return {
+        ...state,
         unarchivedpatient: action.payload,
         loading: false,
       };
@@ -64,15 +72,18 @@ const patientReducer = (state = inital, action) => {
       return {
         ...state,
         deletpatient: action.payload,
+        loading: false, // لا تنسى اللودينج
       };
     case GET_ERROR:
       return {
-        loading: true,
-        patient: action.payload,
+        ...state,
+        loading: false, // عند الخطأ اللودينج ينتهي
+        error: action.payload, // تخزين الخطأ في مكانه الصحيح
       };
 
     default:
       return state;
   }
 };
+
 export default patientReducer;

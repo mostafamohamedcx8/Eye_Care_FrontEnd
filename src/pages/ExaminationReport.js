@@ -55,7 +55,7 @@ const PatientReport = () => {
 
       try {
         const formData = new FormData();
-        formData.append("logoimg", file);
+        formData.append("logoImage", file);
 
         // إرسال الصورة تلقائيًا للباك إند
         await dispatch(updateUserProfileData(formData));
@@ -153,12 +153,12 @@ const PatientReport = () => {
                 <Col md={4}>
                   <div className="mb-2">
                     <strong>{t("reportdata.patientInfo.name")}:</strong>{" "}
-                    {Report?.patient?.firstname || Report?.patient?.lastname ? (
+                    {Report?.patient?.firstName || Report?.patient?.lastName ? (
                       <>
-                        {Report?.patient?.firstname || (
+                        {Report?.patient?.firstName || (
                           <span style={{ color: "red" }}>---</span>
                         )}{" "}
-                        {Report?.patient?.lastname || (
+                        {Report?.patient?.lastName || (
                           <span style={{ color: "red" }}>---</span>
                         )}
                       </>
@@ -698,11 +698,10 @@ const PatientReport = () => {
                         <Accordion.Item
                           eventKey={index.toString()}
                           key={feedback._id}
-                          onClick={() => handleMarkAsRead(feedback)}
                         >
                           <Accordion.Header>
-                            Dr. {feedback.doctor?.firstname || "Unknown"}{" "}
-                            {feedback.doctor?.lastname || ""} –{" "}
+                            Dr. {feedback.doctor?.firstName || "Unknown"}{" "}
+                            {feedback.doctor?.lastName || ""} –{" "}
                             {moment(feedback.createdAt).format(
                               "DD MMM YYYY, h:mm A",
                             )}
@@ -1070,7 +1069,6 @@ const PatientReport = () => {
                         <Accordion.Item
                           eventKey={index.toString()}
                           key={feedback._id}
-                          onClick={() => handleMarkAsRead(feedback)}
                         >
                           <Accordion.Header>
                             Dr. {feedback.doctor?.firstname || "Unknown"}{" "}

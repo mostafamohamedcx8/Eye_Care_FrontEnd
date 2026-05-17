@@ -11,45 +11,39 @@ import notify from "../Hook/useNotification";
 import { useTranslation } from "react-i18next";
 const ResetSection = () => {
   const dispatch = useDispatch();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [ispress, setispress] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isPress, setIsPress] = useState(false);
   const { t } = useTranslation();
-  const HandelSubmit = async (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const isValid = validateForgetPassword({ email, t });
     if (!isValid) return;
+
     localStorage.setItem("user-email", email);
     setLoading(true);
-    setispress(true);
-    await dispatch(
-      ForgetPassword({
-        email,
-      })
-    );
+    setIsPress(true);
+
+    await dispatch(ForgetPassword({ email }));
     setLoading(false);
-    setispress(false);
   };
 
   const res = useSelector((state) => state.alluser.forgetPassword);
-  console.log(res);
+
   useEffect(() => {
-    if (loading === false) {
-      if (res) {
-        if (res.message === "Check your email for further instructions") {
-          notify(t("resetPassword.notifySuccess"), "success");
-          setTimeout(() => {
-            Navigate("/OtpCode");
-          }, 1000);
-        } else if (res.data.message === "No user found with this email") {
-          notify(t("resetPassword.notifyError"), "error");
-        }
-        setLoading(true);
+    if (!loading && isPress && res) {
+      if (res.message === "Check your email for further instructions") {
+        notify(t("resetPassword.notifySuccess"), "success");
+        setTimeout(() => navigate("/OtpCode"), 1500);
+      } else if (res.data?.message === "No user found with this email") {
+        notify(t("resetPassword.notifyError"), "warn");
       }
+      setIsPress(false); // نرجعها false عشان نجهز للمحاولة الجاية
     }
-  }, [loading, t]);
+  }, [loading, res, t, navigate, isPress]);
 
   return (
     <>
@@ -75,7 +69,7 @@ const ResetSection = () => {
 
       {/* Content Section */}
       <Container
-        className="d-flex justify-content-center align-items-center"
+        className="d-flex flex-column justify-content-center align-items-center"
         style={{ minHeight: "50vh" }}
       >
         <Card style={{ width: "100%", maxWidth: "400px" }}>
@@ -83,45 +77,46 @@ const ResetSection = () => {
             <h4 className="text-center mb-3">
               {t("resetPassword.formHeading")}
             </h4>
-            <p className="text-center text-muted mb-4">
-              {t("resetPassword.instructionText")}
-            </p>
-
-            <Form>
+            <Form onSubmit={handleSubmit}>
+              {" "}
+              {/* استخدمنا onSubmit هنا */}
               <Form.Group className="mb-3">
                 <Form.Control
                   type="email"
+                  required
                   placeholder={t("resetPassword.emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </Form.Group>
-
               <div className="d-flex justify-content-end gap-2">
                 <Button
-                  href="/Login"
+                  onClick={() => navigate("/Login")}
                   className="w-100 mb-2"
                   variant="secondary"
                 >
                   {t("resetPassword.cancelButton")}
                 </Button>
                 <Button
+                  type="submit"
                   className="w-100 mb-2 welcome-button"
-                  onClick={HandelSubmit}
+                  disabled={loading}
                 >
-                  {t("resetPassword.searchButton")}
+                  {loading ? (
+                    <Spinner size="sm" animation="border" />
+                  ) : (
+                    t("resetPassword.searchButton")
+                  )}
                 </Button>
               </div>
             </Form>
           </Card.Body>
         </Card>
-        {ispress ? (
-          loading ? (
-            <Spinner animation="border" variant="primary" />
-          ) : (
-            <h4> {t("resetPassword.done")} </h4>
-          )
-        ) : null}
+
+        {/* عرض رسالة النجاح تحت الكارد بشكل أفضل */}
+        {!loading && isPress && res?.status === 200 && (
+          <h4 className="mt-3"> {t("resetPassword.done")} </h4>
+        )}
       </Container>
     </>
   );

@@ -72,7 +72,14 @@ export const validateSignupForm = ({
       return false;
     }
   }
-  if (!dateOfBirthDay || !dateOfBirthMonth || !dateOfBirthYear) {
+  if (
+    !dateOfBirthDay ||
+    dateOfBirthDay === "Day" ||
+    !dateOfBirthMonth ||
+    dateOfBirthMonth === "Month" ||
+    !dateOfBirthYear ||
+    dateOfBirthYear === "Year"
+  ) {
     notify(t("Signupvalidation.notifyDateOfBirthRequired"), "warn");
     return false;
   }

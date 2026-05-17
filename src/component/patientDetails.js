@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button, Container, Row, Col, Form, Spinner } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { CreatePatient } from "../Redux/actions/Patientaction";
 import { validatePatientForm } from "../Validations/patientValidation";
 import notify from "../Hook/useNotification";
@@ -11,74 +11,63 @@ const PatientTab = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const res = useSelector((state) => state.allpatient.patient);
-  console.log(res);
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
+  const [firstName, setFirstname] = useState("");
+  const [lastName, setLastname] = useState("");
   const [salutation, setSalutation] = useState("");
   const [dateOfBirth, setDob] = useState("");
   const [ethnicity, setEthnicity] = useState("");
-  const [loading, setloading] = useState(true);
-  const [ispress, setispress] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
 
-  const removeEmptyFields = (obj) => {
-    return Object.fromEntries(
-      Object.entries(obj).filter(([_, value]) => value !== ""),
-    );
+  const removeEmptyFields = (obj) =>
+    Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== ""));
+
+  const resetForm = () => {
+    setFirstname("");
+    setLastname("");
+    setSalutation("");
+    setDob("");
+    setEmail("");
+    setEthnicity("");
   };
 
   const handelSubmit = async (event) => {
     event.preventDefault();
 
-    // validate first
     const isValid = validatePatientForm({
-      firstname,
-      lastname,
+      firstName,
+      lastName,
       salutation,
       dateOfBirth,
       ethnicity,
       email,
     });
-    if (!isValid) return; // لو في خطأ وقف التنفيذ
+    if (!isValid) return;
 
-    let patientData = {
-      firstname,
-      lastname,
+    const patientData = removeEmptyFields({
+      firstName,
+      lastName,
       salutation,
       dateOfBirth,
       ethnicity,
       email,
-    };
+    });
 
-    patientData = removeEmptyFields(patientData);
+    setLoading(true);
+    const result = await dispatch(CreatePatient(patientData));
+    setLoading(false);
 
-    setloading(true);
-    setispress(true);
-    await dispatch(CreatePatient(patientData));
-    setloading(false);
-  };
-
-  useEffect(() => {
-    if (loading === false) {
-      if (res.status === 201) {
-        const id = res?.data?.data?._id;
-        notify(t("patientForm.notifications.createSuccess"), "success");
-        navigate(`/Examination/${id}`);
-      }
-      setFirstname("");
-      setLastname("");
-      setSalutation("");
-      setDob("");
-      setEmail("");
-      setEthnicity("");
-      setloading(true);
-      setispress(false);
-      setTimeout(() => {
-        setispress(false);
-      }, 3000);
+    if (result?.status === 201) {
+      const id = result?.data?.data?.patient?._id;
+      notify(t("patientForm.notifications.createSuccess"), "success");
+      resetForm();
+      navigate(`/Examination/${id}`);
+    } else {
+      // ❌ لو فشل → الحقول تفضل زي ما هي + رسالة خطأ
+      const msg = result?.data?.message || "حدث خطأ ما";
+      notify(msg, "error");
     }
-  }, [loading, t]);
+  };
 
   return (
     <Container className="mt-5 mb-5">
@@ -93,7 +82,7 @@ const PatientTab = () => {
               <Form.Control
                 placeholder={t("patientForm.placeholders.firstName")}
                 onChange={(e) => setFirstname(e.target.value)}
-                value={firstname}
+                value={firstName}
               />
             </Form.Group>
           </Col>
@@ -103,7 +92,7 @@ const PatientTab = () => {
               <Form.Control
                 placeholder={t("patientForm.placeholders.lastName")}
                 onChange={(e) => setLastname(e.target.value)}
-                value={lastname}
+                value={lastName}
               />
             </Form.Group>
           </Col>
@@ -250,22 +239,27 @@ const PatientTab = () => {
             </Form.Group>
           </Col>
         </Row>
-        <Row></Row>
         <Row className="mt-4">
           <Col>
-            <Button type="submit" variant="primary">
-              {t("patientForm.buttons.create")}
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                    className="me-2"
+                  />
+                  {t("patientForm.buttons.creating") || "Creating..."}
+                </>
+              ) : (
+                t("patientForm.buttons.create")
+              )}
             </Button>
           </Col>
         </Row>
-
-        {ispress ? (
-          loading ? (
-            <Spinner animation="border" variant="primary" />
-          ) : (
-            <h4> done </h4>
-          )
-        ) : null}
       </Form>
     </Container>
   );

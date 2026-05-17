@@ -284,7 +284,9 @@
     "modal_title": "Medical License or Shop License",
     "modal_label": "Upload Medical License or Shop License",
     "modal_cancel_button": "Cancel",
-    "modal_confirm_button": "Confirm & Sign Up"
+    "modal_confirm_button": "Confirm & Sign Up",
+    "fill_all_fields": "Please fill all fields",
+    "loading": "Signing up..."
   },
   "login": {
     "breadcrumbHome": "Home",
@@ -508,7 +510,8 @@
       }
     },
     "buttons": {
-      "create": "Create Patient"
+      "create": "Create Patient",
+      "creating": "creating..."
     },
     "notifications": {
       "createSuccess": "Patient created successfully."

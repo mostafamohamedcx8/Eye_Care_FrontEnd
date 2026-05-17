@@ -26,32 +26,24 @@ const NavBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const [user, SetUser] = useState("");
-  const [token, SetToken] = useState("");
-  useEffect(() => {
+  const [user, SetUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      SetUser(JSON.parse(storedUser));
-      SetToken(token);
+    return storedUser ? JSON.parse(storedUser) : "";
+  });
+  const [token, SetToken] = useState(() => localStorage.getItem("token") || "");
+  useEffect(() => {
+    if (token) {
+      dispatch(getUserData());
+      dispatch(getmynotification());
     }
-  }, []); // يتم التنفيذ مرة واحدة فقط عند تحميل الكومبوننت
-  useEffect(() => {
-    dispatch(getUserData());
-  }, []);
+  }, [dispatch, token]);
+
   const MYData = useSelector((state) => state.alluser.mydata);
-  const userimage = MYData?.data?.imageProfile;
-  useEffect(() => {
-    dispatch(getmynotification());
-  }, [dispatch]);
+  const userimage = MYData?.data?.user?.profileImage;
 
   const data = useSelector((state) => state.allreport.notify?.data);
-
-  // تأكد إن data موجودة وهي array
   const MYNotify = Array.isArray(data) ? data : [];
-
   const unreadCount = MYNotify.filter((n) => !n.read).length;
-
-  console.log("unreadCount:", unreadCount);
 
   const logOut = () => {
     localStorage.removeItem("user");
@@ -67,12 +59,7 @@ const NavBar = () => {
   };
   const handleNotificationClick = (notif) => {
     dispatch(MarkNotifyRead(notif._id));
-    // navigate لصفحة التقرير
-
-    navigate(`/ExaminationReport/${notif.report._id}`);
-
-    // هنا هتزود بعدين dispatch لماركاز ريد
-    // dispatch(markNotificationAsRead(notif._id));
+    navigate(`/ExaminationReport/${notif.patient._id}/${notif.report._id}`);
   };
   return (
     <Navbar bg="white" expand="lg" className="shadow-sm">
@@ -87,7 +74,7 @@ const NavBar = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           <Nav className="align-items-center">
-            {user.firstname ? (
+            {user.firstName ? (
               <>
                 <Nav.Link href="/">{t("navbar.home")}</Nav.Link>
 

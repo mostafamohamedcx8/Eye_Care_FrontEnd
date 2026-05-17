@@ -12,16 +12,18 @@ export const Examination_Hook = () => {
   const navigate = useNavigate();
   const userFromStorage = JSON.parse(localStorage.getItem("user"));
   const dispatch = useDispatch();
-  const { id } = useParams();
+  const { patientId, reportId } = useParams();
+
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    if (id) {
-      dispatch(getSpecificReport(id));
+    if (patientId && reportId) {
+      dispatch(getSpecificReport(patientId, reportId));
     }
-  }, [dispatch, id]);
+  }, [dispatch, patientId, reportId]);
 
   const ReportData = useSelector((state) => state.allreport.specificreport);
+  console.log("ReportData", ReportData);
   // Add optional chaining for safety
 
   const reportRef = useRef();
@@ -51,10 +53,10 @@ export const Examination_Hook = () => {
   const handlePrint = () => {
     window.print();
   };
-  const Report = ReportData.data || [];
+  const Report = ReportData?.data || [];
   console.log("Rdsfds", Report);
 
-  const opticianName = `${Report?.optician?.firstname} ${Report?.optician?.lastname}`;
+  const opticianName = `${Report?.optician?.firstName} ${Report?.optician?.lastName}`;
   const addressParts = [
     Report?.optician?.state,
     Report?.optician?.city,
@@ -64,9 +66,9 @@ export const Examination_Hook = () => {
   const PhoneNumber = `${Report?.optician?.phoneNumber}`;
   const defaultLogo = "/upload.png";
 
-  const LogoImage = Report?.optician?.logoimg || defaultLogo;
+  const LogoImage = Report?.optician?.logoImage || defaultLogo;
 
-  console.log("image", Report?.optician?.logoimg);
+  console.log("image", Report?.optician?.logoImage);
 
   const opticianAddress = addressParts.join(", ");
 
@@ -104,7 +106,7 @@ export const Examination_Hook = () => {
       dispatch(
         MarkDocotrFeedback(Report._id, {
           doctorId: feedback.doctor._id,
-        })
+        }),
       );
     }
   };

@@ -2,8 +2,6 @@ import {
   Card,
   Button,
   Container,
-  Row,
-  Col,
   Form,
   InputGroup,
   Table,
@@ -49,10 +47,8 @@ const DoctorCard = () => {
                     {t("reportForm.patientInfo.labels.name")}
                   </span>
                   <span className="patient-data">
-                    {patient?.data?.firstname || patient?.data?.lastname ? (
-                      `${patient?.data?.firstname || ""} ${
-                        patient?.data?.lastname || ""
-                      }`
+                    {patient?.firstName || patient?.lastName ? (
+                      `${patient?.firstName || ""} ${patient?.lastName || ""}`
                     ) : (
                       <span style={{ color: "red" }}>---</span>
                     )}
@@ -63,8 +59,8 @@ const DoctorCard = () => {
                     {t("reportForm.patientInfo.labels.salutation")}
                   </span>
                   <span className="patient-data">
-                    {patient?.data?.salutation ? (
-                      patient.data.salutation
+                    {patient?.salutation ? (
+                      patient.salutation
                     ) : (
                       <span style={{ color: "red" }}>---</span>
                     )}
@@ -75,10 +71,8 @@ const DoctorCard = () => {
                     {t("reportForm.patientInfo.labels.dateOfBirth")}
                   </span>
                   <span className="patient-data">
-                    {patient?.data?.dateOfBirth ? (
-                      new Date(patient.data.dateOfBirth).toLocaleDateString(
-                        "de-DE"
-                      )
+                    {patient?.dateOfBirth ? (
+                      new Date(patient.dateOfBirth).toLocaleDateString("de-DE")
                     ) : (
                       <span style={{ color: "red" }}>---</span>
                     )}
@@ -89,8 +83,8 @@ const DoctorCard = () => {
                     {t("reportForm.patientInfo.labels.ethnicity")}
                   </span>
                   <span className="patient-data">
-                    {patient?.data?.ethnicity ? (
-                      patient.data.ethnicity
+                    {patient?.ethnicity ? (
+                      patient.ethnicity
                     ) : (
                       <span style={{ color: "red" }}>---</span>
                     )}
@@ -108,11 +102,11 @@ const DoctorCard = () => {
                       gap: "10px",
                     }}
                   >
-                    {patient?.data?.patientId ? (
+                    {patient?.patientId ? (
                       <>
                         <div style={{ marginTop: "10px" }}>
                           <Barcode
-                            value={patient.data.patientId.toString()}
+                            value={patient.patientId.toString()}
                             height={50}
                             width={2}
                             fontSize={14}
@@ -159,9 +153,7 @@ const DoctorCard = () => {
                 <th className="py-2 px-3">
                   {t("doctorpage.tableHeaders.fullAddress")}
                 </th>
-                <th className="py-2 px-3">
-                  {t("doctorpage.tableHeaders.specialty")}
-                </th>
+
                 <th className="py-2 px-3">
                   {t("doctorpage.tableHeaders.tools")}
                 </th>
@@ -174,13 +166,13 @@ const DoctorCard = () => {
                     <span className="px-2 py-1 rounded">{index + 1}</span>
                   </td>
                   <td className="py-2 px-3">
-                    {doctor.firstname} {doctor.lastname}
+                    {doctor.firstName} {doctor.lastName}
                   </td>
                   <td className="py-2 px-3">{doctor.city || "N/A"}</td>
                   <td className="py-2 px-3">{doctor.state || "N/A"}</td>
                   <td className="py-2 px-3">{doctor.postalCode || "N/A"}</td>
                   <td className="py-2 px-3">{doctor.fullAddress || "N/A"}</td>
-                  <td className="py-2 px-3">{doctor.Specialty || "N/A"}</td>
+
                   <td className="py-2 px-3">
                     <div className="d-flex align-items-center">
                       <Button

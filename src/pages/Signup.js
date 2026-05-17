@@ -59,6 +59,23 @@ const SignupSection = () => {
     countryCode,
   ] = Signup_Hook(t);
 
+  // ✅ الزرار يكون مفعّل بس لما الحقول الأساسية متملية
+  const isFormValid =
+    firstname.trim() !== "" &&
+    lastname.trim() !== "" &&
+    email.trim() !== "" &&
+    password.trim() !== "" &&
+    confirmPassword.trim() !== "" &&
+    phoneNumber.trim() !== "" &&
+    salutation !== "" &&
+    dateOfBirthDay !== "" &&
+    dateOfBirthMonth !== "" &&
+    dateOfBirthYear !== "" &&
+    selectedState !== "" &&
+    selectedcity !== "" &&
+    postalCode.trim() !== "" &&
+    fullAddress.trim() !== "";
+
   return (
     <>
       {/* Hero Section */}
@@ -114,13 +131,20 @@ const SignupSection = () => {
           <Form.Label>{t("signup.date_of_birth")}</Form.Label>
           <Row className="mb-3">
             <Col>
+              {/* ✅ إضافة value="" disabled للـ placeholder option */}
               <Form.Select
                 value={dateOfBirthDay}
                 onChange={onChangedateOfBirthDay}
               >
-                <option>{t("signup.day")}</option>
+                <option value="" disabled>
+                  {t("signup.day")}
+                </option>
                 {Array.from({ length: 31 }, (_, i) => (
-                  <option key={i + 1}>{i + 1}</option>
+                  <option key={i + 1} value={i + 1}>
+                    {" "}
+                    {/* ✅ إضافة value */}
+                    {i + 1}
+                  </option>
                 ))}
               </Form.Select>
             </Col>
@@ -135,19 +159,28 @@ const SignupSection = () => {
                     <option key={i} value={i + 1}>
                       {monthLabel}
                     </option>
-                  )
+                  ),
                 )}
               </Form.Select>
             </Col>
             <Col>
+              {/* ✅ إضافة value="" disabled للـ placeholder option */}
               <Form.Select
                 value={dateOfBirthYear}
                 onChange={onChangedateOfBirthYear}
               >
-                <option>{t("signup.year")}</option>
+                <option value="" disabled>
+                  {t("signup.year")}
+                </option>
                 {Array.from({ length: 100 }, (_, i) => {
                   const year = new Date().getFullYear() - i;
-                  return <option key={year}>{year}</option>;
+                  return (
+                    <option key={year} value={year}>
+                      {" "}
+                      {/* ✅ إضافة value */}
+                      {year}
+                    </option>
+                  );
                 })}
               </Form.Select>
             </Col>
@@ -164,7 +197,7 @@ const SignupSection = () => {
                   <option key={index} value={sal.value}>
                     {sal.label}
                   </option>
-                )
+                ),
               )}
             </Form.Select>
           </Form.Group>
@@ -202,7 +235,6 @@ const SignupSection = () => {
           <Form.Group className="mb-4">
             <Form.Label>{t("signup.phone_number")}</Form.Label>
             <div className="d-flex">
-              {/* ✅ Dropdown لاختيار الدولة */}
               <Form.Select
                 value={countryCode}
                 onChange={onChangeCountryCode}
@@ -211,8 +243,6 @@ const SignupSection = () => {
                 <option value="+49">🇩🇪 +49</option>
                 <option value="+1">🇺🇸 +1</option>
               </Form.Select>
-
-              {/* ✅ Input لرقم الهاتف */}
               <Form.Control
                 type="tel"
                 placeholder={t("signup.phone_number_placeholder")}
@@ -245,15 +275,20 @@ const SignupSection = () => {
               ))}
             </Form.Select>
           </Form.Group>
+
           <Form.Group className="mb-3">
             <Form.Label>{t("signup.city")}</Form.Label>
             <Form.Select value={selectedcity} onChange={onChangedSelectedcity}>
-              <option>{t("signup.city_placeholder")}</option>
+              <option value="">{t("signup.city_placeholder")}</option>
+              {/* ✅ إضافة value لكل city option */}
               {cities.map((city, i) => (
-                <option key={i}>{city.name}</option>
+                <option key={i} value={city.name}>
+                  {city.name}
+                </option>
               ))}
             </Form.Select>
           </Form.Group>
+
           <Form.Group className="mb-4">
             <Form.Label>{t("signup.postal_code")}</Form.Label>
             <Form.Control
@@ -274,21 +309,52 @@ const SignupSection = () => {
             />
           </Form.Group>
 
-          <Button type="submit" className="w-100 mb-2 welcome-button">
-            {t("signup.submit_button")}
+          {/* ✅ زرار Signup مع Display كامل */}
+          <Button
+            type="submit"
+            className="w-100 mb-2 welcome-button"
+            disabled={!isFormValid || ispress} // ✅ معطّل لو الفورم ناقص أو جاري التحميل
+            style={{
+              opacity: !isFormValid ? 0.6 : 1, // ✅ شفافية لما يكون معطّل
+              cursor: !isFormValid ? "not-allowed" : "pointer", // ✅ cursor مناسب
+              transition: "opacity 0.3s ease",
+            }}
+          >
+            {ispress && loading ? (
+              // ✅ Spinner جوه الزرار أثناء التحميل
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                  className="me-2"
+                />
+                {t("signup.loading") || "Loading..."}
+              </>
+            ) : (
+              t("signup.submit_button")
+            )}
           </Button>
+
+          {/* ✅ رسالة توضيحية لو الفورم ناقص */}
+          {!isFormValid && (
+            <p
+              className="text-center text-muted mt-1"
+              style={{ fontSize: "0.85rem" }}
+            >
+              {t("signup.fill_all_fields") ||
+                "يرجى ملء جميع الحقول لتفعيل زر التسجيل"}
+            </p>
+          )}
         </Form>
-        {ispress ? (
-          loading ? (
-            <Spinner animation="border" variant="primary" />
-          ) : (
-            <h4> {t("signup.success_message")} </h4>
-          )
-        ) : null}
       </Container>
+
+      {/* Modal رفع الصورة */}
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>{t("signup.modal_title")} </Modal.Title>
+          <Modal.Title>{t("signup.modal_title")}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form.Group>
@@ -306,11 +372,12 @@ const SignupSection = () => {
           </Button>
           <Button
             variant="primary"
-            onClick={(e) => {
+            onClick={() => {
+              // ✅ إزالة e — مش محتاجينها
               handleCloseModal();
-              handelSubmit(e); // ← نفذ السبميت بعد رفع الصورة
+              handelSubmit(); // ✅ بدون event
             }}
-            disabled={!imagemedicallicense} // اعمل تعطيل للزر لو مفيش صورة
+            disabled={!imagemedicallicense}
           >
             {t("signup.modal_confirm_button")}
           </Button>
@@ -319,6 +386,7 @@ const SignupSection = () => {
     </>
   );
 };
+
 const Signup = () => {
   return (
     <div className="color-body">

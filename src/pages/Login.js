@@ -64,7 +64,11 @@ const LoginSection = () => {
             />
           </Form.Group>
 
-          <Button type="submit" className="w-100 mb-2 welcome-button">
+          <Button
+            type="submit"
+            className="w-100 mb-2 welcome-button"
+disabled={ispress}
+          >
             {t("login.button")}
           </Button>
 

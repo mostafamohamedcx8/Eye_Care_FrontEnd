@@ -10,41 +10,40 @@ import { Button, Container, Form, Row, Card, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 const OTPSection = () => {
   const dispatch = useDispatch();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const [resetCode, setResetCode] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [ispress, setispress] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isPress, setIsPress] = useState(false);
   const { t } = useTranslation();
-  const HandelSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setispress(true);
-    await dispatch(
-      verifyPassword({
-        resetCode,
-      })
-    );
-    setLoading(false);
-    setispress(false);
-  };
 
   const res = useSelector((state) => state.alluser.verfiyPassword);
-  console.log(res);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!resetCode) return; // حماية بسيطة لو الكود فاضي
+
+    setLoading(true);
+    setIsPress(true);
+
+    await dispatch(verifyPassword({ resetCode }));
+
+    setLoading(false);
+  };
+
   useEffect(() => {
-    if (loading === false) {
-      if (res) {
-        if (res.message === "Reset code verified successfully") {
-          notify(t("otpCode.notifySuccess"), "success");
-          setTimeout(() => {
-            Navigate("/NewPassword");
-          }, 1000);
-        } else if (res.data.message === "Invalid or expired reset code") {
-          notify(t("otpCode.notifyError"), "error");
-        }
-        setLoading(true);
+    if (!loading && isPress && res) {
+      if (res.message === "Reset code verified successfully") {
+        notify(t("otpCode.notifySuccess"), "success");
+        setTimeout(() => {
+          navigate("/NewPassword");
+        }, 1000);
+      } else if (res.data?.message === "Invalid or expired reset code") {
+        notify(t("otpCode.notifyError"), "error");
       }
+      // لا نحتاج لعمل setLoading(true) هنا، الأفضل تصفير isPress
+      setIsPress(false);
     }
-  }, [loading]);
+  }, [loading, res, navigate, t, isPress]);
 
   return (
     <>
@@ -70,17 +69,15 @@ const OTPSection = () => {
 
       {/* OTP Code Entry Section */}
       <Container
-        className="d-flex justify-content-center align-items-center"
+        className="d-flex flex-column justify-content-center align-items-center"
         style={{ minHeight: "50vh" }}
       >
         <Card style={{ width: "100%", maxWidth: "400px" }}>
           <Card.Body>
             <h4 className="text-center mb-3">{t("otpCode.formHeading")}</h4>
-            <p className="text-center text-muted mb-4">
-              {t("otpCode.instructionText")}
-            </p>
-
-            <Form>
+            <Form onSubmit={handleSubmit}>
+              {" "}
+              {/* استخدام onSubmit أفضل */}
               <Form.Group className="mb-3">
                 <Form.Control
                   type="text"
@@ -90,32 +87,33 @@ const OTPSection = () => {
                   onChange={(e) => setResetCode(e.target.value)}
                 />
               </Form.Group>
-
               <div className="d-flex justify-content-end gap-2">
                 <Button
-                  href="/Login"
+                  onClick={() => navigate("/Login")} // انتقال بدون ريلود
                   className="w-100 mb-2"
                   variant="secondary"
                 >
                   {t("otpCode.cancelButton")}
                 </Button>
                 <Button
+                  type="submit"
                   className="w-100 mb-2 welcome-button"
-                  onClick={HandelSubmit}
+                  disabled={loading} // تعطيل الزر أثناء الإرسال
                 >
-                  {t("otpCode.verifyButton")}
+                  {loading ? (
+                    <Spinner size="sm" animation="border" />
+                  ) : (
+                    t("otpCode.verifyButton")
+                  )}
                 </Button>
               </div>
             </Form>
           </Card.Body>
         </Card>
-        {ispress ? (
-          loading ? (
-            <Spinner animation="border" variant="primary" />
-          ) : (
-            <h4> {t("otpCode.done")} </h4>
-          )
-        ) : null}
+
+        {isPress && !loading && res?.status === 200 && (
+          <h4 className="mt-3"> {t("otpCode.done")} </h4>
+        )}
       </Container>
     </>
   );

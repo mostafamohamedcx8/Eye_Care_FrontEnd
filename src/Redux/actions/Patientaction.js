@@ -16,29 +16,34 @@ import { updateDataWithToken } from "../../Hooks/useUpdateData";
 
 export const CreatePatient = (MYdata) => async (dispatch) => {
   try {
-    const response = await InsertData(`/api/v1/patient`, MYdata);
+    const response = await InsertData(`/api/v1/patients`, MYdata);
 
     dispatch({
       type: CREATEPATIENT,
       payload: response,
-      loading: true,
     });
+
+    return response; // ✅ دي اللي كانت ناقصة
   } catch (e) {
     dispatch({
       type: GET_ERROR,
-      payload: "Error " + e,
+      payload: e.response,
     });
+
+    return e.response; // ✅ وكمان ارجع الـ error عشان تشوفه في الكمبوننت
   }
 };
 
-export const SendPatient = (MYdata) => async (dispatch) => {
+export const SendPatient = (patientId, MYdata) => async (dispatch) => {
   try {
-    const response = await InsertData(`/api/v1/patient/send`, MYdata);
+    const response = await updateDataWithToken(
+      `/api/v1/patients/${patientId}/assign-doctor`,
+      MYdata,
+    );
 
     dispatch({
       type: SENDPATIENT,
       payload: response,
-      loading: true,
     });
   } catch (e) {
     dispatch({
@@ -51,7 +56,7 @@ export const SendPatient = (MYdata) => async (dispatch) => {
 export const getAllpatient = (limit) => async (dispatch) => {
   try {
     const response = await useGetDataToken(
-      `/api/v1/patient/mypatients?limit=${limit}`
+      `/api/v1/patients/mypatients?limit=${limit}`,
     );
 
     dispatch({
@@ -66,43 +71,46 @@ export const getAllpatient = (limit) => async (dispatch) => {
   }
 };
 
-export const getMypatient = (limit, keyword) => async (dispatch) => {
-  try {
-    const response = await useGetDataToken(
-      `/api/v1/patient/mypatients?limit=${limit}&keyword=${keyword}`
-    );
+export const getMypatient =
+  (limit = 10, keyword = "") =>
+  async (dispatch) => {
+    try {
+      const response = await useGetDataToken(
+        `/api/v1/patients/my-patients?archived=false&limit=${limit}&keyword=${keyword}`,
+      );
 
-    dispatch({
-      type: GET_MY_PATIENT,
-      payload: response,
-    });
-  } catch (e) {
-    dispatch({
-      type: GET_MY_PATIENT,
-      payload: e.response,
-    });
-  }
-};
-export const getMyArchivedpatient = (limit, keyword) => async (dispatch) => {
-  try {
-    const response = await useGetDataToken(
-      `/api/v1/patient/myArchivepatients?limit=${limit}&keyword=${keyword}`
-    );
-
-    dispatch({
-      type: GET_MY_ARCHIVEDPATIENT,
-      payload: response,
-    });
-  } catch (e) {
-    dispatch({
-      type: GET_MY_ARCHIVEDPATIENT,
-      payload: e.response,
-    });
-  }
-};
+      dispatch({
+        type: GET_MY_PATIENT,
+        payload: response,
+      });
+    } catch (e) {
+      dispatch({
+        type: GET_MY_PATIENT,
+        payload: e.response,
+      });
+    }
+  };
+export const getMyArchivedpatient =
+  (limit = 10, keyword = "") =>
+  async (dispatch) => {
+    try {
+      const response = await useGetDataToken(
+        `/api/v1/patients/my-patients?archived=true&limit=${limit}&keyword=${keyword}`,
+      );
+      dispatch({
+        type: GET_MY_ARCHIVEDPATIENT,
+        payload: response,
+      });
+    } catch (e) {
+      dispatch({
+        type: GET_ERROR,
+        payload: e.response,
+      });
+    }
+  };
 export const getSpecificpatient = (id) => async (dispatch) => {
   try {
-    const response = await useGetDataToken(`/api/v1/patient/myPatient/${id}`);
+    const response = await useGetDataToken(`/api/v1/patients/${id}`);
 
     dispatch({
       type: GETSPECIFICPATIENT,
@@ -118,7 +126,7 @@ export const getSpecificpatient = (id) => async (dispatch) => {
 
 export const deleteMyPatient = (id) => async (dispatch) => {
   try {
-    const response = await DeleteData(`/api/v1/patient/deleteMyPatient/${id}`);
+    const response = await DeleteData(`/api/v1/patients/${id}`);
 
     dispatch({
       type: DELETMYPATIENT,
@@ -131,49 +139,52 @@ export const deleteMyPatient = (id) => async (dispatch) => {
     });
   }
 };
-export const getAllMyPatientPage = (page) => async (dispatch) => {
-  try {
-    const response = await useGetDataToken(
-      `/api/v1/patient/mypatients?limit=10&page=${page}`
-    );
-    dispatch({
-      type: GET_MY_PATIENT,
-      payload: response,
-    });
-  } catch (e) {
-    dispatch({
-      type: GET_ERROR,
-      payload: "Error " + e,
-    });
-  }
-};
+export const getAllMyPatientPage =
+  (page, limit = 10) =>
+  async (dispatch) => {
+    try {
+      const response = await useGetDataToken(
+        `/api/v1/patients/mypatients?limit=${limit}&page=${page}`,
+      );
+      dispatch({
+        type: GET_MY_PATIENT,
+        payload: response,
+      });
+    } catch (e) {
+      dispatch({
+        type: GET_ERROR,
+        payload: e.response,
+      });
+    }
+  };
 
-export const getAllMyArchivedPatientPage = (page) => async (dispatch) => {
-  try {
-    const response = await useGetDataToken(
-      `/api/v1/patient/myArchivepatients?limit=10&page=${page}`
-    );
-    dispatch({
-      type: GET_MY_ARCHIVEDPATIENT,
-      payload: response,
-    });
-  } catch (e) {
-    dispatch({
-      type: GET_ERROR,
-      payload: "Error " + e,
-    });
-  }
-};
+export const getAllMyArchivedPatientPage =
+  (page, limit = 10) =>
+  async (dispatch) => {
+    try {
+      const response = await useGetDataToken(
+        `/api/v1/patients/my-patients?archived=true&limit=${limit}&page=${page}`,
+      );
+      dispatch({
+        type: GET_MY_ARCHIVEDPATIENT,
+        payload: response,
+      });
+    } catch (e) {
+      dispatch({
+        type: GET_ERROR,
+        payload: e.response,
+      });
+    }
+  };
 
 export const toggleArchivePatient = (id) => async (dispatch) => {
   try {
     const response = await updateDataWithToken(
-      `/api/v1/patient/myPatient/${id}`
+      `/api/v1/patients/${id}/optician-archive`,
     );
     dispatch({
       type: ARCHIVEDPATIENT,
       payload: response,
-      loading: true,
     });
   } catch (e) {
     dispatch({

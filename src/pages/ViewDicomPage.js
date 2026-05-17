@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Button, ButtonGroup, Form } from "react-bootstrap"; // ضفنا Form عشان الـ Gamma
+import { Button, ButtonGroup, Form, Badge } from "react-bootstrap";
 
 import cornerstone from "cornerstone-core";
 import cornerstoneWADOImageLoader from "cornerstone-wado-image-loader";
@@ -9,177 +9,536 @@ import dicomParser from "dicom-parser";
 import Hammer from "hammerjs";
 import cornerstoneMath from "cornerstone-math";
 
-/* ================== SETUP GLOBAL ================== */
 cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
 cornerstoneTools.external.cornerstone = cornerstone;
 cornerstoneTools.external.Hammer = Hammer;
 cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
-
 cornerstoneTools.init();
+
+/* ── Gamma applied via pixel-level canvas manipulation ── */
+const applyGammaToCanvas = (element, gamma) => {
+  const canvas = element.querySelector("canvas");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const { width, height } = canvas;
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  // Build LUT once per gamma value
+  const lut = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) {
+    lut[i] = Math.round(Math.pow(i / 255, 1 / gamma) * 255);
+  }
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = lut[data[i]]; // R
+    data[i + 1] = lut[data[i + 1]]; // G
+    data[i + 2] = lut[data[i + 2]]; // B
+    // Alpha unchanged
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+};
+
+/* ── CLAHE-lite: histogram equalization per tile for fundus ── */
+const applyCLAHE = (element, strength) => {
+  if (strength === 0) return;
+  const canvas = element.querySelector("canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const { width, height } = canvas;
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  // Global histogram equalization blended with original by strength
+  const hist = new Float32Array(256);
+  for (let i = 0; i < data.length; i += 4) {
+    const lum = Math.round(
+      0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2],
+    );
+    hist[lum]++;
+  }
+  const total = width * height;
+  let cum = 0;
+  const lut = new Uint8Array(256);
+  for (let v = 0; v < 256; v++) {
+    cum += hist[v];
+    lut[v] = Math.round((cum / total) * 255);
+  }
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = Math.round(data[i] * (1 - strength) + lut[data[i]] * strength);
+    data[i + 1] = Math.round(
+      data[i + 1] * (1 - strength) + lut[data[i + 1]] * strength,
+    );
+    data[i + 2] = Math.round(
+      data[i + 2] * (1 - strength) + lut[data[i + 2]] * strength,
+    );
+  }
+  ctx.putImageData(imageData, 0, 0);
+};
+
+/* ── Unsharp mask for vessel sharpening ── */
+const applySharpness = (element, amount) => {
+  if (amount === 0) return;
+  const canvas = element.querySelector("canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const { width, height } = canvas;
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  const copy = new Uint8ClampedArray(data);
+
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      const i = (y * width + x) * 4;
+      for (let c = 0; c < 3; c++) {
+        const lap =
+          -copy[(y * width + (x - 1)) * 4 + c] -
+          copy[(y * width + (x + 1)) * 4 + c] -
+          copy[((y - 1) * width + x) * 4 + c] -
+          copy[((y + 1) * width + x) * 4 + c] +
+          4 * copy[i + c];
+        data[i + c] = Math.min(
+          255,
+          Math.max(0, copy[i + c] + amount * lap * 0.08),
+        );
+      }
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+};
+
+/* ── Channel isolation (R / G / B / All) ── */
+const applyChannel = (element, channel) => {
+  if (channel === "all") return;
+  const canvas = element.querySelector("canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const { width, height } = canvas;
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    if (channel === "r") {
+      data[i + 1] = 0;
+      data[i + 2] = 0;
+    } else if (channel === "g") {
+      data[i] = 0;
+      data[i + 2] = 0;
+    } else if (channel === "b") {
+      data[i] = 0;
+      data[i + 1] = 0;
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+};
+
+// ─── Fundus presets ───────────────────────────────────────────────
+const PRESETS = {
+  normal: {
+    gamma: 1.0,
+    clahe: 0,
+    sharp: 0,
+    channel: "all",
+    ww: null,
+    wc: null,
+  },
+  vessel: { gamma: 1.3, clahe: 0.55, sharp: 4, channel: "g", ww: 300, wc: 150 },
+  disc: { gamma: 0.85, clahe: 0.2, sharp: 3, channel: "all", ww: 400, wc: 200 },
+  macula: {
+    gamma: 1.1,
+    clahe: 0.4,
+    sharp: 2,
+    channel: "all",
+    ww: 350,
+    wc: 180,
+  },
+};
 
 const DicomViewerPage = () => {
   const [searchParams] = useSearchParams();
   const dicomUrl = searchParams.get("dicomUrl");
 
   const elementRef = useRef(null);
-  const [activeTool, setActiveTool] = useState("Wwwc");
-  const [gammaValue, setGammaValue] = useState(1.0); // حالة الـ Gamma
+  const imageLoadedRef = useRef(false);
 
+  const [activeTool, setActiveTool] = useState("Wwwc");
+  const [activePreset, setActivePreset] = useState("normal");
+  const [gamma, setGamma] = useState(1.0);
+  const [clahe, setClahe] = useState(0);
+  const [sharp, setSharp] = useState(0);
+  const [channel, setChannel] = useState("all");
+  const [imageInfo, setImageInfo] = useState(null); // metadata display
+  const [isInverted, setIsInverted] = useState(false);
+  const [zoom, setZoom] = useState(1.0);
+
+  // ── كل ما تتغير أي filter نعيد render cornerstone ثم نطبق الـ post-processing
+  const rerender = useCallback(
+    (overrides = {}) => {
+      const el = elementRef.current;
+      if (!el || !imageLoadedRef.current) return;
+
+      const g = overrides.gamma ?? gamma;
+      const cl = overrides.clahe ?? clahe;
+      const sh = overrides.sharp ?? sharp;
+      const ch = overrides.channel ?? channel;
+      const inv = overrides.isInverted ?? isInverted;
+
+      // Invert via cornerstone viewport
+      const vp = cornerstone.getViewport(el);
+      vp.invert = inv;
+      cornerstone.setViewport(el, vp);
+
+      // cornerstone re-renders the canvas; نطبق post-processing بعدها مباشرةً
+      cornerstone.updateImage(el);
+
+      // requestAnimationFrame عشان نضمن إن الـ canvas اتحدث
+      requestAnimationFrame(() => {
+        if (g !== 1.0) applyGammaToCanvas(el, g);
+        if (cl > 0) applyCLAHE(el, cl);
+        if (sh > 0) applySharpness(el, sh);
+        if (ch !== "all") applyChannel(el, ch);
+      });
+    },
+    [gamma, clahe, sharp, channel, isInverted],
+  );
+
+  // ── Setup cornerstone on mount ──────────────────────────────────
   useEffect(() => {
     if (!dicomUrl || !elementRef.current) return;
-
     const element = elementRef.current;
     cornerstone.enable(element);
 
-    // 1. تعريف الأدوات المطلوبة
-    const WwwcTool = cornerstoneTools.WwwcTool; // بتتحكم في Contrast و Brightness
-    const ArrowAnnotateTool = cornerstoneTools.ArrowAnnotateTool; // للـ Annotation
-    const PanTool = cornerstoneTools.PanTool;
-    const ZoomTool = cornerstoneTools.ZoomTool;
-
-    // 2. إضافة الأدوات
-    cornerstoneTools.addToolForElement(element, WwwcTool);
-    cornerstoneTools.addToolForElement(element, ArrowAnnotateTool);
-    cornerstoneTools.addToolForElement(element, PanTool);
-    cornerstoneTools.addToolForElement(element, ZoomTool);
+    [
+      cornerstoneTools.WwwcTool,
+      cornerstoneTools.ArrowAnnotateTool,
+      cornerstoneTools.PanTool,
+      cornerstoneTools.ZoomTool,
+      cornerstoneTools.LengthTool, // ← قياس المسافات
+      cornerstoneTools.AngleTool, // ← قياس الزوايا
+      cornerstoneTools.EllipticalRoiTool, // ← ROI بيظهر mean/std
+      cornerstoneTools.RotateTool, // ← تدوير
+    ].forEach((Tool) => cornerstoneTools.addToolForElement(element, Tool));
 
     const imageId = `wadouri:${dicomUrl}`;
-
     cornerstone.loadImage(imageId).then((image) => {
       cornerstone.displayImage(element, image);
+      imageLoadedRef.current = true;
 
-      // تفعيل الـ Wwwc كأداة افتراضية
+      // استخراج metadata
+      const ds = image.data;
+      setImageInfo({
+        rows: ds.uint16("x00280010") || image.height,
+        cols: ds.uint16("x00280011") || image.width,
+        bits: ds.uint16("x00280100") || 8,
+        modality: ds.string("x00080060") || "OP",
+        patientId: ds.string("x00100020") || "—",
+        studyDate: ds.string("x00080020") || "—",
+      });
+
       cornerstoneTools.setToolActiveForElement(element, "Wwwc", {
         mouseButtonMask: 1,
+      });
+
+      // Zoom event listener
+      element.addEventListener("cornerstoneimagerendered", (e) => {
+        setZoom(e.detail.viewport.scale?.toFixed(2) || 1);
       });
     });
 
     return () => {
+      imageLoadedRef.current = false;
       cornerstone.disable(element);
     };
   }, [dicomUrl]);
 
-  /* ================= CONTROLS ================= */
-
+  // ── Tool switcher ───────────────────────────────────────────────
   const changeTool = (toolName) => {
-    const element = elementRef.current;
-    if (!element) return;
-
-    // تعطيل كل الأدوات على الزر الأيسر أولاً
-    ["Wwwc", "ArrowAnnotate", "Pan", "Zoom"].forEach((t) => {
-      cornerstoneTools.setToolPassiveForElement(element, t);
-    });
-
-    // تفعيل الأداة المختارة
-    cornerstoneTools.setToolActiveForElement(element, toolName, {
+    const el = elementRef.current;
+    if (!el) return;
+    [
+      "Wwwc",
+      "ArrowAnnotate",
+      "Pan",
+      "Zoom",
+      "Length",
+      "Angle",
+      "EllipticalRoi",
+      "Rotate",
+    ].forEach((t) => cornerstoneTools.setToolPassiveForElement(el, t));
+    cornerstoneTools.setToolActiveForElement(el, toolName, {
       mouseButtonMask: 1,
     });
     setActiveTool(toolName);
   };
 
-  // التحكم في الـ Gamma
-  const handleGammaChange = (e) => {
-    const value = parseFloat(e.target.value);
-    setGammaValue(value);
-    const element = elementRef.current;
-    const viewport = cornerstone.getViewport(element);
-    viewport.gamma = value; // تحديث الـ Gamma في الـ Viewport
-    cornerstone.setViewport(element, viewport);
+  // ── Preset handler ──────────────────────────────────────────────
+  const applyPreset = (name) => {
+    const p = PRESETS[name];
+    if (!p) return;
+    setActivePreset(name);
+    setGamma(p.gamma);
+    setClahe(p.clahe);
+    setSharp(p.sharp);
+    setChannel(p.channel);
+
+    const el = elementRef.current;
+    if (el && imageLoadedRef.current && p.ww) {
+      const vp = cornerstone.getViewport(el);
+      vp.voi.windowWidth = p.ww;
+      vp.voi.windowCenter = p.wc;
+      cornerstone.setViewport(el, vp);
+    }
+    rerender({
+      gamma: p.gamma,
+      clahe: p.clahe,
+      sharp: p.sharp,
+      channel: p.channel,
+    });
   };
 
-  const reset = () => {
-    setGammaValue(1.0);
-    cornerstone.reset(elementRef.current);
+  // ── Slider handler (generic) ────────────────────────────────────
+  const handleSlider = (setter, key) => (e) => {
+    const v = parseFloat(e.target.value);
+    setter(v);
+    rerender({ [key]: v });
   };
+
+  // ── Invert ──────────────────────────────────────────────────────
+  const toggleInvert = () => {
+    const next = !isInverted;
+    setIsInverted(next);
+    rerender({ isInverted: next });
+  };
+
+  // ── Export PNG ──────────────────────────────────────────────────
+  const exportPNG = () => {
+    const canvas = elementRef.current?.querySelector("canvas");
+    if (!canvas) return;
+    const a = document.createElement("a");
+    a.download = "fundus_export.png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+  };
+
+  // ── Reset ───────────────────────────────────────────────────────
+  const reset = () => {
+    setGamma(1.0);
+    setClahe(0);
+    setSharp(0);
+    setChannel("all");
+    setIsInverted(false);
+    setActivePreset("normal");
+    cornerstone.reset(elementRef.current);
+    imageLoadedRef.current && cornerstone.updateImage(elementRef.current);
+  };
+
+  // ── Slider config ───────────────────────────────────────────────
+  const sliders = [
+    {
+      label: "Gamma",
+      key: "gamma",
+      val: gamma,
+      setter: setGamma,
+      min: 0.2,
+      max: 3.0,
+      step: 0.05,
+    },
+    {
+      label: "CLAHE",
+      key: "clahe",
+      val: clahe,
+      setter: setClahe,
+      min: 0,
+      max: 1,
+      step: 0.05,
+    },
+    {
+      label: "Sharpness",
+      key: "sharp",
+      val: sharp,
+      setter: setSharp,
+      min: 0,
+      max: 10,
+      step: 0.5,
+    },
+  ];
 
   return (
     <div
       style={{
-        background: "#000",
+        background: "#0d0d0d",
         color: "#fff",
         height: "100vh",
         display: "flex",
         flexDirection: "column",
+        fontFamily: "sans-serif",
       }}
     >
+      {/* ── Top toolbar ── */}
       <div
         style={{
-          padding: "10px",
-          borderBottom: "1px solid #444",
+          padding: "8px 12px",
+          borderBottom: "1px solid #2a2a2a",
           display: "flex",
           flexWrap: "wrap",
-          justifyContent: "center",
-          gap: "15px",
+          alignItems: "center",
+          gap: "10px",
         }}
       >
-        {/* الأدوات الأساسية */}
-        <ButtonGroup>
-          <Button
-            variant={activeTool === "Wwwc" ? "primary" : "outline-light"}
-            onClick={() => changeTool("Wwwc")}
-          >
-            Brightness & Contrast
-          </Button>
-          <Button
-            variant={
-              activeTool === "ArrowAnnotate" ? "primary" : "outline-light"
-            }
-            onClick={() => changeTool("ArrowAnnotate")}
-          >
-            Annotation
-          </Button>
-          <Button
-            variant={activeTool === "Pan" ? "primary" : "outline-light"}
-            onClick={() => changeTool("Pan")}
-          >
-            Pan
-          </Button>
+        {/* Tool buttons */}
+        <ButtonGroup size="sm">
+          {[
+            { id: "Wwwc", label: "W/L" },
+            { id: "Pan", label: "Pan" },
+            { id: "Zoom", label: "Zoom" },
+            { id: "Length", label: "Length" },
+            { id: "Angle", label: "Angle" },
+            { id: "EllipticalRoi", label: "ROI" },
+            { id: "ArrowAnnotate", label: "Annotate" },
+            { id: "Rotate", label: "Rotate" },
+          ].map(({ id, label }) => (
+            <Button
+              key={id}
+              size="sm"
+              variant={activeTool === id ? "primary" : "outline-secondary"}
+              onClick={() => changeTool(id)}
+            >
+              {label}
+            </Button>
+          ))}
         </ButtonGroup>
 
-        {/* التحكم في الـ Gamma (Slider) */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            width: "200px",
-          }}
-        >
-          <span>Gamma:</span>
-          <Form.Range
-            min="0.1"
-            max="3.0"
-            step="0.1"
-            value={gammaValue}
-            onChange={handleGammaChange}
-          />
-          <span style={{ minWidth: "30px" }}>{gammaValue}</span>
-        </div>
+        {/* Fundus presets */}
+        <ButtonGroup size="sm">
+          {Object.keys(PRESETS).map((name) => (
+            <Button
+              key={name}
+              size="sm"
+              variant={activePreset === name ? "warning" : "outline-warning"}
+              onClick={() => applyPreset(name)}
+              style={{ textTransform: "capitalize" }}
+            >
+              {name}
+            </Button>
+          ))}
+        </ButtonGroup>
 
-        <Button variant="danger" onClick={reset}>
+        {/* Channel */}
+        <ButtonGroup size="sm">
+          {["all", "r", "g", "b"].map((ch) => (
+            <Button
+              key={ch}
+              size="sm"
+              variant={channel === ch ? "info" : "outline-info"}
+              onClick={() => {
+                setChannel(ch);
+                rerender({ channel: ch });
+              }}
+              style={{ textTransform: "uppercase" }}
+            >
+              {ch === "all" ? "RGB" : ch}
+            </Button>
+          ))}
+        </ButtonGroup>
+
+        {/* Sliders */}
+        {sliders.map(({ label, key, val, setter, min, max, step }) => (
+          <div
+            key={key}
+            style={{ display: "flex", alignItems: "center", gap: "6px" }}
+          >
+            <span style={{ fontSize: 12, minWidth: 60, color: "#aaa" }}>
+              {label}
+            </span>
+            <Form.Range
+              style={{ width: 110 }}
+              min={min}
+              max={max}
+              step={step}
+              value={val}
+              onChange={handleSlider(setter, key)}
+            />
+            <span style={{ fontSize: 12, minWidth: 28, color: "#fff" }}>
+              {val.toFixed(key === "sharp" ? 1 : 2)}
+            </span>
+          </div>
+        ))}
+
+        {/* Extra buttons */}
+        <Button
+          size="sm"
+          variant={isInverted ? "light" : "outline-light"}
+          onClick={toggleInvert}
+        >
+          Invert
+        </Button>
+        <Button size="sm" variant="outline-light" onClick={exportPNG}>
+          Export PNG
+        </Button>
+        <Button size="sm" variant="danger" onClick={reset}>
           Reset
         </Button>
       </div>
 
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      {/* ── Canvas area ── */}
+      <div style={{ flex: 1, display: "flex", position: "relative" }}>
         <div
           ref={elementRef}
           onContextMenu={(e) => e.preventDefault()}
-          style={{
-            width: "80vw",
-            height: "80vh",
-            background: "black",
-            outline: "1px solid #333",
-          }}
+          style={{ width: "100%", height: "100%", background: "black" }}
         />
+
+        {/* ── Metadata overlay (bottom-left) ── */}
+        {imageInfo && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 12,
+              left: 12,
+              background: "rgba(0,0,0,0.55)",
+              padding: "8px 12px",
+              borderRadius: 6,
+              fontSize: 11,
+              lineHeight: 1.7,
+              color: "#ccc",
+              pointerEvents: "none",
+            }}
+          >
+            <div>
+              Patient: <b style={{ color: "#fff" }}>{imageInfo.patientId}</b>
+            </div>
+            <div>
+              Date: <b style={{ color: "#fff" }}>{imageInfo.studyDate}</b>
+            </div>
+            <div>
+              Size:{" "}
+              <b style={{ color: "#fff" }}>
+                {imageInfo.cols} × {imageInfo.rows}
+              </b>
+            </div>
+            <div>
+              Bits: <b style={{ color: "#fff" }}>{imageInfo.bits}</b>
+            </div>
+            <div>
+              Modality: <b style={{ color: "#fff" }}>{imageInfo.modality}</b>
+            </div>
+          </div>
+        )}
+
+        {/* ── Zoom badge (top-right) ── */}
+        <div
+          style={{
+            position: "absolute",
+            top: 10,
+            right: 12,
+            pointerEvents: "none",
+          }}
+        >
+          <Badge bg="secondary">Zoom: {zoom}x</Badge>
+        </div>
       </div>
     </div>
   );

@@ -24,14 +24,14 @@ const ProfilePage = () => {
     dispatch(getUserData());
   }, []);
   const MYData = useSelector((state) => state.alluser.mydata);
-  const userimage = MYData?.data?.imageProfile;
+  const userimage = MYData?.data?.user?.profileImage;
   const defaultLogo = "/upload.png";
-  const LogoImage = MYData?.data?.logoimg || defaultLogo;
+  const LogoImage = MYData?.data?.user?.logoImage || defaultLogo;
 
   const userFromStorage = JSON.parse(localStorage.getItem("user")) || {};
 
-  const [firstname, setFirstname] = useState(userFromStorage.firstname || "");
-  const [lastname, setLastname] = useState(userFromStorage.lastname || "");
+  const [firstName, setFirstname] = useState(userFromStorage.firstName || "");
+  const [lastName, setLastname] = useState(userFromStorage.lastName || "");
   const [email, setEmail] = useState(userFromStorage.email || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -39,7 +39,7 @@ const ProfilePage = () => {
   const [state, setState] = useState(userFromStorage.state || "");
   const [city, setCity] = useState(userFromStorage.city || "");
   const [fullAddress, setFullAddress] = useState(
-    userFromStorage.fullAddress || ""
+    userFromStorage.fullAddress || "",
   );
   const [previewImage, setPreviewImage] = useState(null);
   const [logoPreview, setLogoPreview] = useState(LogoImage);
@@ -86,13 +86,13 @@ const ProfilePage = () => {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("firstname", firstname);
-      formData.append("lastname", lastname);
+      formData.append("firstName", firstName);
+      formData.append("lastName", lastName);
       formData.append("email", email);
       formData.append("state", state);
       formData.append("city", city);
       formData.append("fullAddress", fullAddress);
-      formData.append("imageProfile", selectedFile);
+      formData.append("profileImage", selectedFile);
 
       // إرسال البيانات باستخدام الـ action
       await dispatch(updateUserProfileData(formData));
@@ -100,13 +100,13 @@ const ProfilePage = () => {
       // تحديث localStorage
       const updatedUser = {
         ...userFromStorage,
-        firstname,
-        lastname,
+        firstName,
+        lastName,
         email,
         state,
         city,
         fullAddress,
-        imageProfile: previewImage,
+        profileImage: previewImage,
       };
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
@@ -123,12 +123,11 @@ const ProfilePage = () => {
     }
   };
   const res = useSelector((state) => state.alluser.userpassword);
-  console.log(res);
   const handlePasswordChange = async () => {
     const hashedPassword = userFromStorage?.password;
     if (!currentPassword || !newPassword || !confirmPassword) {
       return notify(
-        t("profilepage.notifications.fillAllPasswordFields", "warn")
+        t("profilepage.notifications.fillAllPasswordFields", "warn"),
       );
     }
 
@@ -143,7 +142,7 @@ const ProfilePage = () => {
 
     if (!isMatch) {
       return notify(
-        t("profilepage.notifications.incorrectCurrentPassword", "warn")
+        t("profilepage.notifications.incorrectCurrentPassword", "warn"),
       );
     }
 
@@ -151,7 +150,7 @@ const ProfilePage = () => {
     await dispatch(
       UpdateLoggedUserPassword({
         password: newPassword,
-      })
+      }),
     );
     setloading(false);
   };
@@ -164,7 +163,7 @@ const ProfilePage = () => {
 
       try {
         const formData = new FormData();
-        formData.append("logoimg", file);
+        formData.append("logoImage", file);
 
         // إرسال الصورة تلقائيًا للباك إند
         await dispatch(updateUserProfileData(formData));
@@ -182,7 +181,7 @@ const ProfilePage = () => {
     if (Loading === false) {
       if (res && res.status === 200) {
         notify(
-          t("profilepage.notifications.passwordChangedSuccess", "success")
+          t("profilepage.notifications.passwordChangedSuccess", "success"),
         );
         setTimeout(() => {
           localStorage.removeItem("token");
@@ -209,7 +208,7 @@ const ProfilePage = () => {
                 <strong>{t("profilepage.fields.fullName")}</strong> <br />
                 {!editMode.name ? (
                   <div className="d-flex justify-content-between">
-                    {firstname} {lastname}
+                    {firstName} {lastName}
                     <Button
                       variant="link"
                       className="p-0"
@@ -226,7 +225,7 @@ const ProfilePage = () => {
                       </Form.Label>
                       <Form.Control
                         type="text"
-                        value={firstname}
+                        value={firstName}
                         onChange={(e) => setFirstname(e.target.value)}
                       />
                     </Form.Group>
@@ -237,7 +236,7 @@ const ProfilePage = () => {
                       </Form.Label>
                       <Form.Control
                         type="text"
-                        value={lastname}
+                        value={lastName}
                         onChange={(e) => setLastname(e.target.value)}
                       />
                     </Form.Group>

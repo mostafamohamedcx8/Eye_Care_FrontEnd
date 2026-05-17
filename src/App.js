@@ -29,6 +29,11 @@ import Advertise from "./pages/Advertise";
 function ProtectedRoute({ children }) {
   return localStorage.getItem("token") ? children : <Navigate to="/" />;
 }
+
+function HomeRoute() {
+  const token = localStorage.getItem("token");
+  return token ? <PatientTableUI /> : <Home />;
+}
 function App() {
   return (
     <div className="App">
@@ -56,19 +61,15 @@ function App() {
             }
           />
           <Route
-            path="/ExaminationReport/:id"
+            path="/ExaminationReport/:patientId/:reportId"
             element={
               <ProtectedRoute>
                 <ExaminationReport />
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/"
-            element={
-              localStorage.getItem("token") ? <PatientTableUI /> : <Home />
-            }
-          />
+          <Route path="/" element={<HomeRoute />} />
+
           <Route
             path="/DoctorCard/:id"
             element={

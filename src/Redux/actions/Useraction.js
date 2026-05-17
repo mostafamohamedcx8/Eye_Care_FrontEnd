@@ -25,7 +25,6 @@ export const CreateUser = (MYdata) => async (dispatch) => {
     dispatch({
       type: CREATEUSER,
       payload: response,
-      loading: true,
     });
     return response;
   } catch (e) {
@@ -40,23 +39,15 @@ export const CreateUser = (MYdata) => async (dispatch) => {
 export const LoginUser = (MYdata) => async (dispatch) => {
   try {
     const response = await InsertData(`/api/v1/auth/login`, MYdata);
-
-    dispatch({
-      type: LOGINUSER,
-      payload: response.data,
-      loading: true,
-    });
+    dispatch({ type: LOGINUSER, payload: response.data });
   } catch (e) {
-    dispatch({
-      type: LOGINUSER,
-      payload: e.response,
-    });
+    dispatch({ type: LOGINUSER, payload: e.response });
   }
 };
 
 export const Create_New_Password = (data) => async (dispatch) => {
   try {
-    const response = await updateData(`/api/v1/auth/resetpassword`, data);
+    const response = await updateData(`/api/v1/auth/reset-password`, data);
 
     dispatch({
       type: CREATE_NEW_PASSWORD,
@@ -73,7 +64,7 @@ export const Create_New_Password = (data) => async (dispatch) => {
 
 export const verifyPassword = (MYdata) => async (dispatch) => {
   try {
-    const response = await InsertData(`api/v1/auth/verifyresetcode`, MYdata);
+    const response = await InsertData(`api/v1/auth/verify-reset-code`, MYdata);
 
     dispatch({
       type: VERIFYPASSWORD,
@@ -89,7 +80,7 @@ export const verifyPassword = (MYdata) => async (dispatch) => {
 };
 export const ForgetPassword = (MYdata) => async (dispatch) => {
   try {
-    const response = await InsertData(`api/v1/auth/forgetpassword`, MYdata);
+    const response = await InsertData(`api/v1/auth/forgot-password`, MYdata);
 
     dispatch({
       type: FORGETPASSWORD,
@@ -106,10 +97,10 @@ export const ForgetPassword = (MYdata) => async (dispatch) => {
 export const verifyEmailCode = (token) => async (dispatch) => {
   try {
     const res = await axios.post(
-      "http://localhost:8000/api/v1/auth/verifyemailcode",
+      "https://backend.auge.cloud/api/v1/auth/verify-email",
       {
         token: token,
-      }
+      },
     );
 
     dispatch({
@@ -126,10 +117,7 @@ export const verifyEmailCode = (token) => async (dispatch) => {
 
 export const updateUserProfileData = (body) => async (dispatch) => {
   try {
-    const response = await UpdateDataWithImage(
-      `/api/v1/user/updatemydata`,
-      body
-    );
+    const response = await UpdateDataWithImage(`/api/v1/users/updateMe`, body);
     dispatch({
       type: UPDATE_USER_PROFILE,
       payload: response,
@@ -145,7 +133,7 @@ export const updateUserProfileData = (body) => async (dispatch) => {
 
 export const getUserData = () => async (dispatch) => {
   try {
-    const response = await useGetDataToken(`/api/v1/user/getMe`);
+    const response = await useGetDataToken(`/api/v1/users/Me`);
 
     dispatch({
       type: GETMYDATA,
@@ -162,8 +150,8 @@ export const getUserData = () => async (dispatch) => {
 export const UpdateLoggedUserPassword = (body) => async (dispatch) => {
   try {
     const response = await updateDataWithToken(
-      `/api/v1/user/changemypassword`,
-      body
+      `/api/v1/users/changemypassword`,
+      body,
     );
     dispatch({
       type: UPDATELOGGEDUSERPASSWORD,

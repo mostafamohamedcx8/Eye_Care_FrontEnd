@@ -10,6 +10,7 @@ const inital = {
   specificdoctor: [],
   loading: true,
 };
+
 const doctorReducer = (state = inital, action) => {
   switch (action.type) {
     case GET_ALL_DOCTOR:
@@ -18,23 +19,31 @@ const doctorReducer = (state = inital, action) => {
         doctor: action.payload,
         loading: false,
       };
+
     case CREATE_DOCTOR:
       return {
+        ...state,
         doctor: action.payload,
         loading: false,
       };
+
     case GETSPECIFICDOCTOR:
       return {
+        ...state,
         specificdoctor: action.payload,
         loading: false,
       };
+
     case GET_ERROR:
       return {
-        loading: true,
-        doctor: action.payload,
+        ...state,
+        loading: false,
+        error: action.payload,
       };
+
     default:
       return state;
   }
 };
+
 export default doctorReducer;

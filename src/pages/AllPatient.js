@@ -65,7 +65,6 @@ const PatientTableUI = () => {
               <th>{t("patientTable.tableHeaders.name")}</th>
               <th>{t("patientTable.tableHeaders.dateOfBirth")}</th>
               <th>{t("patientTable.tableHeaders.aiReportCount")}</th>
-              <th>{t("patientTable.tableHeaders.feedbackCount")}</th>
               <th>{t("patientTable.tableHeaders.tools")}</th>
             </tr>
           </thead>
@@ -129,8 +128,8 @@ const PatientTableUI = () => {
                   </td>
                   <td>
                     {patient.salutation ||
-                    patient.firstname ||
-                    patient.lastname ? (
+                    patient.firstName ||
+                    patient.lastName ? (
                       <>
                         {patient.salutation ? (
                           patient.salutation
@@ -138,13 +137,13 @@ const PatientTableUI = () => {
                           <span style={{ color: "red" }}>---</span>
                         )}
                         .
-                        {patient.firstname ? (
-                          patient.firstname
+                        {patient.firstName ? (
+                          patient.firstName
                         ) : (
                           <span style={{ color: "red" }}>---</span>
                         )}{" "}
-                        {patient.lastname ? (
-                          patient.lastname
+                        {patient.lastName ? (
+                          patient.lastName
                         ) : (
                           <span style={{ color: "red" }}>---</span>
                         )}
@@ -161,34 +160,7 @@ const PatientTableUI = () => {
                       <span style={{ color: "red" }}>---</span>
                     )}
                   </td>
-                  <td>{patient.report?.length || 0}</td>
-                  <td>
-                    {(() => {
-                      const feedbacks =
-                        patient.report?.flatMap(
-                          (r) => r.doctorFeedbacks || []
-                        ) || [];
-                      const readCount = feedbacks.filter(
-                        (f) => f.readed === true
-                      ).length;
-                      const unreadCount = feedbacks.filter(
-                        (f) => f.readed !== true
-                      ).length;
-
-                      return (
-                        <div className="d-flex align-items-center gap-2">
-                          <span title={t("patientTable.feedback.seen")}>
-                            <i className="bi bi-eye-fill text-success"></i>{" "}
-                            {readCount}
-                          </span>
-                          <span title={t("patientTable.feedback.unseen")}>
-                            <i className="bi bi-eye-slash-fill text-secondary"></i>{" "}
-                            {unreadCount}
-                          </span>
-                        </div>
-                      );
-                    })()}
-                  </td>
+                  <td>{patient.reportsCount || 0}</td>
                   <td>
                     {userFromStorage?.role !== "doctor" && (
                       <button

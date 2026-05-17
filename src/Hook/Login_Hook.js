@@ -3,13 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { LoginUser } from "../Redux/actions/Useraction";
 import notify from "../Hook/useNotification";
 import { validateLogin } from "../Validations/validateSignupForm";
+import { useNavigate } from "react-router-dom";
 export const Login_Hook = (t) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [ispress, setispress] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [ispress, setispress] = useState(false);
 
   const HandelSubmit = async (e) => {
     e.preventDefault();
@@ -23,64 +25,45 @@ export const Login_Hook = (t) => {
         email,
         password,
         role: "optician",
-      })
+      }),
     );
     setLoading(false);
     setispress(false);
   };
   const res = useSelector((state) => state.alluser.loginUser);
 
-  const onChangeEmail = (e) => {
-    e.persist();
-    setEmail(e.target.value);
-  };
-  const onChangePassword = (e) => {
-    e.persist();
-    setPassword(e.target.value);
-  };
+  const onChangeEmail = (e) => setEmail(e.target.value);
+  const onChangePassword = (e) => setPassword(e.target.value);
 
   useEffect(() => {
-    if (loading === false) {
-      if (res) {
-        console.log(res.data.message);
-        if (res.token) {
-          localStorage.setItem("token", res.token);
-          localStorage.setItem("user", JSON.stringify(res.data));
-          notify(t("loginHook.notifySuccess"), "success");
-          setTimeout(() => {
-            window.location.href = "/";
-          }, 1500);
-        } else if (res?.data?.message === "Invalid email or password ") {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+    if (loading === false && res) {
+      if (res.token) {
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("user", JSON.stringify(res.data));
+        notify(t("loginHook.notifySuccess"), "success");
+
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      } else {
+        const msg = res?.data?.message;
+
+        if (msg?.includes("Invalid email or password")) {
           notify(t("loginHook.notifyInvalidCredentials"), "warn");
-        } else if (
-          res?.data?.message ===
-          "Your email is not verified. We have sent a new verification link to your email."
-        ) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+        } else if (msg?.includes("not verified")) {
           notify(t("loginHook.notifyEmailNotVerified"), "warn");
-        } else if (res?.data?.message === "Invalid email or password or role") {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          notify(t("loginHook.notifyInvalidRole"), "warn");
-        } else if (
-          res.data.message ===
-          "Your medical license is still under review. You will be notified by email once it's verified."
-        ) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
+        } else if (msg?.includes("medical license")) {
           notify(t("loginHook.notifyLicenseUnderReview"), "warn");
-        } else {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          // notify(t("loginHook.notifyGenericError"), "error");
+        } else if (msg?.includes("role")) {
+          notify(t("loginHook.notifyInvalidRole"), "warn");
         }
-        setLoading(true);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
+
+      setLoading(true);
     }
-  }, [loading, t]);
+  }, [loading, res, t, navigate]);
 
   return [
     email,

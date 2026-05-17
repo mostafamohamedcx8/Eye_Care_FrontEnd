@@ -117,10 +117,8 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.name")}
                 </span>
                 <span className="patient-data">
-                  {patient?.data?.firstname || patient?.data?.lastname ? (
-                    `${patient?.data?.firstname || ""} ${
-                      patient?.data?.lastname || ""
-                    }`
+                  {patient?.firstName || patient?.lastName ? (
+                    `${patient?.firstName || ""} ${patient?.lastName || ""}`
                   ) : (
                     <span style={{ color: "red" }}>---</span>
                   )}
@@ -131,8 +129,8 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.salutation")}
                 </span>
                 <span className="patient-data">
-                  {patient?.data?.salutation ? (
-                    patient.data.salutation
+                  {patient?.salutation ? (
+                    patient.salutation
                   ) : (
                     <span style={{ color: "red" }}>---</span>
                   )}
@@ -143,10 +141,8 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.dateOfBirth")}
                 </span>
                 <span className="patient-data">
-                  {patient?.data?.dateOfBirth ? (
-                    new Date(patient.data.dateOfBirth).toLocaleDateString(
-                      "de-DE",
-                    )
+                  {patient?.dateOfBirth ? (
+                    new Date(patient.dateOfBirth).toLocaleDateString("de-DE")
                   ) : (
                     <span style={{ color: "red" }}>---</span>
                   )}
@@ -157,8 +153,8 @@ const ReportDetails = () => {
                   {t("reportForm.patientInfo.labels.ethnicity")}
                 </span>
                 <span className="patient-data">
-                  {patient?.data?.ethnicity ? (
-                    patient.data.ethnicity
+                  {patient?.ethnicity ? (
+                    patient.ethnicity
                   ) : (
                     <span style={{ color: "red" }}>---</span>
                   )}
@@ -172,11 +168,11 @@ const ReportDetails = () => {
                   className="patient-data"
                   style={{ display: "flex", alignItems: "center", gap: "10px" }}
                 >
-                  {patient?.data?.patientId ? (
+                  {patient?.patientId ? (
                     <>
                       <div style={{ marginTop: "10px" }}>
                         <Barcode
-                          value={patient.data.patientId.toString()}
+                          value={patient.patientId.toString()}
                           height={50}
                           width={2}
                           fontSize={14}
@@ -592,7 +588,6 @@ const ReportDetails = () => {
                     setImages={setRightImages}
                     theme={"light"}
                     max={8}
-                    cropConfig={{ crop, ruleOfThirds: true }}
                   />
                   <Form.Text className="text-muted">
                     {t("reportForm.eyeExamination.imageNote")}
@@ -853,13 +848,12 @@ const ReportDetails = () => {
                       })}
                     </div>
                   </div>
-
                   <MultiImageInput
+                    className="multi-image-input__image"
                     images={Leftimages}
                     setImages={setLeftImages}
                     theme={"light"}
                     max={8}
-                    cropConfig={{ crop, ruleOfThirds: true }}
                   />
                   <Form.Text className="text-muted">
                     {t("reportForm.eyeExamination.imageNote")}
