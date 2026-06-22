@@ -419,7 +419,8 @@
       "deleteSuccess": "Patient deleted successfully",
       "deleteError": "There was a problem with the deletion",
       "archiveSuccess": "Patient archive status updated successfully!",
-      "archiveError": "Failed updating patient archive status"
+      "archiveError": "Failed updating patient archive status",
+      "updateSuccess": "Patient updated successfully"
     },
     "archived": {
       "title": "Archived Patients",
@@ -455,7 +456,9 @@
       "salutation": "Salutation",
       "dateOfBirth": "Date of Birth",
       "ethnicity": "Ethnicity",
-      "email": "Email"
+      "email": "Email",
+      "optional": "Optional",
+      "opticianConsent": "Patient has given verbal/written consent for the optician to create reports on their behalf"
     },
     "placeholders": {
       "firstName": "Enter First Name",
@@ -465,7 +468,10 @@
       "email": "Enter Email Address"
     },
     "messages": {
-      "emailHelp": "Credentials will be sent to this email. Make sure it's correct."
+      "emailHelp": "Credentials will be sent to this email. Make sure it's correct.",
+      "consentGiven": "Consent recorded. No email will be sent for consent.",
+      "consentPending": "A consent request will be sent to the patient's email.",
+      "consentMissing": "No consent recorded. Add an email to send a consent request."
     },
     "salutationOptions": {
       "mr": "Mr",
@@ -522,7 +528,8 @@
       "dobRequired": "Date of Birth is required",
       "dobInvalid": "Date of Birth is invalid",
       "dobFuture": "Date of Birth must be in the past",
-      "ethnicityRequired": "Ethnicity is required"
+      "ethnicityRequired": "Ethnicity is required",
+      "emailRequired": "Email is required"
     }
   },
   "reportForm": {

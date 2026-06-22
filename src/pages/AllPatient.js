@@ -37,6 +37,16 @@ const PatientTableUI = () => {
     handleClose,
     handleDeleteConfirmed,
     onChangeKeyword,
+    showEdit,
+    handleShowEdit,
+    handleCloseEdit,
+    editEmail,
+    setEditEmail,
+    editConsent,
+    setEditConsent,
+    editLoading,
+    handleEditConfirmed,
+    opticianId,
   ] = Allpatient_Hook(t);
 
   return (
@@ -162,7 +172,7 @@ const PatientTableUI = () => {
                   </td>
                   <td>{patient.reportsCount || 0}</td>
                   <td>
-                    {userFromStorage?.role !== "doctor" && (
+                    {patient?.createdBy === opticianId && (
                       <button
                         className="btn btn-sm btn-outline-danger me-2"
                         onClick={() => handleShow(patient._id)}
@@ -176,18 +186,30 @@ const PatientTableUI = () => {
                     >
                       <i className="bi bi-eye"></i>
                     </button>
-                    <button
-                      className="btn btn-sm btn-outline-success me-2 "
-                      onClick={() => navigate(`/Examination/${patient._id}`)}
-                    >
-                      <i className="bi bi-journal-plus"></i>
-                    </button>
+                    {patient?.opticians?.some(
+                      (d) =>
+                        d.opticianConsent?.consentToReports &&
+                        d.optician?._id === opticianId,
+                    ) && (
+                      <button
+                        className="btn btn-sm btn-outline-success me-2"
+                        onClick={() => navigate(`/Examination/${patient._id}`)}
+                      >
+                        <i className="bi bi-journal-plus"></i>
+                      </button>
+                    )}
                     <button
                       className="btn btn-sm btn-outline-secondary me-2 "
                       onClick={(e) => handleToggleArchive(patient._id, e)}
                       disabled={archiveLoading[patient._id]}
                     >
                       <i className="bi bi-archive"></i>
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-warning me-2"
+                      onClick={() => handleShowEdit(patient)}
+                    >
+                      <i className="bi bi-pencil"></i>
                     </button>
                     <OverlayTrigger
                       placement="top"
@@ -235,6 +257,49 @@ const PatientTableUI = () => {
           </Button>
           <Button variant="danger" onClick={handleDeleteConfirmed}>
             {t("patientTable.modal.delete")}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={showEdit} onHide={handleCloseEdit}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit patient</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="mb-3">
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              value={editEmail}
+              onChange={(e) => setEditEmail(e.target.value)}
+              placeholder="patient@email.com"
+            />
+            <Form.Text className="text-muted">
+              Credentials will be sent to this email once updated.
+            </Form.Text>
+          </Form.Group>
+          <Form.Group>
+            <Form.Check
+              type="checkbox"
+              id="editConsent"
+              checked={editConsent}
+              onChange={(e) => setEditConsent(e.target.checked)}
+              label="Allow optician to create reports"
+            />
+            <Form.Text className="text-muted ms-4">
+              {editConsent ? "✅ Consent recorded." : "⏳ Consent not granted."}
+            </Form.Text>
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseEdit}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleEditConfirmed}
+            disabled={editLoading}
+          >
+            {editLoading ? "Saving..." : "Save changes"}
           </Button>
         </Modal.Footer>
       </Modal>

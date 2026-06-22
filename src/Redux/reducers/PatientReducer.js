@@ -8,6 +8,7 @@ import {
   GETSPECIFICPATIENT,
   ARCHIVEDPATIENT,
   GET_MY_ARCHIVEDPATIENT,
+  UPDATE_PATIENT_EMAIL,
 } from "../type";
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
   sendpatient: [],
   archivedpatient: [],
   unarchivedpatient: [],
+  updatepatientemail: [],
   loading: true,
   error: null, // إضافة حقل للخطأ
 };
@@ -73,6 +75,12 @@ const patientReducer = (state = initialState, action) => {
         ...state,
         deletpatient: action.payload,
         loading: false, // لا تنسى اللودينج
+      };
+    case UPDATE_PATIENT_EMAIL:
+      return {
+        ...state,
+        updatepatientemail: action.payload,
+        loading: false,
       };
     case GET_ERROR:
       return {

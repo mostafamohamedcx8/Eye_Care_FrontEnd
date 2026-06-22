@@ -6,6 +6,7 @@ import { validatePatientForm } from "../Validations/patientValidation";
 import notify from "../Hook/useNotification";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+
 const PatientTab = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ const PatientTab = () => {
   const [ethnicity, setEthnicity] = useState("");
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  // ✅ optician consent checkbox state (default false)
+  const [opticianConsent, setOpticianConsent] = useState(false);
 
   const removeEmptyFields = (obj) =>
     Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== ""));
@@ -29,6 +32,7 @@ const PatientTab = () => {
     setDob("");
     setEmail("");
     setEthnicity("");
+    setOpticianConsent(false);
   };
 
   const handelSubmit = async (event) => {
@@ -44,27 +48,30 @@ const PatientTab = () => {
     });
     if (!isValid) return;
 
-    const patientData = removeEmptyFields({
-      firstName,
-      lastName,
-      salutation,
-      dateOfBirth,
-      ethnicity,
-      email,
-    });
+    // Remove empty string fields, but keep opticianConsent as boolean always
+    const patientData = {
+      ...removeEmptyFields({
+        firstName,
+        lastName,
+        salutation,
+        dateOfBirth,
+        ethnicity,
+        email,
+      }),
+      consentFlag: opticianConsent, // always included even if false
+    };
 
     setLoading(true);
     const result = await dispatch(CreatePatient(patientData));
+    console.log("CreatePatient result:", result);
     setLoading(false);
 
     if (result?.status === 201) {
-      const id = result?.data?.data?.patient?._id;
       notify(t("patientForm.notifications.createSuccess"), "success");
       resetForm();
-      navigate(`/Examination/${id}`);
+      navigate(`/`);
     } else {
-      // ❌ لو فشل → الحقول تفضل زي ما هي + رسالة خطأ
-      const msg = result?.data?.message || "حدث خطأ ما";
+      const msg = result?.data?.message || "Something went wrong";
       notify(msg, "error");
     }
   };
@@ -122,12 +129,13 @@ const PatientTab = () => {
             </Form.Group>
           </Col>
         </Row>
+
         <Row>
           <Col>
             <Form.Group>
               <Form.Label>
-                {t("patientForm.labels.email")}{" "}
-                <span className="text-danger ms-1">*</span>
+                {t("patientForm.labels.email")}
+                {/* Email is optional - no required asterisk */}
               </Form.Label>
               <Form.Control
                 type="email"
@@ -136,18 +144,17 @@ const PatientTab = () => {
                 }
                 onChange={(e) => setEmail(e.target.value)}
                 value={email}
-                required // تفعيل خاصية الـ HTML5 validation
+                // ✅ removed required - email is now optional
               />
               <Form.Text className="text-muted">
                 {t("patientForm.messages.emailHelp") ||
-                  "Credentials will be sent to this email."}
+                  "If provided, credentials and consent request will be sent to this email."}
               </Form.Text>
             </Form.Group>
           </Col>
           <Col>
             <Form.Group>
               <Form.Label>{t("patientForm.labels.dateOfBirth")}</Form.Label>
-
               <Form.Control
                 type="date"
                 onChange={(e) => setDob(e.target.value)}
@@ -158,7 +165,6 @@ const PatientTab = () => {
           <Col>
             <Form.Group>
               <Form.Label>{t("patientForm.labels.ethnicity")}</Form.Label>
-
               <Form.Select
                 onChange={(e) => setEthnicity(e.target.value)}
                 value={ethnicity}
@@ -239,6 +245,40 @@ const PatientTab = () => {
             </Form.Group>
           </Col>
         </Row>
+
+        {/* ✅ Optician consent checkbox section */}
+        <Row className="mt-4">
+          <Col>
+            <Form.Group>
+              <Form.Check
+                type="checkbox"
+                id="opticianConsent"
+                checked={opticianConsent}
+                onChange={(e) => setOpticianConsent(e.target.checked)}
+                label={
+                  <span>
+                    {t("patientForm.labels.opticianConsent") ||
+                      "Patient has given verbal/written consent for the optician to create reports on their behalf"}
+                  </span>
+                }
+              />
+              <Form.Text className="text-muted ms-4">
+                {opticianConsent
+                  ? // ✅ checkbox is checked
+                    t("patientForm.messages.consentGiven") ||
+                    "✅ Consent recorded. No email will be sent for consent."
+                  : email
+                    ? // checkbox not checked but email exists
+                      t("patientForm.messages.consentPending") ||
+                      "⏳ A consent request will be sent to the patient's email."
+                    : // no checkbox, no email
+                      t("patientForm.messages.consentMissing") ||
+                      "⚠️ No consent recorded. Add an email to send a consent request."}
+              </Form.Text>
+            </Form.Group>
+          </Col>
+        </Row>
+
         <Row className="mt-4">
           <Col>
             <Button type="submit" variant="primary" disabled={loading}>

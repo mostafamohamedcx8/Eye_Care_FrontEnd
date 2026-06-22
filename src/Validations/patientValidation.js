@@ -22,17 +22,8 @@ export const validatePatientForm = ({
   ethnicity,
   email,
 }) => {
-  if (!email || email.trim() === "") {
-    notify(
-      i18n.t("patientForm.validation.emailRequired") ||
-        "Email is required to send login credentials",
-      "warn",
-    );
-    return false;
-  }
-
-  // 2. التحقق من صيغة الإيميل
-  if (!validateEmailFormat(email)) {
+  // Validate email format only if email is provided (email is optional)
+  if (email && !validateEmailFormat(email)) {
     notify(
       i18n.t("patientForm.validation.emailInvalid") ||
         "Please enter a valid email address",
@@ -40,7 +31,8 @@ export const validatePatientForm = ({
     );
     return false;
   }
-  // لو في تاريخ مكتوب، لازم يكون صحيح وفي الماضي
+
+  // Validate date of birth only if provided (optional field)
   if (dateOfBirth) {
     const dob = new Date(dateOfBirth);
     const now = new Date();
@@ -56,6 +48,5 @@ export const validatePatientForm = ({
     }
   }
 
-  // ✅ كل الحقول اختيارية
   return true;
 };

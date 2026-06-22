@@ -97,7 +97,7 @@ export const ForgetPassword = (MYdata) => async (dispatch) => {
 export const verifyEmailCode = (token) => async (dispatch) => {
   try {
     const res = await axios.post(
-      "https://backend.auge.cloud/api/v1/auth/verify-email",
+      "http://localhost:8000/api/v1/auth/verify-email",
       {
         token: token,
       },

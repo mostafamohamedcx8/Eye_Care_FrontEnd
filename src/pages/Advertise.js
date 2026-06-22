@@ -4,13 +4,18 @@ import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
 import React from "react";
 import { Container, Row } from "react-bootstrap";
+import usePageData from "../Hooks/usePageData";
 import { useTranslation } from "react-i18next";
 
 const AdvertiseSection = () => {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const pageId = i18n.language === "de" ? 229 : 227; // غير الـ IDs
+
+  const { data, loading } = usePageData(pageId, []);
+  if (loading) return <div>Loading...</div>;
+
   return (
     <>
-      {/* Hero Section */}
       <Row>
         <div className="hero-section">
           <div className="overlay hero-section">
@@ -19,26 +24,23 @@ const AdvertiseSection = () => {
                 {t("advertise.breadcrumb_home")}
               </Link>
               <span className="separator">/</span>
-              <span className="active">
-                {t("advertise.breadcrumb_advertise")}
-              </span>
+              <span className="active">{data?.advertise_title}</span>
             </div>
-            <h1 className="title">{t("advertise.title")}</h1>
+            <h1 className="title">{data?.advertise_title}</h1>
           </div>
         </div>
       </Row>
 
-      {/* Content Section */}
       <Container className="py-5">
-        <h2>{t("advertise.section_title")}</h2>
-        <p>{t("advertise.paragraph_1")}</p>
+        <h2>{data?.advertise_section_title}</h2>
+        <p>{data?.paragraph_1}</p>
         <ul>
-          <li>{t("advertise.list_item_1")}</li>
-          <li>{t("advertise.list_item_2")}</li>
-          <li>{t("advertise.list_item_3")}</li>
+          <li>{data?.list_item_1}</li>
+          <li>{data?.list_item_2}</li>
+          <li>{data?.list_item_3}</li>
         </ul>
         <p>
-          📩 {t("advertise.contact")}
+          📩 {data?.contact_text}
           <a href="mailto:advertise@augenarzt.cloud">jobs@augenarzt.cloud</a>
         </p>
       </Container>

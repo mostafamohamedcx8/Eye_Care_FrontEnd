@@ -444,7 +444,8 @@
       "deleteSuccess": "Patient erfolgreich gelöscht",
       "deleteError": "Es gab ein Problem beim Löschen",
       "archiveSuccess": "Archivstatus des Patienten erfolgreich aktualisiert!",
-      "archiveError": "Fehler beim Aktualisieren des Archivstatus des Patienten"
+      "archiveError": "Fehler beim Aktualisieren des Archivstatus des Patienten",
+      "updateSuccess": "Patient erfolgreich aktualisiert"
     }
   },
   "patientForm": {
@@ -455,10 +456,15 @@
       "salutation": "Anrede",
       "dateOfBirth": "Geburtsdatum",
       "ethnicity": "Ethnische Zugehörigkeit",
-      "email": "E-Mail"
+      "email": "E-Mail",
+      "optional": "Optional",
+      "opticianConsent": "Der Patient hat dem Optiker mündlich/schriftlich zugestimmt, Berichte in seinem Namen zu erstellen"
     },
     "messages": {
-      "emailHelp": "Die Zugangsdaten werden an diese E-Mail-Adresse gesendet. Bitte überprüfen Sie, ob sie korrekt ist."
+      "emailHelp": "Die Anmeldedaten werden an diese E-Mail gesendet. Bitte stellen Sie sicher, dass sie korrekt ist.",
+      "consentGiven": "Zustimmung erfasst. Es wird keine E-Mail zur Einwilligung gesendet.",
+      "consentPending": "Eine Einwilligungsanfrage wird an die E-Mail des Patienten gesendet.",
+      "consentMissing": "Keine Zustimmung erfasst. Fügen Sie eine E-Mail hinzu, um eine Einwilligungsanfrage zu senden."
     },
     "placeholders": {
       "firstName": "Vornamen eingeben",
@@ -522,7 +528,8 @@
       "dobRequired": "Geburtsdatum ist erforderlich",
       "dobInvalid": "Geburtsdatum ist ungültig",
       "dobFuture": "Geburtsdatum muss in der Vergangenheit liegen",
-      "ethnicityRequired": "Ethnische Zugehörigkeit ist erforderlich"
+      "ethnicityRequired": "Ethnische Zugehörigkeit ist erforderlich",
+      "emailRequired": "E-Mail ist erforderlich"
     }
   },
   "reportForm": {

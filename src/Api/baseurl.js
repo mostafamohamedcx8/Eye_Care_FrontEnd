@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const baseUrl = axios.create({
-  baseURL: "https://backend.auge.cloud", // ✅ الصحيح
+  baseURL: "http://localhost:8000", // ✅ الصحيح
 });
 
 export default baseUrl;

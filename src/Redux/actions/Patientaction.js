@@ -8,6 +8,7 @@ import {
   GETSPECIFICPATIENT,
   ARCHIVEDPATIENT,
   GET_MY_ARCHIVEDPATIENT,
+  UPDATE_PATIENT_EMAIL,
 } from "../type";
 import { InsertData } from "../../Hooks/useInsertData";
 import { useGetDataToken } from "../../Hooks/useGetData";
@@ -121,6 +122,26 @@ export const getSpecificpatient = (id) => async (dispatch) => {
       type: GETSPECIFICPATIENT,
       payload: e.response,
     });
+  }
+};
+
+export const updatePatientEmail = (patientId, data) => async (dispatch) => {
+  try {
+    const response = await updateDataWithToken(
+      `/api/v1/patients/${patientId}/update-email`,
+      data,
+    );
+    dispatch({
+      type: UPDATE_PATIENT_EMAIL,
+      payload: response,
+    });
+    return response;
+  } catch (e) {
+    dispatch({
+      type: GET_ERROR,
+      payload: e.response,
+    });
+    return e.response;
   }
 };
 

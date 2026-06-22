@@ -1,4 +1,5 @@
 import MultiImageInput from "react-multiple-image-input";
+import MultiImageInputCustom from "../component/MultiImageInputCustom";
 import Barcode from "react-barcode";
 import {
   Container,
@@ -582,11 +583,9 @@ const ReportDetails = () => {
                     })}
                   </div>
 
-                  <MultiImageInput
-                    className="multi-image-input__image"
+                  <MultiImageInputCustom
                     images={Rightimages}
                     setImages={setRightImages}
-                    theme={"light"}
                     max={8}
                   />
                   <Form.Text className="text-muted">
@@ -848,16 +847,14 @@ const ReportDetails = () => {
                       })}
                     </div>
                   </div>
-                  <MultiImageInput
-                    className="multi-image-input__image"
+                  <MultiImageInputCustom
                     images={Leftimages}
                     setImages={setLeftImages}
-                    theme={"light"}
                     max={8}
                   />
+
                   <Form.Text className="text-muted">
                     {t("reportForm.eyeExamination.imageNote")}
-                    diagnosis.
                   </Form.Text>
                   <div className="text-form pb-2 pt-4">
                     {t("reportForm.eyeExamination.labels.uploadDicom", {

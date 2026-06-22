@@ -6,6 +6,7 @@ import {
   getAllMyArchivedPatientPage,
   deleteMyPatient,
   toggleArchivePatient,
+  updatePatientEmail,
 } from "../Redux/actions/Patientaction";
 import notify from "../Hook/useNotification";
 
@@ -17,8 +18,44 @@ export const Arcivedpatient_Hook = (t) => {
   const [keyword, setKeyword] = useState("");
   const [show, setShow] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [editPatient, setEditPatient] = useState(null);
+  const [editEmail, setEditEmail] = useState("");
+  const [editConsent, setEditConsent] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
 
   const userFromStorage = JSON.parse(localStorage.getItem("user"));
+
+  const handleShowEdit = (patient) => {
+    setEditPatient(patient);
+    setEditEmail(patient.email || "");
+    setEditConsent(
+      patient.opticians?.some((o) => o.opticianConsent?.consentToReports) ||
+        false,
+    );
+    setShowEdit(true);
+  };
+
+  const handleCloseEdit = () => {
+    setShowEdit(false);
+    setEditPatient(null);
+  };
+
+  const handleEditConfirmed = async () => {
+    const data = {};
+    if (editEmail && editEmail !== editPatient?.email) data.email = editEmail;
+    data.consentFlag = editConsent;
+
+    if (!Object.keys(data).length) return handleCloseEdit();
+
+    setEditLoading(true);
+    await dispatch(updatePatientEmail(editPatient._id, data));
+    setEditLoading(false);
+    handleCloseEdit();
+    dispatch(getMyArchivedpatient(10, keyword));
+    notify(t("patientTable.notifications.updateSuccess"), "success");
+  };
 
   const MypatinetData = useSelector(
     (state) => state.allpatient.archivedpatient,
@@ -93,5 +130,14 @@ export const Arcivedpatient_Hook = (t) => {
     handleClose,
     handleDeleteConfirmed,
     onChangeKeyword,
+    showEdit,
+    handleShowEdit,
+    handleCloseEdit,
+    editEmail,
+    setEditEmail,
+    editConsent,
+    setEditConsent,
+    editLoading,
+    handleEditConfirmed,
   ];
 };

@@ -4,13 +4,18 @@ import { Link } from "react-router-dom";
 import Footer from "../component/Footer";
 import React from "react";
 import { Container, Row } from "react-bootstrap";
+import usePageData from "../Hooks/usePageData";
 import { useTranslation } from "react-i18next";
 
 const CareerSection = () => {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const pageId = i18n.language === "de" ? 102 : 100; // غير الـ IDs
+
+  const { data, loading } = usePageData(pageId, []);
+  if (loading) return <div>Loading...</div>;
+
   return (
     <>
-      {/* Hero Section */}
       <Row>
         <div className="hero-section">
           <div className="overlay hero-section">
@@ -19,27 +24,26 @@ const CareerSection = () => {
                 {t("career.breadcrumb_home")}
               </Link>
               <span className="separator">/</span>
-              <span className="active">{t("career.breadcrumb_career")}</span>
+              <span className="active">{data?.career_title}</span>
             </div>
-            <h1 className="title">{t("career.title")}</h1>
+            <h1 className="title">{data?.career_title}</h1>
           </div>
         </div>
       </Row>
 
-      {/* Content Section */}
       <Container className="py-5">
-        <h2>{t("career.section_title")}</h2>
-        <p>{t("career.paragraph_1")}</p>
-        <p>{t("career.paragraph_2")}</p>
-        <h5>{t("career.current_openings")}</h5>
+        <h2>{data?.career_section_title}</h2>
+        <p>{data?.career_paragraph_1}</p>
+        <p>{data?.career_paragraph_2}</p>
+        <h5>{data?.career_current_openings}</h5>
         <ul>
-          <li>{t("career.opening_1")}</li>
-          <li>{t("career.opening_2")}</li>
-          <li>{t("career.opening_3")}</li>
-          <li>{t("career.opening_4")}</li>
+          <li>{data?.opening_1}</li>
+          <li>{data?.opening_2}</li>
+          <li>{data?.opening_3}</li>
+          <li>{data?.opening_4}</li>
         </ul>
         <p>
-          📧 {t("career.contact")}{" "}
+          📧 {data?.contact_text}{" "}
           <a href="mailto:jobs@augenarzt.cloud">jobs@augenarzt.cloud</a>
         </p>
       </Container>

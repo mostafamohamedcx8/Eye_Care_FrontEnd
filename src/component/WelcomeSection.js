@@ -1,25 +1,22 @@
 import React from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { useTranslation } from "react-i18next";
 
-const WelcomeSection = () => {
-  const { t } = useTranslation(); // Initialize translation hook
-
+const WelcomeSection = ({ data }) => {
   return (
     <div className="welcome-section">
       <Container>
         <Row className="align-items-center">
           <Col md={6}>
-            <h2 className="welcome-title">{t("welcome.title")}</h2>
-            <p className="welcome-text">{t("welcome.text")}</p>
-            <Button className="welcome-button" href="/about">
-              {t("welcome.learn_more")}
+            <h2 className="welcome-title">{data?.welcome_title}</h2>
+            <p className="welcome-text">{data?.welcome_text}</p>
+            <Button className="welcome-button" href={data?.welcome_button_url}>
+              {data?.welcome_button_text}
             </Button>
           </Col>
           <Col md={6}>
             <img
-              src={"Doctorimage.png"}
-              alt={t("welcome.image_alt")}
+              src={data?.welcome_image}
+              alt="welcome"
               className="welcome-image"
             />
           </Col>

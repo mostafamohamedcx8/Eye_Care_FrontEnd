@@ -16,6 +16,9 @@ cornerstoneTools.external.Hammer = Hammer;
 cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
 cornerstoneTools.init();
 
+/* ── أدوات القياس/الـ annotations اللي عايزين نقدر نمسحها ── */
+const MEASURE_TOOLS = ["Length", "Angle", "EllipticalRoi", "ArrowAnnotate"];
+
 /* ── Gamma applied via pixel-level canvas manipulation ── */
 const applyGammaToCanvas = (element, gamma) => {
   const canvas = element.querySelector("canvas");
@@ -205,6 +208,38 @@ const DicomViewerPage = () => {
     [gamma, clahe, sharp, channel, isInverted],
   );
 
+  // ── مسح القياسة المحددة فقط (اللي ضاغط/واقف عليها) ──────────────
+  const removeSelectedAnnotations = useCallback(() => {
+    const el = elementRef.current;
+    if (!el) return;
+    let removedAny = false;
+
+    MEASURE_TOOLS.forEach((toolName) => {
+      const toolState = cornerstoneTools.getToolState(el, toolName);
+      if (!toolState || !toolState.data) return;
+
+      // ناخد نسخة من الـ array عشان منعدلش عليه وإحنا بنلف
+      [...toolState.data].forEach((data) => {
+        if (data.active || data.selected) {
+          cornerstoneTools.removeToolState(el, toolName, data);
+          removedAny = true;
+        }
+      });
+    });
+
+    if (removedAny) cornerstone.updateImage(el);
+  }, []);
+
+  // ── مسح كل القياسات مرة واحدة ────────────────────────────────────
+  const clearAllAnnotations = useCallback(() => {
+    const el = elementRef.current;
+    if (!el) return;
+    MEASURE_TOOLS.forEach((toolName) => {
+      cornerstoneTools.clearToolState(el, toolName);
+    });
+    cornerstone.updateImage(el);
+  }, []);
+
   // ── Setup cornerstone on mount ──────────────────────────────────
   useEffect(() => {
     if (!dicomUrl || !elementRef.current) return;
@@ -253,6 +288,20 @@ const DicomViewerPage = () => {
       cornerstone.disable(element);
     };
   }, [dicomUrl]);
+
+  // ── مسح القياسة المحددة عند الضغط على Delete / Backspace ────────
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Delete" || e.key === "Backspace") {
+        // منع المسح لو المستخدم كاتب في أي input/textarea في الصفحة
+        const tag = document.activeElement?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+        removeSelectedAnnotations();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [removeSelectedAnnotations]);
 
   // ── Tool switcher ───────────────────────────────────────────────
   const changeTool = (toolName) => {
@@ -477,6 +526,13 @@ const DicomViewerPage = () => {
         </Button>
         <Button size="sm" variant="outline-light" onClick={exportPNG}>
           Export PNG
+        </Button>
+        <Button
+          size="sm"
+          variant="outline-danger"
+          onClick={clearAllAnnotations}
+        >
+          Clear Annotations
         </Button>
         <Button size="sm" variant="danger" onClick={reset}>
           Reset
