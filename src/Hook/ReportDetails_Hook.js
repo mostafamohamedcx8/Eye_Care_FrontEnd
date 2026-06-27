@@ -273,7 +273,6 @@ export const ReportDetails_Hook = () => {
 
     const isLeftValid = validateLeftEyeSection(leftEyeData);
     if (!isLeftValid) {
-      notify(t("reportForm.notifications.completeLeftEye"), "error");
       return;
     }
 

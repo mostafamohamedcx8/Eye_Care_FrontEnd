@@ -15,6 +15,14 @@ import { useGetDataToken } from "../../Hooks/useGetData";
 import DeleteData from "../../Hooks/useDeleteData";
 import { updateDataWithToken } from "../../Hooks/useUpdateData";
 
+const buildFilterParams = (filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.filterType) params.append("filterType", filters.filterType);
+  if (filters.dateFrom) params.append("dateFrom", filters.dateFrom);
+  if (filters.dateTo) params.append("dateTo", filters.dateTo);
+  return params;
+};
+
 export const CreatePatient = (MYdata) => async (dispatch) => {
   try {
     const response = await InsertData(`/api/v1/patients`, MYdata);
@@ -73,11 +81,16 @@ export const getAllpatient = (limit) => async (dispatch) => {
 };
 
 export const getMypatient =
-  (limit = 10, keyword = "") =>
+  (limit = 10, keyword = "", filters = {}) =>
   async (dispatch) => {
     try {
+      const params = buildFilterParams(filters);
+      params.append("archived", "false");
+      params.append("limit", limit);
+      if (keyword) params.append("keyword", keyword);
+
       const response = await useGetDataToken(
-        `/api/v1/patients/my-patients?archived=false&limit=${limit}&keyword=${keyword}`,
+        `/api/v1/patients/my-patients?${params.toString()}`,
       );
 
       dispatch({
@@ -91,12 +104,18 @@ export const getMypatient =
       });
     }
   };
+
 export const getMyArchivedpatient =
-  (limit = 10, keyword = "") =>
+  (limit = 10, keyword = "", filters = {}) =>
   async (dispatch) => {
     try {
+      const params = buildFilterParams(filters);
+      params.append("archived", "true");
+      params.append("limit", limit);
+      if (keyword) params.append("keyword", keyword);
+
       const response = await useGetDataToken(
-        `/api/v1/patients/my-patients?archived=true&limit=${limit}&keyword=${keyword}`,
+        `/api/v1/patients/my-patients?${params.toString()}`,
       );
       dispatch({
         type: GET_MY_ARCHIVEDPATIENT,
@@ -109,6 +128,7 @@ export const getMyArchivedpatient =
       });
     }
   };
+
 export const getSpecificpatient = (id) => async (dispatch) => {
   try {
     const response = await useGetDataToken(`/api/v1/patients/${id}`);
@@ -160,13 +180,22 @@ export const deleteMyPatient = (id) => async (dispatch) => {
     });
   }
 };
+
 export const getAllMyPatientPage =
-  (page, limit = 10) =>
+  (page, limit = 10, keyword = "", filters = {}) =>
   async (dispatch) => {
     try {
+      const params = buildFilterParams(filters);
+      params.append("archived", "false");
+      params.append("limit", limit);
+      params.append("page", page);
+      if (keyword) params.append("keyword", keyword);
+
+      // ✅ تصحيح: كان فيه typo في المسار (مفيهوش "-" ومفيهوش archived=false)
       const response = await useGetDataToken(
-        `/api/v1/patients/mypatients?limit=${limit}&page=${page}`,
+        `/api/v1/patients/my-patients?${params.toString()}`,
       );
+
       dispatch({
         type: GET_MY_PATIENT,
         payload: response,
@@ -180,11 +209,17 @@ export const getAllMyPatientPage =
   };
 
 export const getAllMyArchivedPatientPage =
-  (page, limit = 10) =>
+  (page, limit = 10, keyword = "", filters = {}) =>
   async (dispatch) => {
     try {
+      const params = buildFilterParams(filters);
+      params.append("archived", "true");
+      params.append("limit", limit);
+      params.append("page", page);
+      if (keyword) params.append("keyword", keyword);
+
       const response = await useGetDataToken(
-        `/api/v1/patients/my-patients?archived=true&limit=${limit}&page=${page}`,
+        `/api/v1/patients/my-patients?${params.toString()}`,
       );
       dispatch({
         type: GET_MY_ARCHIVEDPATIENT,

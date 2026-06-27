@@ -10,12 +10,13 @@ import {
   Badge,
 } from "react-bootstrap";
 import Barcode from "react-barcode";
-import { Fire } from "react-bootstrap-icons";
+import { Fire, FileEarmarkMedical } from "react-bootstrap-icons";
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import DicomThumbnail from "../component/Dicomthumbnail";
 import { Examination_Hook } from "../Hook/Examination_Hook";
 import { useTranslation } from "react-i18next";
 import { updateUserProfileData } from "../Redux/actions/Useraction";
@@ -431,16 +432,20 @@ const PatientReport = () => {
                             src={link}
                             crossOrigin="anonymous"
                             loading="lazy"
-                            alt={`${t("reportdata.rightEye.header")} Image ${
-                              idx + 1
-                            }`}
+                            alt={`${t("reportdata.leftEye.header")} Image ${idx + 1}`}
                             style={{
                               width: "100%",
                               height: "auto",
                               borderRadius: "8px",
                               border: "1px solid #ccc",
+                              cursor: "pointer",
                             }}
-                            onClick={() => setSelectedImage(link)}
+                            onClick={() =>
+                              window.open(
+                                `/view-dicom?dicomUrl=${encodeURIComponent(link)}&type=image`,
+                                "_blank",
+                              )
+                            }
                           />
 
                           {heatmapLink && (
@@ -516,25 +521,21 @@ const PatientReport = () => {
                   </Modal.Body>
                 </Modal>
                 {Report?.eyeExamination?.rightEye?.dicom?.length > 0 && (
-                  <div className="mt-3 no-print">
+                  <div className="mt-3 no-print d-flex gap-2">
                     {Report.eyeExamination.rightEye.dicom.map(
                       (dicomUrl, idx) => (
-                        <Button
+                        <DicomThumbnail
                           key={idx}
-                          variant="outline-primary"
-                          size="sm"
-                          // التعديل هنا: بنفتح Tab جديد ونبعت الرابط كمعامل (Param)
+                          dicomUrl={dicomUrl}
+                          size={56}
+                          title={t("reportdata.rightEye.viewDicom")}
                           onClick={() =>
                             window.open(
                               `/view-dicom?dicomUrl=${encodeURIComponent(dicomUrl)}`,
                               "_blank",
                             )
                           }
-                          className="d-flex align-items-center gap-2"
-                        >
-                          <i className="bi bi-eye"></i>{" "}
-                          {t("reportdata.rightEye.viewDicom")}
-                        </Button>
+                        />
                       ),
                     )}
                   </div>
@@ -810,16 +811,20 @@ const PatientReport = () => {
                           src={link}
                           crossOrigin="anonymous"
                           loading="lazy"
-                          alt={`${t("reportdata.leftEye.header")} Image ${
-                            idx + 1
-                          }`}
+                          alt={`${t("reportdata.leftEye.header")} Image ${idx + 1}`}
                           style={{
                             width: "100%",
                             height: "auto",
                             borderRadius: "8px",
                             border: "1px solid #ccc",
+                            cursor: "pointer",
                           }}
-                          onClick={() => setSelectedImage(link)}
+                          onClick={() =>
+                            window.open(
+                              `/view-dicom?dicomUrl=${encodeURIComponent(link)}&type=image`,
+                              "_blank",
+                            )
+                          }
                         />
 
                         {heatmapLink && (
@@ -892,24 +897,20 @@ const PatientReport = () => {
               </Modal>
 
               {Report?.eyeExamination?.leftEye?.dicom?.length > 0 && (
-                <div className="mt-3 no-print">
+                <div className="mt-3 no-print d-flex gap-2">
                   {Report.eyeExamination.leftEye.dicom.map((dicomUrl, idx) => (
-                    <Button
+                    <DicomThumbnail
                       key={idx}
-                      variant="outline-primary"
-                      size="sm"
-                      // التعديل هنا: بنفتح Tab جديد ونبعت الرابط كمعامل (Param)
+                      dicomUrl={dicomUrl}
+                      size={56}
+                      title={t("reportdata.leftEye.viewDicom")}
                       onClick={() =>
                         window.open(
                           `/view-dicom?dicomUrl=${encodeURIComponent(dicomUrl)}`,
                           "_blank",
                         )
                       }
-                      className="d-flex align-items-center gap-2"
-                    >
-                      <i className="bi bi-eye"></i>{" "}
-                      {t("reportdata.leftEye.viewDicom")}
-                    </Button>
+                    />
                   ))}
                 </div>
               )}

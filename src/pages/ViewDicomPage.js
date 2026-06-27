@@ -8,6 +8,7 @@ import cornerstoneTools from "cornerstone-tools";
 import dicomParser from "dicom-parser";
 import Hammer from "hammerjs";
 import cornerstoneMath from "cornerstone-math";
+import cornerstoneWebImageLoader from "cornerstone-web-image-loader";
 
 cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
@@ -15,6 +16,10 @@ cornerstoneTools.external.cornerstone = cornerstone;
 cornerstoneTools.external.Hammer = Hammer;
 cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
 cornerstoneTools.init();
+
+cornerstoneWebImageLoader.external.cornerstone = cornerstone;
+cornerstone.registerImageLoader("http", cornerstoneWebImageLoader.loadImage);
+cornerstone.registerImageLoader("https", cornerstoneWebImageLoader.loadImage);
 
 /* ── أدوات القياس/الـ annotations اللي عايزين نقدر نمسحها ── */
 const MEASURE_TOOLS = ["Length", "Angle", "EllipticalRoi", "ArrowAnnotate"];
@@ -163,6 +168,9 @@ const PRESETS = {
 const DicomViewerPage = () => {
   const [searchParams] = useSearchParams();
   const dicomUrl = searchParams.get("dicomUrl");
+  // "image" يعني صورة fundus عادية (jpeg/png) — أي قيمة تانية أو مفيش param يبقى ملف DICOM حقيقي
+  const fileType = searchParams.get("type");
+  const isPlainImage = fileType === "image";
 
   const elementRef = useRef(null);
   const imageLoadedRef = useRef(false);
@@ -176,6 +184,7 @@ const DicomViewerPage = () => {
   const [imageInfo, setImageInfo] = useState(null); // metadata display
   const [isInverted, setIsInverted] = useState(false);
   const [zoom, setZoom] = useState(1.0);
+  const [loadError, setLoadError] = useState(null);
 
   // ── كل ما تتغير أي filter نعيد render cornerstone ثم نطبق الـ post-processing
   const rerender = useCallback(
@@ -245,6 +254,7 @@ const DicomViewerPage = () => {
     if (!dicomUrl || !elementRef.current) return;
     const element = elementRef.current;
     cornerstone.enable(element);
+    setLoadError(null);
 
     [
       cornerstoneTools.WwwcTool,
@@ -257,37 +267,64 @@ const DicomViewerPage = () => {
       cornerstoneTools.RotateTool, // ← تدوير
     ].forEach((Tool) => cornerstoneTools.addToolForElement(element, Tool));
 
-    const imageId = `wadouri:${dicomUrl}`;
-    cornerstone.loadImage(imageId).then((image) => {
-      cornerstone.displayImage(element, image);
-      imageLoadedRef.current = true;
+    // ✅ صورة fundus عادية (jpeg/png) تتحمل مباشرة عن طريق web image loader
+    // ملف DICOM حقيقي يتحمل عن طريق wadouri (dicom parser)
+    const imageId = isPlainImage ? dicomUrl : `wadouri:${dicomUrl}`;
 
-      // استخراج metadata
-      const ds = image.data;
-      setImageInfo({
-        rows: ds.uint16("x00280010") || image.height,
-        cols: ds.uint16("x00280011") || image.width,
-        bits: ds.uint16("x00280100") || 8,
-        modality: ds.string("x00080060") || "OP",
-        patientId: ds.string("x00100020") || "—",
-        studyDate: ds.string("x00080020") || "—",
-      });
+    cornerstone
+      .loadImage(imageId)
+      .then((image) => {
+        cornerstone.displayImage(element, image);
+        imageLoadedRef.current = true;
 
-      cornerstoneTools.setToolActiveForElement(element, "Wwwc", {
-        mouseButtonMask: 1,
-      });
+        if (isPlainImage) {
+          // صورة عادية مفيهاش DICOM tags
+          setImageInfo({
+            rows: image.height,
+            cols: image.width,
+            bits: 8,
+            modality: "Fundus Photo",
+            patientId: "—",
+            studyDate: "—",
+          });
+        } else {
+          // استخراج metadata من DICOM
+          const ds = image.data;
+          setImageInfo({
+            rows: ds.uint16("x00280010") || image.height,
+            cols: ds.uint16("x00280011") || image.width,
+            bits: ds.uint16("x00280100") || 8,
+            modality: ds.string("x00080060") || "OP",
+            patientId: ds.string("x00100020") || "—",
+            studyDate: ds.string("x00080020") || "—",
+          });
+        }
 
-      // Zoom event listener
-      element.addEventListener("cornerstoneimagerendered", (e) => {
-        setZoom(e.detail.viewport.scale?.toFixed(2) || 1);
+        const defaultTool = isPlainImage ? "Pan" : "Wwwc";
+        cornerstoneTools.setToolActiveForElement(element, defaultTool, {
+          mouseButtonMask: 1,
+        });
+        setActiveTool(defaultTool);
+
+        // Zoom event listener
+        element.addEventListener("cornerstoneimagerendered", (e) => {
+          setZoom(e.detail.viewport.scale?.toFixed(2) || 1);
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to load image:", err);
+        setLoadError(
+          isPlainImage
+            ? "فشل تحميل الصورة. تأكد من صحة الرابط."
+            : "فشل تحميل ملف DICOM. تأكد من صحة الرابط أو صيغة الملف.",
+        );
       });
-    });
 
     return () => {
       imageLoadedRef.current = false;
       cornerstone.disable(element);
     };
-  }, [dicomUrl]);
+  }, [dicomUrl, isPlainImage]);
 
   // ── مسح القياسة المحددة عند الضغط على Delete / Backspace ────────
   useEffect(() => {
@@ -546,6 +583,26 @@ const DicomViewerPage = () => {
           onContextMenu={(e) => e.preventDefault()}
           style={{ width: "100%", height: "100%", background: "black" }}
         />
+
+        {/* ── Error message ── */}
+        {loadError && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "rgba(180,30,30,0.85)",
+              padding: "16px 24px",
+              borderRadius: 8,
+              fontSize: 14,
+              color: "#fff",
+              textAlign: "center",
+            }}
+          >
+            {loadError}
+          </div>
+        )}
 
         {/* ── Metadata overlay (bottom-left) ── */}
         {imageInfo && (

@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Container, Button, Modal, Spinner, Table } from "react-bootstrap";
+import {
+  Container,
+  Button,
+  Modal,
+  Spinner,
+  Table,
+  Tabs,
+  Tab,
+} from "react-bootstrap";
 import Header from "../component/Header";
 import NavBar from "../component/NavBar";
 import Footer from "../component/Footer";
@@ -11,6 +19,7 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import notify from "../Hook/useNotification";
 import { useTranslation } from "react-i18next";
+import VisionTab from "../component/Visiontab";
 
 const ReportsList = () => {
   const { t } = useTranslation();
@@ -22,11 +31,13 @@ const ReportsList = () => {
 
   const [show, setShow] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [activeTab, setActiveTab] = useState("vision"); // ✅ تاب الرؤية هو الافتراضي
 
   const ReportData = useSelector(
     (state) => state.allreport.getpatientwithreport,
   );
   const Report = ReportData?.data || [];
+  console.log("ReportData:", Report);
 
   useEffect(() => {
     dispatch(getPatientWithReport(id));
@@ -77,104 +88,134 @@ const ReportsList = () => {
             {t("reports.no_reports")}
           </p>
         ) : (
-          <Table striped bordered hover responsive className="shadow-sm">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>{t("reports.tableHeaders.report_date")}</th>
-                <th>{t("reports.tableHeaders.right_eye_visus")}</th>
-                <th>{t("reports.tableHeaders.left_eye_visus")}</th>
-                <th>{t("reports.tableHeaders.image_quality")}</th>
-                <th>{t("reports.tableHeaders.tools")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Report?.reports?.map((report, index) => {
-                const rightEyePredictions = report?.modelResults?.rightEye
-                  ? JSON.parse(report.modelResults.rightEye)
-                  : null;
-                const leftEyePredictions = report?.modelResults?.leftEye
-                  ? JSON.parse(report.modelResults.leftEye)
-                  : null;
+          <Tabs
+            activeKey={activeTab}
+            onSelect={(key) => setActiveTab(key)}
+            className="mb-3"
+          >
+            {/* ---------------------------------------------------- */}
+            {/* Vision tab: charts (summary + per-report)             */}
+            {/* ---------------------------------------------------- */}
+            <Tab eventKey="vision" title={t("vision.tabTitle", "Vision")}>
+              <div className="mt-3">
+                <VisionTab reports={Report?.reports || []} patientId={id} />
+              </div>
+            </Tab>
 
-                const predictionsToShow =
-                  rightEyePredictions || leftEyePredictions;
-
-                return (
-                  <tr key={report._id}>
-                    <td>{index + 1}</td>
-                    <td className="py-2 px-3">
-                      {new Date(report?.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="py-2 px-3">
-                      {report?.eyeExamination?.rightEye?.visusCC || "---"}
-                    </td>
-                    <td className="py-2 px-3">
-                      {report?.eyeExamination?.leftEye?.visusCC || "----"}
-                    </td>
-                    <td className="py-2 px-3">
-                      {predictionsToShow ? (
-                        <>
-                          {predictionsToShow.image_quality && (
-                            <div className="text-warning">
-                              {predictionsToShow.image_quality.status} (
-                              {predictionsToShow.image_quality.confidence ??
-                                "----"}
-                              %)
-                            </div>
-                          )}
-                          {Object.entries(predictionsToShow)
-                            .filter(
-                              ([key, value]) =>
-                                key !== "image_quality" &&
-                                key !== "eye_side" &&
-                                value.status === "Detected",
-                            )
-                            .map(([diseaseName, details]) => (
-                              <div key={diseaseName}>
-                                {t("reports.disease_detected", {
-                                  disease: diseaseName,
-                                  confidence: details.confidence ?? "N/A",
-                                })}
-                              </div>
-                            ))}
-                          {Object.entries(predictionsToShow).filter(
-                            ([key, value]) =>
-                              key !== "image_quality" &&
-                              key !== "eye_side" &&
-                              value.status === "Detected",
-                          ).length === 0 && (
-                            <div>{t("reports.no_diseases")}</div>
-                          )}
-                        </>
-                      ) : (
-                        <div>{t("reports.no_prediction")}</div>
-                      )}
-                    </td>
-                    <td className="py-2 px-3">
-                      <div className="d-flex align-items-center">
-                        {userFromStorage?._id === report?.createdBy?._id && (
-                          <button
-                            className="btn btn-sm btn-outline-danger me-2"
-                            onClick={() => handleShow(report?._id)}
-                          >
-                            <i className="bi bi-trash"></i>
-                          </button>
-                        )}
-                        <button
-                          className="btn btn-sm btn-outline-primary me-2"
-                          onClick={() => handleViewDetails(report._id)}
-                          disabled={isNavigating}
-                        >
-                          <i className="bi bi-eye"></i>
-                        </button>
-                      </div>
-                    </td>
+            {/* ---------------------------------------------------- */}
+            {/* Reports tab: the original table, unchanged            */}
+            {/* ---------------------------------------------------- */}
+            <Tab
+              eventKey="reports"
+              title={t("vision.reportsTabTitle", "Reports")}
+            >
+              <Table
+                striped
+                bordered
+                hover
+                responsive
+                className="shadow-sm mt-3"
+              >
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>{t("reports.tableHeaders.report_date")}</th>
+                    <th>{t("reports.tableHeaders.right_eye_visus")}</th>
+                    <th>{t("reports.tableHeaders.left_eye_visus")}</th>
+                    <th>{t("reports.tableHeaders.image_quality")}</th>
+                    <th>{t("reports.tableHeaders.tools")}</th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </Table>
+                </thead>
+                <tbody>
+                  {Report?.reports?.map((report, index) => {
+                    const rightEyePredictions = report?.modelResults?.rightEye
+                      ? JSON.parse(report.modelResults.rightEye)
+                      : null;
+                    const leftEyePredictions = report?.modelResults?.leftEye
+                      ? JSON.parse(report.modelResults.leftEye)
+                      : null;
+
+                    const predictionsToShow =
+                      rightEyePredictions || leftEyePredictions;
+
+                    return (
+                      <tr key={report._id}>
+                        <td>{index + 1}</td>
+                        <td className="py-2 px-3">
+                          {new Date(report?.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="py-2 px-3">
+                          {report?.eyeExamination?.rightEye?.visusCC || "---"}
+                        </td>
+                        <td className="py-2 px-3">
+                          {report?.eyeExamination?.leftEye?.visusCC || "----"}
+                        </td>
+                        <td className="py-2 px-3">
+                          {predictionsToShow ? (
+                            <>
+                              {predictionsToShow.image_quality && (
+                                <div className="text-warning">
+                                  {predictionsToShow.image_quality.status} (
+                                  {predictionsToShow.image_quality.confidence ??
+                                    "----"}
+                                  %)
+                                </div>
+                              )}
+                              {Object.entries(predictionsToShow)
+                                .filter(
+                                  ([key, value]) =>
+                                    key !== "image_quality" &&
+                                    key !== "eye_side" &&
+                                    value.status === "Detected",
+                                )
+                                .map(([diseaseName, details]) => (
+                                  <div key={diseaseName}>
+                                    {t("reports.disease_detected", {
+                                      disease: diseaseName,
+                                      confidence: details.confidence ?? "N/A",
+                                    })}
+                                  </div>
+                                ))}
+                              {Object.entries(predictionsToShow).filter(
+                                ([key, value]) =>
+                                  key !== "image_quality" &&
+                                  key !== "eye_side" &&
+                                  value.status === "Detected",
+                              ).length === 0 && (
+                                <div>{t("reports.no_diseases")}</div>
+                              )}
+                            </>
+                          ) : (
+                            <div>{t("reports.no_prediction")}</div>
+                          )}
+                        </td>
+                        <td className="py-2 px-3">
+                          <div className="d-flex align-items-center">
+                            {userFromStorage?._id ===
+                              report?.createdBy?._id && (
+                              <button
+                                className="btn btn-sm btn-outline-danger me-2"
+                                onClick={() => handleShow(report?._id)}
+                              >
+                                <i className="bi bi-trash"></i>
+                              </button>
+                            )}
+                            <button
+                              className="btn btn-sm btn-outline-primary me-2"
+                              onClick={() => handleViewDetails(report._id)}
+                              disabled={isNavigating}
+                            >
+                              <i className="bi bi-eye"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            </Tab>
+          </Tabs>
         )}
       </Container>
 

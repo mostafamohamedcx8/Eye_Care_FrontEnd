@@ -10,6 +10,8 @@ import {
 } from "../Redux/actions/Patientaction";
 import notify from "../Hook/useNotification";
 
+const FILTERS_WITH_DATE_RANGE = ["newPatients", "reportCustomRange"];
+
 export const Arcivedpatient_Hook = (t) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -24,6 +26,11 @@ export const Arcivedpatient_Hook = (t) => {
   const [editEmail, setEditEmail] = useState("");
   const [editConsent, setEditConsent] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+
+  // ── حالة الفلاتر الجديدة ──
+  const [filterType, setFilterType] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   const userFromStorage = JSON.parse(localStorage.getItem("user"));
 
@@ -53,7 +60,9 @@ export const Arcivedpatient_Hook = (t) => {
     await dispatch(updatePatientEmail(editPatient._id, data));
     setEditLoading(false);
     handleCloseEdit();
-    dispatch(getMyArchivedpatient(10, keyword));
+    dispatch(
+      getMyArchivedpatient(10, keyword, { filterType, dateFrom, dateTo }),
+    );
     notify(t("patientTable.notifications.updateSuccess"), "success");
   };
 
@@ -67,12 +76,23 @@ export const Arcivedpatient_Hook = (t) => {
   if (MypatinetData?.pagination?.numberOfPages) {
     pagecount = MypatinetData.pagination.numberOfPages;
   }
+
   useEffect(() => {
-    dispatch(getMyArchivedpatient(10, keyword));
-  }, [keyword, dispatch]);
+    if (filterType === "reportCustomRange") return;
+    dispatch(
+      getMyArchivedpatient(10, keyword, { filterType, dateFrom, dateTo }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyword, filterType, dispatch]);
 
   const getpage = (page) => {
-    dispatch(getAllMyArchivedPatientPage(page));
+    dispatch(
+      getAllMyArchivedPatientPage(page, 10, keyword, {
+        filterType,
+        dateFrom,
+        dateTo,
+      }),
+    );
   };
 
   const handleClose = () => {
@@ -86,14 +106,15 @@ export const Arcivedpatient_Hook = (t) => {
   };
 
   const handleView = (id) => {
-    navigate(`/ReportsList/${id}`); // ✅ شيل الـ setTimeout مش محتاجه
+    navigate(`/ReportsList/${id}`);
   };
 
   const handleDeleteConfirmed = async () => {
-    const res = await dispatch(deleteMyPatient(deleteId));
+    await dispatch(deleteMyPatient(deleteId));
     handleClose();
-    // ✅ نفس نمط الـ Hook السابق
-    dispatch(getMyArchivedpatient(10, keyword));
+    dispatch(
+      getMyArchivedpatient(10, keyword, { filterType, dateFrom, dateTo }),
+    );
     notify(t("patientTable.notifications.deleteSuccess"), "success");
   };
 
@@ -105,14 +126,41 @@ export const Arcivedpatient_Hook = (t) => {
     try {
       setArchiveLoading((prev) => ({ ...prev, [patientId]: true }));
       await dispatch(toggleArchivePatient(patientId));
-      // ✅ جيب الداتا مباشرة بدل refreshData state
-      dispatch(getMyArchivedpatient(10, keyword));
+      dispatch(
+        getMyArchivedpatient(10, keyword, { filterType, dateFrom, dateTo }),
+      );
       notify(t("patientTable.notifications.archiveSuccess"), "success");
     } catch (error) {
       notify(t("patientTable.notifications.archiveError"), "error");
     } finally {
       setArchiveLoading((prev) => ({ ...prev, [patientId]: false }));
     }
+  };
+
+  const handleFilterTypeChange = (e) => {
+    const value = e.target.value;
+    setFilterType(value);
+    if (!FILTERS_WITH_DATE_RANGE.includes(value)) {
+      setDateFrom("");
+      setDateTo("");
+    }
+  };
+
+  const handleApplyCustomRange = () => {
+    if (filterType === "reportCustomRange" && (!dateFrom || !dateTo)) {
+      notify(t("patientTable.notifications.dateRangeRequired"), "error");
+      return;
+    }
+    dispatch(
+      getMyArchivedpatient(10, keyword, { filterType, dateFrom, dateTo }),
+    );
+  };
+
+  const handleClearFilter = () => {
+    setFilterType("");
+    setDateFrom("");
+    setDateTo("");
+    dispatch(getMyArchivedpatient(10, keyword, {}));
   };
 
   return [
@@ -139,5 +187,13 @@ export const Arcivedpatient_Hook = (t) => {
     setEditConsent,
     editLoading,
     handleEditConfirmed,
+    filterType,
+    handleFilterTypeChange,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    handleApplyCustomRange,
+    handleClearFilter,
   ];
 };

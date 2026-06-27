@@ -395,6 +395,22 @@
   "patientTable": {
     "title": "Aktive Patienten",
     "searchPlaceholder": "Nach Namen suchen...",
+    "filters": {
+      "label": "Patienten filtern",
+      "all": "Alle",
+      "newPatients": "Neue Patienten",
+      "reportToday": "Bericht heute",
+      "reportThisMonth": "Bericht diesen Monat",
+      "reportCustomRange": "Benutzerdefinierter Zeitraum (Bericht)",
+      "pendingReport": "Bericht in Bearbeitung",
+      "reportFailed": "Bericht fehlgeschlagen",
+      "noReport": "Noch kein Bericht",
+      "aiJustCompleted": "KI gerade abgeschlossen",
+      "dateFrom": "Von Datum",
+      "dateTo": "Bis Datum",
+      "apply": "Anwenden",
+      "clear": "Filter zurücksetzen"
+    },
     "tableHeaders": {
       "number": "#",
       "name": "Name",
@@ -445,7 +461,8 @@
       "deleteError": "Es gab ein Problem beim Löschen",
       "archiveSuccess": "Archivstatus des Patienten erfolgreich aktualisiert!",
       "archiveError": "Fehler beim Aktualisieren des Archivstatus des Patienten",
-      "updateSuccess": "Patient erfolgreich aktualisiert"
+      "updateSuccess": "Patient erfolgreich aktualisiert",
+      "dateRangeRequired": "Sie müssen einen Zeitraum (von - bis) auswählen, um diesen Filter anzuwenden"
     }
   },
   "patientForm": {
@@ -978,5 +995,22 @@
     "modal_delete": "Löschen",
     "success_message": "Bericht erfolgreich gelöscht",
     "error_message": "Es gab ein Problem beim Löschen"
+  },
+  "visionTab": {
+    "summary": "Übersicht",
+    "latest": "Neueste",
+    "metricVisus": "Visus (CC)",
+    "metricIop": "Augeninnendruck",
+    "metricImages": "Bilder",
+    "eyeRight": "Rechtes Auge",
+    "eyeLeft": "Linkes Auge",
+    "eyeBoth": "Beide Augen",
+    "date": "Datum",
+    "close": "Schließen",
+    "imageHint": "Klicken Sie auf einen Punkt, um die Bilder dieses Berichts anzuzeigen.",
+    "imagesCount": "Bild(er)",
+    "noData": "Es sind noch keine Berichte zum Anzeigen vorhanden.",
+    "noImages": "Für den ausgewählten Augenfilter wurden keine Bilder gefunden.",
+    "viewFullReport": "Vollständigen Bericht anzeigen"
   }
 }

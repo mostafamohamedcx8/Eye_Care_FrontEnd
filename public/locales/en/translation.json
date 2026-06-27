@@ -395,6 +395,22 @@
   "patientTable": {
     "title": "Active Patients",
     "searchPlaceholder": "Search by name...",
+    "filters": {
+      "label": "Filter Patients",
+      "all": "All",
+      "newPatients": "New Patients",
+      "reportToday": "Report Today",
+      "reportThisMonth": "Report This Month",
+      "reportCustomRange": "Custom Range (Report)",
+      "pendingReport": "Report Pending Review",
+      "reportFailed": "Report Failed",
+      "noReport": "No Report Yet",
+      "aiJustCompleted": "AI Just Completed",
+      "dateFrom": "From Date",
+      "dateTo": "To Date",
+      "apply": "Apply",
+      "clear": "Clear Filter"
+    },
     "tableHeaders": {
       "number": "#",
       "name": "Name",
@@ -420,7 +436,8 @@
       "deleteError": "There was a problem with the deletion",
       "archiveSuccess": "Patient archive status updated successfully!",
       "archiveError": "Failed updating patient archive status",
-      "updateSuccess": "Patient updated successfully"
+      "updateSuccess": "Patient updated successfully",
+      "dateRangeRequired": "You need to select a date range (from - to) to apply this filter"
     },
     "archived": {
       "title": "Archived Patients",
@@ -978,5 +995,22 @@
     "modal_delete": "Delete",
     "success_message": "Report deleted successfully",
     "error_message": "There was a problem with the deletion"
+  },
+  "visionTab": {
+    "summary": "Summary",
+    "latest": "Latest",
+    "metricVisus": "Visus (CC)",
+    "metricIop": "Intraocular Pressure",
+    "metricImages": "Images",
+    "eyeRight": "Right Eye",
+    "eyeLeft": "Left Eye",
+    "eyeBoth": "Both Eyes",
+    "date": "Date",
+    "close": "Close",
+    "imageHint": "Click a marker to view the images captured for that report.",
+    "imagesCount": "image(s)",
+    "noData": "No reports available to chart yet.",
+    "noImages": "No images found for the selected eye filter.",
+    "viewFullReport": "View full report"
   }
 }

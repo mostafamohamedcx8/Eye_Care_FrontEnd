@@ -11,6 +11,9 @@ import {
 import notify from "../Hook/useNotification";
 import { useTranslation } from "react-i18next";
 
+// الفلاتر اللي محتاجة dateFrom/dateTo (سواء اختياري أو إجباري)
+const FILTERS_WITH_DATE_RANGE = ["newPatients", "reportCustomRange"];
+
 export const Allpatient_Hook = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -26,6 +29,11 @@ export const Allpatient_Hook = () => {
   const [editEmail, setEditEmail] = useState("");
   const [editConsent, setEditConsent] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+
+  // ── حالة الفلاتر الجديدة ──
+  const [filterType, setFilterType] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   const userFromStorage = JSON.parse(localStorage.getItem("user"));
   const opticianId = userFromStorage?._id;
@@ -67,15 +75,20 @@ export const Allpatient_Hook = () => {
 
     setEditLoading(false);
     handleCloseEdit();
-    dispatch(getMypatient(10, keyword));
+    dispatch(getMypatient(10, keyword, { filterType, dateFrom, dateTo }));
     notify(t("patientTable.notifications.updateSuccess"), "success");
   };
+
+  // ── كل ما الكيورد أو الفلتر يتغير، نرجع لأول صفحة ونعيد الجلب ──
+  // ملحوظة: للفلاتر اللي محتاجة dateFrom/dateTo اختياريًا (newPatients)، بنسمح
+  // بالجلب من غير تواريخ. للفلتر الإجباري (reportCustomRange) بننتظر زرار "تطبيق".
   useEffect(() => {
-    dispatch(getMypatient(10, keyword));
-  }, [keyword, dispatch]);
+    if (filterType === "reportCustomRange") return; // ينتظر زرار التطبيق بتاع الفترة المخصصة
+    dispatch(getMypatient(10, keyword, { filterType, dateFrom, dateTo }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyword, filterType, dispatch]);
 
   const MypatinetData = useSelector((state) => state.allpatient.mypatient);
-
   const Loading = useSelector((state) => state.allpatient.loading);
 
   let pagecount = 0;
@@ -84,11 +97,12 @@ export const Allpatient_Hook = () => {
   }
 
   const getpage = (page) => {
-    dispatch(getAllMyPatientPage(page));
+    dispatch(
+      getAllMyPatientPage(page, 10, keyword, { filterType, dateFrom, dateTo }),
+    );
   };
 
   const AllPatient = MypatinetData?.data?.patients || [];
-  console.log("AllPatient", AllPatient);
 
   const handleView = (id) => {
     navigate(`/ReportsList/${id}`);
@@ -99,7 +113,7 @@ export const Allpatient_Hook = () => {
     await dispatch(deleteMyPatient(deleteId));
     setDeleteLoading(false);
     handleClose();
-    dispatch(getMypatient(10, keyword));
+    dispatch(getMypatient(10, keyword, { filterType, dateFrom, dateTo }));
     notify(t("patientTable.notifications.deleteSuccess"), "success");
   };
 
@@ -112,7 +126,9 @@ export const Allpatient_Hook = () => {
       try {
         setArchiveLoading((prev) => ({ ...prev, [patientId]: true }));
         await dispatch(toggleArchivePatient(patientId));
-        await dispatch(getMypatient(10, keyword));
+        await dispatch(
+          getMypatient(10, keyword, { filterType, dateFrom, dateTo }),
+        );
         notify(t("patientTable.notifications.archiveSuccess"), "success");
       } catch (error) {
         notify(t("patientTable.notifications.archiveError"), "error");
@@ -120,8 +136,38 @@ export const Allpatient_Hook = () => {
         setArchiveLoading((prev) => ({ ...prev, [patientId]: false }));
       }
     },
-    [dispatch, keyword, t],
+    [dispatch, keyword, filterType, dateFrom, dateTo, t],
   );
+
+  // ── هاندلرز خاصة بالفلاتر ──
+
+  // لما يختار فلتر من الدروب داون
+  const handleFilterTypeChange = (e) => {
+    const value = e.target.value;
+    setFilterType(value);
+    // مسح التواريخ القديمة لو خرجنا من فلتر بيستخدم تواريخ
+    if (!FILTERS_WITH_DATE_RANGE.includes(value)) {
+      setDateFrom("");
+      setDateTo("");
+    }
+  };
+
+  // تطبيق فترة مخصصة (للفلتر اللي محتاج dateFrom/dateTo إجباري)
+  const handleApplyCustomRange = () => {
+    if (filterType === "reportCustomRange" && (!dateFrom || !dateTo)) {
+      notify(t("patientTable.notifications.dateRangeRequired"), "error");
+      return;
+    }
+    dispatch(getMypatient(10, keyword, { filterType, dateFrom, dateTo }));
+  };
+
+  // مسح الفلتر والرجوع لعرض كل المرضى
+  const handleClearFilter = () => {
+    setFilterType("");
+    setDateFrom("");
+    setDateTo("");
+    dispatch(getMypatient(10, keyword, {}));
+  };
 
   return [
     keyword,
@@ -148,5 +194,14 @@ export const Allpatient_Hook = () => {
     editLoading,
     handleEditConfirmed,
     opticianId,
+    // ── الإضافات الجديدة بتاعة الفلاتر ──
+    filterType,
+    handleFilterTypeChange,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    handleApplyCustomRange,
+    handleClearFilter,
   ];
 };

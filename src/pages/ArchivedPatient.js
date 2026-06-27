@@ -44,7 +44,20 @@ const PatientTableUI = () => {
     setEditConsent,
     editLoading,
     handleEditConfirmed,
+    // ── الفلاتر الجديدة ──
+    filterType,
+    handleFilterTypeChange,
+    dateFrom,
+    setDateFrom,
+    dateTo,
+    setDateTo,
+    handleApplyCustomRange,
+    handleClearFilter,
   ] = Arcivedpatient_Hook(t);
+
+  // الفلاتر اللي بتحتاج date range تظهر فيها الـ inputs
+  const showDateRange =
+    filterType === "newPatients" || filterType === "reportCustomRange";
 
   return (
     <>
@@ -63,6 +76,88 @@ const PatientTableUI = () => {
               onChange={onChangeKeyword}
             />
           </Col>
+        </Row>
+
+        {/* ── شريط الفلاتر ── */}
+        <Row className="mb-3 align-items-end g-2">
+          <Col md={3}>
+            <Form.Label className="small text-muted mb-1">
+              {t("patientTable.filters.label")}
+            </Form.Label>
+            <Form.Select value={filterType} onChange={handleFilterTypeChange}>
+              <option value="">{t("patientTable.filters.all")}</option>
+              <option value="newPatients">
+                {t("patientTable.filters.newPatients")}
+              </option>
+              <option value="reportToday">
+                {t("patientTable.filters.reportToday")}
+              </option>
+              <option value="reportThisMonth">
+                {t("patientTable.filters.reportThisMonth")}
+              </option>
+              <option value="reportCustomRange">
+                {t("patientTable.filters.reportCustomRange")}
+              </option>
+              <option value="pendingReport">
+                {t("patientTable.filters.pendingReport")}
+              </option>
+              <option value="reportFailed">
+                {t("patientTable.filters.reportFailed")}
+              </option>
+              <option value="noReport">
+                {t("patientTable.filters.noReport")}
+              </option>
+              <option value="aiJustCompleted">
+                {t("patientTable.filters.aiJustCompleted")}
+              </option>
+            </Form.Select>
+          </Col>
+
+          {showDateRange && (
+            <>
+              <Col md={2}>
+                <Form.Label className="small text-muted mb-1">
+                  {t("patientTable.filters.dateFrom")}
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                />
+              </Col>
+              <Col md={2}>
+                <Form.Label className="small text-muted mb-1">
+                  {t("patientTable.filters.dateTo")}
+                </Form.Label>
+                <Form.Control
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                />
+              </Col>
+              <Col md={2}>
+                <Button
+                  variant="primary"
+                  className="w-100"
+                  onClick={handleApplyCustomRange}
+                >
+                  {t("patientTable.filters.apply")}
+                </Button>
+              </Col>
+            </>
+          )}
+
+          {filterType && (
+            <Col md={2}>
+              <Button
+                variant="outline-secondary"
+                className="w-100"
+                onClick={handleClearFilter}
+              >
+                {t("patientTable.filters.clear")}
+              </Button>
+            </Col>
+          )}
         </Row>
 
         <Table striped bordered hover responsive>
