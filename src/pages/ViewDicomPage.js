@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button, ButtonGroup, Form, Badge } from "react-bootstrap";
 
@@ -10,12 +16,18 @@ import Hammer from "hammerjs";
 import cornerstoneMath from "cornerstone-math";
 import cornerstoneWebImageLoader from "cornerstone-web-image-loader";
 
+import LayerViewer from "../component/FundusLayerViewer";
+
 cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
 cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
 cornerstoneTools.external.cornerstone = cornerstone;
 cornerstoneTools.external.Hammer = Hammer;
 cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
 cornerstoneTools.init();
+cornerstoneTools.toolStyle.setToolWidth(3); // سُمك الخط (كان افتراضيًا 1)
+cornerstoneTools.textStyle.setFont("18px Arial"); // حجم الخط (كان صغير جدًا افتراضيًا)
+cornerstoneTools.toolColors.setToolColor("rgb(79, 209, 255)"); // اللون الافتراضي (غير محدد)
+cornerstoneTools.toolColors.setActiveColor("rgb(255, 210, 63)");
 
 cornerstoneWebImageLoader.external.cornerstone = cornerstone;
 cornerstone.registerImageLoader("http", cornerstoneWebImageLoader.loadImage);
@@ -165,15 +177,61 @@ const PRESETS = {
   },
 };
 
+/**
+ * Safely parses the "images" query param, which is expected to be a
+ * JSON-encoded array of { url, modality, aligned, _id } objects
+ * (as returned by the backend for eyeExamination.<eye>.images /
+ * eyeExamination.<eye>.alignedImages).
+ * Returns null if missing or invalid, so callers can fall back to the
+ * legacy single dicomUrl behavior.
+ */
+const parseImagesParam = (raw) => {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return null;
+    // Normalize: support both string URLs (legacy) and {url, modality} objects
+    return parsed.map((item, index) =>
+      typeof item === "string"
+        ? { url: item, modality: "UNKNOWN", _id: `legacy-${index}` }
+        : item,
+    );
+  } catch (err) {
+    console.error("Failed to parse 'images' query param:", err);
+    return null;
+  }
+};
+
 const DicomViewerPage = () => {
   const [searchParams] = useSearchParams();
-  const dicomUrl = searchParams.get("dicomUrl");
+  const dicomUrlParam = searchParams.get("dicomUrl");
   // "image" يعني صورة fundus عادية (jpeg/png) — أي قيمة تانية أو مفيش param يبقى ملف DICOM حقيقي
   const fileType = searchParams.get("type");
-  const isPlainImage = fileType === "image";
+
+  // NEW: optional multi-image payload for the Layer View
+  const imagesParam = searchParams.get("images");
+  const parsedImages = useMemo(
+    () => parseImagesParam(imagesParam),
+    [imagesParam],
+  );
+  const hasLayers = Array.isArray(parsedImages) && parsedImages.length > 1;
+
+  // View mode: "layers" (new Photoshop-style stack) or "single" (existing cornerstone viewer)
+  const [viewMode, setViewMode] = useState(hasLayers ? "layers" : "single");
+
+  // The URL currently shown in the single-image cornerstone viewer.
+  // Falls back to the legacy dicomUrl param, or the first image of the
+  // "images" payload if that's all we got.
+  const [singleImageUrl, setSingleImageUrl] = useState(
+    dicomUrlParam || parsedImages?.[0]?.url || null,
+  );
+
+  // A single image opened from the "images"/Layer payload is always a
+  // plain fundus photo (jpeg/png), never a raw .dcm file.
+  const isPlainImage = fileType === "image" || Boolean(parsedImages);
 
   const elementRef = useRef(null);
-  const imageLoadedRef = useRef(false);
+  const imageLoadedRef = useRef(null);
 
   const [activeTool, setActiveTool] = useState("Wwwc");
   const [activePreset, setActivePreset] = useState("normal");
@@ -249,9 +307,10 @@ const DicomViewerPage = () => {
     cornerstone.updateImage(el);
   }, []);
 
-  // ── Setup cornerstone on mount ──────────────────────────────────
+  // ── Setup cornerstone whenever we're in "single" mode with a valid URL ──
   useEffect(() => {
-    if (!dicomUrl || !elementRef.current) return;
+    if (viewMode !== "single") return;
+    if (!singleImageUrl || !elementRef.current) return;
     const element = elementRef.current;
     cornerstone.enable(element);
     setLoadError(null);
@@ -269,7 +328,7 @@ const DicomViewerPage = () => {
 
     // ✅ صورة fundus عادية (jpeg/png) تتحمل مباشرة عن طريق web image loader
     // ملف DICOM حقيقي يتحمل عن طريق wadouri (dicom parser)
-    const imageId = isPlainImage ? dicomUrl : `wadouri:${dicomUrl}`;
+    const imageId = isPlainImage ? singleImageUrl : `wadouri:${singleImageUrl}`;
 
     cornerstone
       .loadImage(imageId)
@@ -324,7 +383,7 @@ const DicomViewerPage = () => {
       imageLoadedRef.current = false;
       cornerstone.disable(element);
     };
-  }, [dicomUrl, isPlainImage]);
+  }, [viewMode, singleImageUrl, isPlainImage]);
 
   // ── مسح القياسة المحددة عند الضغط على Delete / Backspace ────────
   useEffect(() => {
@@ -421,6 +480,11 @@ const DicomViewerPage = () => {
     imageLoadedRef.current && cornerstone.updateImage(elementRef.current);
   };
 
+  // ── Switch back to the layer stack (only relevant if we came from it) ──
+  const backToLayers = () => {
+    setViewMode("layers");
+  };
+
   // ── Slider config ───────────────────────────────────────────────
   const sliders = [
     {
@@ -463,196 +527,252 @@ const DicomViewerPage = () => {
         fontFamily: "sans-serif",
       }}
     >
-      {/* ── Top toolbar ── */}
-      <div
-        style={{
-          padding: "8px 12px",
-          borderBottom: "1px solid #2a2a2a",
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
-        {/* Tool buttons */}
-        <ButtonGroup size="sm">
-          {[
-            { id: "Wwwc", label: "W/L" },
-            { id: "Pan", label: "Pan" },
-            { id: "Zoom", label: "Zoom" },
-            { id: "Length", label: "Length" },
-            { id: "Angle", label: "Angle" },
-            { id: "EllipticalRoi", label: "ROI" },
-            { id: "ArrowAnnotate", label: "Annotate" },
-            { id: "Rotate", label: "Rotate" },
-          ].map(({ id, label }) => (
-            <Button
-              key={id}
-              size="sm"
-              variant={activeTool === id ? "primary" : "outline-secondary"}
-              onClick={() => changeTool(id)}
-            >
-              {label}
-            </Button>
-          ))}
-        </ButtonGroup>
-
-        {/* Fundus presets */}
-        <ButtonGroup size="sm">
-          {Object.keys(PRESETS).map((name) => (
-            <Button
-              key={name}
-              size="sm"
-              variant={activePreset === name ? "warning" : "outline-warning"}
-              onClick={() => applyPreset(name)}
-              style={{ textTransform: "capitalize" }}
-            >
-              {name}
-            </Button>
-          ))}
-        </ButtonGroup>
-
-        {/* Channel */}
-        <ButtonGroup size="sm">
-          {["all", "r", "g", "b"].map((ch) => (
-            <Button
-              key={ch}
-              size="sm"
-              variant={channel === ch ? "info" : "outline-info"}
-              onClick={() => {
-                setChannel(ch);
-                rerender({ channel: ch });
-              }}
-              style={{ textTransform: "uppercase" }}
-            >
-              {ch === "all" ? "RGB" : ch}
-            </Button>
-          ))}
-        </ButtonGroup>
-
-        {/* Sliders */}
-        {sliders.map(({ label, key, val, setter, min, max, step }) => (
-          <div
-            key={key}
-            style={{ display: "flex", alignItems: "center", gap: "6px" }}
-          >
-            <span style={{ fontSize: 12, minWidth: 60, color: "#aaa" }}>
-              {label}
-            </span>
-            <Form.Range
-              style={{ width: 110 }}
-              min={min}
-              max={max}
-              step={step}
-              value={val}
-              onChange={handleSlider(setter, key)}
-            />
-            <span style={{ fontSize: 12, minWidth: 28, color: "#fff" }}>
-              {val.toFixed(key === "sharp" ? 1 : 2)}
-            </span>
-          </div>
-        ))}
-
-        {/* Extra buttons */}
-        <Button
-          size="sm"
-          variant={isInverted ? "light" : "outline-light"}
-          onClick={toggleInvert}
-        >
-          Invert
-        </Button>
-        <Button size="sm" variant="outline-light" onClick={exportPNG}>
-          Export PNG
-        </Button>
-        <Button
-          size="sm"
-          variant="outline-danger"
-          onClick={clearAllAnnotations}
-        >
-          Clear Annotations
-        </Button>
-        <Button size="sm" variant="danger" onClick={reset}>
-          Reset
-        </Button>
-      </div>
-
-      {/* ── Canvas area ── */}
-      <div style={{ flex: 1, display: "flex", position: "relative" }}>
-        <div
-          ref={elementRef}
-          onContextMenu={(e) => e.preventDefault()}
-          style={{ width: "100%", height: "100%", background: "black" }}
-        />
-
-        {/* ── Error message ── */}
-        {loadError && (
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              background: "rgba(180,30,30,0.85)",
-              padding: "16px 24px",
-              borderRadius: 8,
-              fontSize: 14,
-              color: "#fff",
-              textAlign: "center",
-            }}
-          >
-            {loadError}
-          </div>
-        )}
-
-        {/* ── Metadata overlay (bottom-left) ── */}
-        {imageInfo && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: 12,
-              left: 12,
-              background: "rgba(0,0,0,0.55)",
-              padding: "8px 12px",
-              borderRadius: 6,
-              fontSize: 11,
-              lineHeight: 1.7,
-              color: "#ccc",
-              pointerEvents: "none",
-            }}
-          >
-            <div>
-              Patient: <b style={{ color: "#fff" }}>{imageInfo.patientId}</b>
-            </div>
-            <div>
-              Date: <b style={{ color: "#fff" }}>{imageInfo.studyDate}</b>
-            </div>
-            <div>
-              Size:{" "}
-              <b style={{ color: "#fff" }}>
-                {imageInfo.cols} × {imageInfo.rows}
-              </b>
-            </div>
-            <div>
-              Bits: <b style={{ color: "#fff" }}>{imageInfo.bits}</b>
-            </div>
-            <div>
-              Modality: <b style={{ color: "#fff" }}>{imageInfo.modality}</b>
-            </div>
-          </div>
-        )}
-
-        {/* ── Zoom badge (top-right) ── */}
+      {/* ── Mode switch bar (only shown when multiple aligned images were passed) ── */}
+      {hasLayers && (
         <div
           style={{
-            position: "absolute",
-            top: 10,
-            right: 12,
-            pointerEvents: "none",
+            padding: "6px 12px",
+            borderBottom: "1px solid #2a2a2a",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
           }}
         >
-          <Badge bg="secondary">Zoom: {zoom}x</Badge>
+          <ButtonGroup size="sm">
+            <Button
+              variant={viewMode === "layers" ? "primary" : "outline-secondary"}
+              onClick={() => setViewMode("layers")}
+            >
+              Layer View
+            </Button>
+            <Button
+              variant={viewMode === "single" ? "primary" : "outline-secondary"}
+              onClick={() => setViewMode("single")}
+            >
+              Single Image View
+            </Button>
+          </ButtonGroup>
+
+          {viewMode === "single" && (
+            <Button size="sm" variant="outline-light" onClick={backToLayers}>
+              ← Back to Layers
+            </Button>
+          )}
         </div>
-      </div>
+      )}
+
+      {/* ── Layer View: stacked/blendable images ── */}
+      {viewMode === "layers" && hasLayers && (
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <LayerViewer
+            layers={parsedImages}
+            onSelectSingle={(url) => {
+              setSingleImageUrl(url);
+              setViewMode("single");
+            }}
+          />
+        </div>
+      )}
+
+      {/* ── Single Image / DICOM View: existing cornerstone-based viewer (unchanged) ── */}
+      {viewMode === "single" && (
+        <>
+          {/* ── Top toolbar ── */}
+          <div
+            style={{
+              padding: "8px 12px",
+              borderBottom: "1px solid #2a2a2a",
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            {/* Tool buttons */}
+            <ButtonGroup size="sm">
+              {[
+                { id: "Wwwc", label: "W/L" },
+                { id: "Pan", label: "Pan" },
+                { id: "Zoom", label: "Zoom" },
+                { id: "Length", label: "Length" },
+                { id: "Angle", label: "Angle" },
+                { id: "EllipticalRoi", label: "ROI" },
+                { id: "ArrowAnnotate", label: "Annotate" },
+                { id: "Rotate", label: "Rotate" },
+              ].map(({ id, label }) => (
+                <Button
+                  key={id}
+                  size="sm"
+                  variant={activeTool === id ? "primary" : "outline-secondary"}
+                  onClick={() => changeTool(id)}
+                >
+                  {label}
+                </Button>
+              ))}
+            </ButtonGroup>
+
+            {/* Fundus presets */}
+            <ButtonGroup size="sm">
+              {Object.keys(PRESETS).map((name) => (
+                <Button
+                  key={name}
+                  size="sm"
+                  variant={
+                    activePreset === name ? "warning" : "outline-warning"
+                  }
+                  onClick={() => applyPreset(name)}
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {name}
+                </Button>
+              ))}
+            </ButtonGroup>
+
+            {/* Channel */}
+            <ButtonGroup size="sm">
+              {["all", "r", "g", "b"].map((ch) => (
+                <Button
+                  key={ch}
+                  size="sm"
+                  variant={channel === ch ? "info" : "outline-info"}
+                  onClick={() => {
+                    setChannel(ch);
+                    rerender({ channel: ch });
+                  }}
+                  style={{ textTransform: "uppercase" }}
+                >
+                  {ch === "all" ? "RGB" : ch}
+                </Button>
+              ))}
+            </ButtonGroup>
+
+            {/* Sliders */}
+            {sliders.map(({ label, key, val, setter, min, max, step }) => (
+              <div
+                key={key}
+                style={{ display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <span style={{ fontSize: 12, minWidth: 60, color: "#aaa" }}>
+                  {label}
+                </span>
+                <Form.Range
+                  style={{ width: 110 }}
+                  min={min}
+                  max={max}
+                  step={step}
+                  value={val}
+                  onChange={handleSlider(setter, key)}
+                />
+                <span style={{ fontSize: 12, minWidth: 28, color: "#fff" }}>
+                  {val.toFixed(key === "sharp" ? 1 : 2)}
+                </span>
+              </div>
+            ))}
+
+            {/* Extra buttons */}
+            <Button
+              size="sm"
+              variant={isInverted ? "light" : "outline-light"}
+              onClick={toggleInvert}
+            >
+              Invert
+            </Button>
+            <Button size="sm" variant="outline-light" onClick={exportPNG}>
+              Export PNG
+            </Button>
+            <Button
+              size="sm"
+              variant="outline-danger"
+              onClick={clearAllAnnotations}
+            >
+              Clear Annotations
+            </Button>
+            <Button size="sm" variant="danger" onClick={reset}>
+              Reset
+            </Button>
+          </div>
+
+          {/* ── Canvas area ── */}
+          <div style={{ flex: 1, display: "flex", position: "relative" }}>
+            <div
+              ref={elementRef}
+              onContextMenu={(e) => e.preventDefault()}
+              style={{ width: "100%", height: "100%", background: "black" }}
+            />
+
+            {/* ── Error message ── */}
+            {loadError && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  background: "rgba(180,30,30,0.85)",
+                  padding: "16px 24px",
+                  borderRadius: 8,
+                  fontSize: 14,
+                  color: "#fff",
+                  textAlign: "center",
+                }}
+              >
+                {loadError}
+              </div>
+            )}
+
+            {/* ── Metadata overlay (bottom-left) ── */}
+            {imageInfo && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 12,
+                  left: 12,
+                  background: "rgba(0,0,0,0.55)",
+                  padding: "8px 12px",
+                  borderRadius: 6,
+                  fontSize: 11,
+                  lineHeight: 1.7,
+                  color: "#ccc",
+                  pointerEvents: "none",
+                }}
+              >
+                <div>
+                  Patient:{" "}
+                  <b style={{ color: "#fff" }}>{imageInfo.patientId}</b>
+                </div>
+                <div>
+                  Date: <b style={{ color: "#fff" }}>{imageInfo.studyDate}</b>
+                </div>
+                <div>
+                  Size:{" "}
+                  <b style={{ color: "#fff" }}>
+                    {imageInfo.cols} × {imageInfo.rows}
+                  </b>
+                </div>
+                <div>
+                  Bits: <b style={{ color: "#fff" }}>{imageInfo.bits}</b>
+                </div>
+                <div>
+                  Modality:{" "}
+                  <b style={{ color: "#fff" }}>{imageInfo.modality}</b>
+                </div>
+              </div>
+            )}
+
+            {/* ── Zoom badge (top-right) ── */}
+            <div
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 12,
+                pointerEvents: "none",
+              }}
+            >
+              <Badge bg="secondary">Zoom: {zoom}x</Badge>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

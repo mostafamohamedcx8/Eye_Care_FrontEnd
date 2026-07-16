@@ -111,6 +111,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/ReportsList/:id"
             element={

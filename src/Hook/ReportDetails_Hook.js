@@ -25,6 +25,8 @@ export const ReportDetails_Hook = () => {
   const [activeTab, setActiveTab] = useState("history");
   const [innerTab, setInnerTab] = useState("medical");
   const [Rightimages, setRightImages] = useState([]);
+  const [rightFileNames, setRightFileNames] = useState([]); // 🆕
+  const [leftFileNames, setLeftFileNames] = useState([]); // 🆕
   const [Leftimages, setLeftImages] = useState([]);
   const [RightDic, setRightDic] = useState(null); // ✅ null بدل []
   const [LeftDic, setLeftDic] = useState(null); // ✅ null بدل []
@@ -246,13 +248,13 @@ export const ReportDetails_Hook = () => {
     const ItemRightImages = Array.from(
       Array(Object.keys(Rightimages).length).keys(),
     ).map((item, index) =>
-      dataURLtoFile(Rightimages[index], Math.random() + ".png"),
+      dataURLtoFile(Rightimages[index], rightFileNames[index]),
     );
 
     const ItemLeftImages = Array.from(
       Array(Object.keys(Leftimages).length).keys(),
     ).map((item, index) =>
-      dataURLtoFile(Leftimages[index], Math.random() + ".png"),
+      dataURLtoFile(Leftimages[index], leftFileNames[index]),
     );
 
     if (!validateImageFiles(ItemRightImages)) {
@@ -561,5 +563,9 @@ export const ReportDetails_Hook = () => {
     onChangeRightDic,
     LeftDic,
     onChangeLeftDic,
+    rightFileNames,
+    setRightFileNames,
+    leftFileNames,
+    setLeftFileNames,
   ];
 };

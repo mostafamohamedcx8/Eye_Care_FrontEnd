@@ -4,25 +4,29 @@ import { Modal, Button } from "react-bootstrap";
 /**
  * Custom multi-image uploader.
  * - Adding images takes the FULL image, no forced crop.
- * - A pencil icon appears on hover over each image.
- * - Clicking the pencil opens a modal with a draggable/resizable crop box (canvas-based).
- * - Confirming the crop replaces that image with the cropped version.
+ * - Keeps the ORIGINAL file name for each image so it can be sent to the backend.
  *
  * Props:
- *  images:    array of base64 data URL strings (e.g. "data:image/jpeg;base64,...")
- *             -> SAME shape as the old react-multi-image-input component.
- *  setImages: setter function, same shape (array of base64 strings)
- *  max:       max number of images (default 8)
+ *  images:      array of base64 data URL strings
+ *  setImages:   setter function
+ *  fileNames:   array of original file names, SAME order/index as images  🆕
+ *  setFileNames: setter function for fileNames                            🆕
+ *  max:         max number of images (default 8)
  */
-const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
+const MultiImageInputCustom = ({
+  images = [],
+  setImages,
+  fileNames = [],
+  setFileNames,
+  max = 8,
+}) => {
   const fileInputRef = useRef(null);
-  const [cropTarget, setCropTarget] = useState(null); // index of image being cropped
+  const [cropTarget, setCropTarget] = useState(null);
   const [cropBox, setCropBox] = useState({ x: 20, y: 20, w: 200, h: 200 });
   const [dragState, setDragState] = useState(null);
   const imgRef = useRef(null);
   const containerRef = useRef(null);
 
-  // ---- Helper: read a File as a base64 data URL ----
   const fileToDataUrl = (file) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -40,19 +44,22 @@ const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
     const filesToAdd = files.slice(0, remainingSlots);
 
     const newDataUrls = await Promise.all(filesToAdd.map(fileToDataUrl));
+    const newNames = filesToAdd.map((f) => f.name); // 👈 هنا بنمسك اسم الملف الحقيقي
 
     setImages([...images, ...newDataUrls]);
-    e.target.value = ""; // allow re-selecting same file again
+    setFileNames([...fileNames, ...newNames]); // 👈 وهنا بنخزنه بنفس الترتيب
+
+    e.target.value = "";
   };
 
   const handleRemove = (index) => {
     setImages(images.filter((_, i) => i !== index));
+    setFileNames(fileNames.filter((_, i) => i !== index)); // 👈 نمسح الاسم لما نمسح الصورة
   };
 
-  // ---- Crop modal logic ----
+  // ---- Crop modal logic (زي ما هو، من غير تغيير) ----
   const openCrop = (index) => {
     setCropTarget(index);
-    // reset crop box to a sane default once the image is shown
     setCropBox({ x: 20, y: 20, w: 200, h: 200 });
   };
 
@@ -69,11 +76,10 @@ const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
     setCropBox({ x: 10, y: 10, w, h });
   };
 
-  // Dragging / resizing the crop box
   const startDrag = (mode) => (e) => {
     e.preventDefault();
     setDragState({
-      mode, // "move" | "resize"
+      mode,
       startX: e.clientX,
       startY: e.clientY,
       origBox: { ...cropBox },
@@ -105,7 +111,6 @@ const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
 
   const onMouseUp = useCallback(() => setDragState(null), []);
 
-  // Attach/detach global listeners while dragging
   const containerProps = {
     onMouseMove: dragState ? onMouseMove : undefined,
     onMouseUp: dragState ? onMouseUp : undefined,
@@ -136,12 +141,12 @@ const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
       canvas.height,
     );
 
-    // Output as base64 data URL, same shape as the rest of the array
     const newDataUrl = canvas.toDataURL("image/jpeg", 0.92);
 
     const updated = [...images];
     updated[cropTarget] = newDataUrl;
     setImages(updated);
+    // اسم الملف بيفضل زي ما هو حتى بعد الكروب، مفيش داعي نغيره
     closeCrop();
   };
 
@@ -167,7 +172,6 @@ const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
 
-            {/* Pencil icon - opens crop modal */}
             <button
               type="button"
               onClick={() => openCrop(index)}
@@ -191,7 +195,6 @@ const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
               <i className="bi bi-pencil" style={{ fontSize: 12 }}></i>
             </button>
 
-            {/* Remove icon */}
             <button
               type="button"
               onClick={() => handleRemove(index)}
@@ -246,7 +249,6 @@ const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
         onChange={handleFilesSelected}
       />
 
-      {/* Crop Modal */}
       <Modal show={cropTarget !== null} onHide={closeCrop} size="lg" centered>
         <Modal.Header closeButton>
           <Modal.Title>Crop image</Modal.Title>
@@ -276,7 +278,6 @@ const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
                 draggable={false}
               />
 
-              {/* Dim overlay outside crop box using box-shadow trick */}
               <div
                 onMouseDown={startDrag("move")}
                 style={{
@@ -290,7 +291,6 @@ const MultiImageInputCustom = ({ images = [], setImages, max = 8 }) => {
                   cursor: "move",
                 }}
               >
-                {/* Resize handle */}
                 <div
                   onMouseDown={(e) => {
                     e.stopPropagation();

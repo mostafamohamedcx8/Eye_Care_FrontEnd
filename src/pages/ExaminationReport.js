@@ -398,51 +398,77 @@ const PatientReport = () => {
 
               <>
                 {Report?.eyeExamination?.rightEye?.images?.length > 0 ? (
-                  <div className="d-flex flex-wrap gap-3 mb-4">
-                    {Report.eyeExamination.rightEye.images.map((link, idx) => {
-                      // parse modelResults.rightEye JSON string
-                      let rightEyeResults = null;
-                      try {
-                        rightEyeResults = JSON.parse(
-                          Report.modelResults?.rightEye || "{}",
-                        );
-                      } catch (err) {
-                        console.error(
-                          "Invalid JSON in modelResults.rightEye:",
-                          err,
-                        );
-                      }
+                  (() => {
+                    // parse modelResults.rightEye JSON string - مرة واحدة برا مش جوه loop
+                    let rightEyeResults = {};
+                    try {
+                      rightEyeResults = JSON.parse(
+                        Report.modelResults?.rightEye || "{}",
+                      );
+                    } catch (err) {
+                      console.error(
+                        "Invalid JSON in modelResults.rightEye:",
+                        err,
+                      );
+                      rightEyeResults = {}; // default آمن لو الـ parse فشل
+                    }
 
-                      const heatmapLink = rightEyeResults[
-                        "Main Eye Disease (8 Classes)"
-                      ]?.heatmap_path
-                        ? `https://backend.auge.cloud/heatmaps/${rightEyeResults[
-                            "Main Eye Disease (8 Classes)"
-                          ].heatmap_path
-                            .split("/")
-                            .pop()}`
-                        : null;
+                    const heatmapLink = rightEyeResults[
+                      "Main Eye Disease (8 Classes)"
+                    ]?.heatmap_path
+                      ? `https://backend.auge.cloud/heatmaps/${rightEyeResults[
+                          "Main Eye Disease (8 Classes)"
+                        ].heatmap_path
+                          .split("/")
+                          .pop()}`
+                      : null;
 
-                      return (
+                    // ⚠️ FIX: images دلوقتي array of { url, modality } objects مش strings،
+                    // فلازم نستخرج الـ url بدل ما نستخدم الـ object نفسه كـ src.
+                    // بنفضّل صورة الـ COLOR كمعاينة، ولو مش موجودة ناخد أول صورة.
+                    const rightEyeImages =
+                      Report.eyeExamination.rightEye.images;
+                    const colorImageObj =
+                      rightEyeImages.find((img) => img.modality === "COLOR") ||
+                      rightEyeImages[0];
+                    const colorImageUrl = colorImageObj?.url;
+
+                    // ✅ NEW: نفضّل الصور بعد المحاذاة (alignedImages) لو موجودة، عشان
+                    // الـ Layer View يعرض صور متطابقة فعليًا فوق بعض. لو مفيش (مثلاً
+                    // المحاذاة فشلت)، نرجع للصور الأصلية عادي - الـ viewer بيتعامل
+                    // مع الحالتين.
+                    const imagesForLayerView =
+                      Report.eyeExamination.rightEye.alignedImages?.length > 0
+                        ? Report.eyeExamination.rightEye.alignedImages
+                        : Report.eyeExamination.rightEye.images;
+
+                    return (
+                      <div className="mb-4">
                         <div
-                          key={idx}
-                          style={{ position: "relative", cursor: "pointer" }}
+                          style={{
+                            position: "relative",
+                            cursor: "pointer",
+                            width: "160px",
+                          }}
                         >
                           <img
-                            src={link}
+                            src={colorImageUrl}
                             crossOrigin="anonymous"
                             loading="lazy"
-                            alt={`${t("reportdata.leftEye.header")} Image ${idx + 1}`}
+                            alt={`${t("reportdata.rightEye.header")} Image`}
                             style={{
-                              width: "100%",
-                              height: "auto",
+                              width: "160px",
+                              height: "160px",
+                              objectFit: "cover",
                               borderRadius: "8px",
                               border: "1px solid #ccc",
                               cursor: "pointer",
                             }}
                             onClick={() =>
                               window.open(
-                                `/view-dicom?dicomUrl=${encodeURIComponent(link)}&type=image`,
+                                `/view-dicom?images=${encodeURIComponent(
+                                  JSON.stringify(imagesForLayerView),
+                                )}&type=image`,
                                 "_blank",
                               )
                             }
@@ -466,9 +492,9 @@ const PatientReport = () => {
                             </Badge>
                           )}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })()
                 ) : (
                   <p>{t("reportdata.rightEye.noImages")}</p>
                 )}
@@ -777,51 +803,73 @@ const PatientReport = () => {
                 )}
               </div>
               {Report?.eyeExamination?.leftEye?.images?.length > 0 ? (
-                <div className="d-flex flex-wrap gap-3 mb-4">
-                  {Report.eyeExamination.leftEye.images.map((link, idx) => {
-                    // parse modelResults.leftEye JSON string
-                    let leftEyeResults = null;
-                    try {
-                      leftEyeResults = JSON.parse(
-                        Report.modelResults?.leftEye || "{}",
-                      );
-                    } catch (err) {
-                      console.error(
-                        "Invalid JSON in modelResults.leftEye:",
-                        err,
-                      );
-                    }
+                (() => {
+                  // parse modelResults.leftEye JSON string - مرة واحدة برا مش جوه loop
+                  let leftEyeResults = {};
+                  try {
+                    leftEyeResults = JSON.parse(
+                      Report.modelResults?.leftEye || "{}",
+                    );
+                  } catch (err) {
+                    console.error("Invalid JSON in modelResults.leftEye:", err);
+                    leftEyeResults = {}; // default آمن لو الـ parse فشل
+                  }
 
-                    const heatmapLink = leftEyeResults[
-                      "Main Eye Disease (8 Classes)"
-                    ]?.heatmap_path
-                      ? `https://backend.auge.cloud/heatmaps/${leftEyeResults[
-                          "Main Eye Disease (8 Classes)"
-                        ]?.heatmap_path
-                          .split("/")
-                          .pop()}`
-                      : null;
+                  const heatmapLink = leftEyeResults[
+                    "Main Eye Disease (8 Classes)"
+                  ]?.heatmap_path
+                    ? `https://backend.auge.cloud/heatmaps/${leftEyeResults[
+                        "Main Eye Disease (8 Classes)"
+                      ].heatmap_path
+                        .split("/")
+                        .pop()}`
+                    : null;
 
-                    return (
+                  // ⚠️ FIX: images دلوقتي array of { url, modality } objects مش strings،
+                  // فلازم نستخرج الـ url بدل ما نستخدم الـ object نفسه كـ src.
+                  // بنفضّل صورة الـ COLOR كمعاينة، ولو مش موجودة ناخد أول صورة.
+                  const leftEyeImages = Report.eyeExamination.leftEye.images;
+                  const colorImageObj =
+                    leftEyeImages.find((img) => img.modality === "COLOR") ||
+                    leftEyeImages[0];
+                  const colorImageUrl = colorImageObj?.url;
+
+                  // ✅ NEW: نفضّل الصور بعد المحاذاة (alignedImages) لو موجودة، عشان
+                  // الـ Layer View يعرض صور متطابقة فعليًا فوق بعض. لو مفيش (مثلاً
+                  // المحاذاة فشلت)، نرجع للصور الأصلية عادي - الـ viewer بيتعامل
+                  // مع الحالتين.
+                  const imagesForLayerView =
+                    Report.eyeExamination.leftEye.alignedImages?.length > 0
+                      ? Report.eyeExamination.leftEye.alignedImages
+                      : Report.eyeExamination.leftEye.images;
+
+                  return (
+                    <div className="mb-4">
                       <div
-                        key={idx}
-                        style={{ position: "relative", cursor: "pointer" }}
+                        style={{
+                          position: "relative",
+                          cursor: "pointer",
+                          width: "160px",
+                        }}
                       >
                         <img
-                          src={link}
+                          src={colorImageUrl}
                           crossOrigin="anonymous"
                           loading="lazy"
-                          alt={`${t("reportdata.leftEye.header")} Image ${idx + 1}`}
+                          alt={`${t("reportdata.leftEye.header")} Image`}
                           style={{
-                            width: "100%",
-                            height: "auto",
+                            width: "160px",
+                            height: "160px",
+                            objectFit: "cover",
                             borderRadius: "8px",
                             border: "1px solid #ccc",
                             cursor: "pointer",
                           }}
                           onClick={() =>
                             window.open(
-                              `/view-dicom?dicomUrl=${encodeURIComponent(link)}&type=image`,
+                              `/view-dicom?images=${encodeURIComponent(
+                                JSON.stringify(imagesForLayerView),
+                              )}&type=image`,
                               "_blank",
                             )
                           }
@@ -845,9 +893,9 @@ const PatientReport = () => {
                           </Badge>
                         )}
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })()
               ) : (
                 <p>{t("reportdata.leftEye.noImages")}</p>
               )}

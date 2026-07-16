@@ -99,6 +99,10 @@ const ReportDetails = () => {
     onChangeRightDic,
     LeftDic,
     onChangeLeftDic,
+    rightFileNames,
+    setRightFileNames,
+    leftFileNames,
+    setLeftFileNames,
   ] = ReportDetails_Hook();
 
   return (
@@ -586,6 +590,8 @@ const ReportDetails = () => {
                   <MultiImageInputCustom
                     images={Rightimages}
                     setImages={setRightImages}
+                    fileNames={rightFileNames}
+                    setFileNames={setRightFileNames}
                     max={8}
                   />
                   <Form.Text className="text-muted">
@@ -850,6 +856,8 @@ const ReportDetails = () => {
                   <MultiImageInputCustom
                     images={Leftimages}
                     setImages={setLeftImages}
+                    fileNames={leftFileNames}
+                    setFileNames={setLeftFileNames}
                     max={8}
                   />
 
