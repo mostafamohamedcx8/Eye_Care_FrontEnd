@@ -41,7 +41,7 @@ export const ReportDetails_Hook = () => {
   const [rightIntraocularPressure, setRightIntraocularPressure] = useState("");
   const [rightCornealThickness, setRightCornealThickness] = useState("");
   const [rightChamberAngle, setRightChamberAngle] = useState("");
-  const [rightAmslerTestAbnormal, setRightAmslerTestAbnormal] = useState(false);
+  const [rightAmslerTest, setRightAmslerTest] = useState("notdone");
   const [leftVisusCC, setLeftVisusCC] = useState("");
   const [leftPreviousValue, setLeftPreviousValue] = useState("");
   const [leftSince, setLeftSince] = useState("");
@@ -51,10 +51,15 @@ export const ReportDetails_Hook = () => {
   const [leftIntraocularPressure, setLeftIntraocularPressure] = useState("");
   const [leftCornealThickness, setLeftCornealThickness] = useState("");
   const [leftChamberAngle, setLeftChamberAngle] = useState("");
-  const [leftAmslerTestAbnormal, setLeftAmslerTestAbnormal] = useState(false);
+  const [leftAmslerTest, setLeftAmslerTest] = useState("notdone");
   const [historyData, setHistoryData] = useState({ medical: [], eye: [] });
   const [newMedicalDisease, setNewMedicalDisease] = useState("");
   const [newEyeDisease, setNewEyeDisease] = useState("");
+  const [newMedicalMedication, setNewMedicalMedication] = useState("");
+  const [newEyeMedication, setNewEyeMedication] = useState("");
+  const [medicalMedications, setMedicalMedications] = useState([]);
+  const [eyeMedications, setEyeMedications] = useState([]);
+  const [nextVisitDate, setNextVisitDate] = useState("");
   const [loading, setloading] = useState(true);
   const [ispress, setispress] = useState(false);
   const [eyeDiseases, setEyeDiseases] = useState([
@@ -78,6 +83,7 @@ export const ReportDetails_Hook = () => {
 
   const GetLastReport = ReportData?.data?.reports || [];
   const lastReport = GetLastReport.length ? GetLastReport[0] : null;
+  console.log("lastReport", lastReport);
 
   useEffect(() => {
     if (lastReport?.history) {
@@ -86,6 +92,42 @@ export const ReportDetails_Hook = () => {
           lastReport.history.medical?.map(({ _id, ...rest }) => rest) || [],
         eye: lastReport.history.eye?.map(({ _id, ...rest }) => rest) || [],
       });
+      setMedicalMedications(
+        lastReport.history.medicalMedications?.map(
+          ({ _id, ...rest }) => rest,
+        ) || [],
+      );
+      setEyeMedications(
+        lastReport.history.eyeMedications?.map(({ _id, ...rest }) => rest) ||
+          [],
+      );
+    }
+  }, [lastReport]);
+
+  useEffect(() => {
+    if (lastReport?.eyeExamination) {
+      const right = lastReport?.eyeExamination?.rightEye;
+      const left = lastReport?.eyeExamination?.leftEye;
+
+      if (right) {
+        setRightSphere(right.sphere || "");
+        setRightCylinder(right.cylinder || "");
+        setRightAxis(right.axis || "");
+        setRightIntraocularPressure(right.intraocularPressure || "");
+        setRightCornealThickness(right.cornealThickness || "");
+        setRightChamberAngle(right.chamberAngle || "");
+        setRightAmslerTest(right.amslerTest || "notdone");
+      }
+
+      if (left) {
+        setLeftSphere(left.sphere || "");
+        setLeftCylinder(left.cylinder || "");
+        setLeftAxis(left.axis || "");
+        setLeftIntraocularPressure(left.intraocularPressure || "");
+        setLeftCornealThickness(left.cornealThickness || "");
+        setLeftChamberAngle(left.chamberAngle || "");
+        setLeftAmslerTest(left.amslerTest || "notdone");
+      }
     }
   }, [lastReport]);
 
@@ -117,7 +159,7 @@ export const ReportDetails_Hook = () => {
     rightIntraocularPressure,
     rightChamberAngle,
     rightCornealThickness,
-    rightAmslerTestAbnormal,
+    rightAmslerTest,
     Rightimages,
     RightDic,
     rightImageCaptureDate,
@@ -133,7 +175,7 @@ export const ReportDetails_Hook = () => {
     leftIntraocularPressure,
     leftChamberAngle,
     leftCornealThickness,
-    leftAmslerTestAbnormal,
+    leftAmslerTest,
     Leftimages,
     LeftDic,
     leftImageCaptureDate,
@@ -232,6 +274,28 @@ export const ReportDetails_Hook = () => {
     setNewMedicalDisease("");
   };
 
+  const handleAddMedicalMedication = () => {
+    const trimmed = newMedicalMedication.trim();
+    if (!trimmed) return;
+    setMedicalMedications((prev) => [...prev, { name: trimmed }]);
+    setNewMedicalMedication("");
+  };
+
+  const handleRemoveMedicalMedication = (medIndex) => {
+    setMedicalMedications((prev) => prev.filter((_, i) => i !== medIndex));
+  };
+
+  const handleAddEyeMedication = () => {
+    const trimmed = newEyeMedication.trim();
+    if (!trimmed) return;
+    setEyeMedications((prev) => [...prev, { name: trimmed }]);
+    setNewEyeMedication("");
+  };
+
+  const handleRemoveEyeMedication = (medIndex) => {
+    setEyeMedications((prev) => prev.filter((_, i) => i !== medIndex));
+  };
+
   function dataURLtoFile(dataurl, filename) {
     var arr = dataurl.split(","),
       mime = arr[0].match(/:(.*?);/)[1],
@@ -301,10 +365,7 @@ export const ReportDetails_Hook = () => {
       rightCornealThickness,
     );
     formData.append("eyeExamination.rightEye.chamberAngle", rightChamberAngle);
-    formData.append(
-      "eyeExamination.rightEye.amslerTestAbnormal",
-      rightAmslerTestAbnormal,
-    );
+    formData.append("eyeExamination.rightEye.amslerTest", rightAmslerTest);
 
     formData.append("eyeExamination.leftEye.visusCC", leftVisusCC);
     formData.append("eyeExamination.leftEye.previousValue", leftPreviousValue);
@@ -325,10 +386,8 @@ export const ReportDetails_Hook = () => {
       leftCornealThickness,
     );
     formData.append("eyeExamination.leftEye.chamberAngle", leftChamberAngle);
-    formData.append(
-      "eyeExamination.leftEye.amslerTestAbnormal",
-      leftAmslerTestAbnormal,
-    );
+    formData.append("eyeExamination.leftEye.amslerTest", leftAmslerTest);
+    formData.append("nextVisitDate", nextVisitDate);
 
     if (RightDic) formData.append("rightEyeDic", RightDic);
     if (LeftDic) formData.append("leftEyeDic", LeftDic);
@@ -348,7 +407,6 @@ export const ReportDetails_Hook = () => {
           `history[medical][${index}][sinceWhen]`,
           condition.sinceWhen || "",
         );
-        // ✅ متبعتش hba1cValue لو فاضي عشان الـ Schema بيتوقع Number
         if (condition.hba1cValue) {
           formData.append(
             `history[medical][${index}][hba1cValue]`,
@@ -377,7 +435,13 @@ export const ReportDetails_Hook = () => {
         condition.appliesTo ?? "",
       );
     });
+    medicalMedications.forEach((med, index) => {
+      formData.append(`history[medicalMedications][${index}][name]`, med.name);
+    });
 
+    eyeMedications.forEach((med, index) => {
+      formData.append(`history[eyeMedications][${index}][name]`, med.name);
+    });
     ItemRightImages.forEach((item) => formData.append("rightEyeImages", item));
     ItemLeftImages.forEach((item) => formData.append("leftEyeImages", item));
 
@@ -463,8 +527,7 @@ export const ReportDetails_Hook = () => {
   const onChangeRightCornealThickness = (e) =>
     setRightCornealThickness(e.target.value);
   const onChangeRightChamberAngle = (e) => setRightChamberAngle(e.target.value);
-  const onChangeRightAmslerTestAbnormal = (e) =>
-    setRightAmslerTestAbnormal(e.target.checked);
+  const onChangeRightAmslerTest = (e) => setRightAmslerTest(e.target.value);
   const onChangeLeftVisusCC = (e) => setLeftVisusCC(e.target.value);
   const onChangeLeftPreviousValue = (e) => setLeftPreviousValue(e.target.value);
   const onChangeLeftSince = (e) => setLeftSince(e.target.value);
@@ -472,14 +535,14 @@ export const ReportDetails_Hook = () => {
     setLeftImageCaptureDate(e.target.value);
   const onChangeLeftSphere = (e) => setLeftSphere(e.target.value);
   const onChangeLeftCylinder = (e) => setLeftCylinder(e.target.value);
-  const onChangeLeftAmslerTestAbnormal = (e) =>
-    setLeftAmslerTestAbnormal(e.target.checked);
+  const onChangeLeftAmslerTest = (e) => setLeftAmslerTest(e.target.value);
   const onChangeLeftAxis = (e) => setLeftAxis(e.target.value);
   const onChangeLeftIntraocularPressure = (e) =>
     setLeftIntraocularPressure(e.target.value);
   const onChangeLeftCornealThickness = (e) =>
     setLeftCornealThickness(e.target.value);
   const onChangeLeftChamberAngle = (e) => setLeftChamberAngle(e.target.value);
+  const onChangeNextVisitDate = (e) => setNextVisitDate(e.target.value);
   const onChangeRightDic = (e) => {
     if (e.target.files?.[0]) setRightDic(e.target.files[0]);
   };
@@ -515,7 +578,7 @@ export const ReportDetails_Hook = () => {
     rightIntraocularPressure,
     rightCornealThickness,
     rightChamberAngle,
-    rightAmslerTestAbnormal,
+    rightAmslerTest,
     rightEyeData,
     leftVisusCC,
     leftPreviousValue,
@@ -529,13 +592,13 @@ export const ReportDetails_Hook = () => {
     leftIntraocularPressure,
     leftCornealThickness,
     leftChamberAngle,
-    leftAmslerTestAbnormal,
+    leftAmslerTest,
     HandelSendingData,
     ispress,
     loading,
     handleAddEyeDisease,
     onChangeMedicalDisease,
-    onChangeLeftAmslerTestAbnormal,
+    onChangeLeftAmslerTest,
     onChangeLeftAxis,
     onChangeLeftChamberAngle,
     onChangeLeftCylinder,
@@ -548,7 +611,7 @@ export const ReportDetails_Hook = () => {
     onChangeRightIntraocularPressure,
     onChangeLeftCornealThickness,
     onChangeLeftImageCaptureDate,
-    onChangeRightAmslerTestAbnormal,
+    onChangeRightAmslerTest,
     onChangeRightChamberAngle,
     onChangeRightCornealThickness,
     onChangeRightAxis,
@@ -567,5 +630,17 @@ export const ReportDetails_Hook = () => {
     setRightFileNames,
     leftFileNames,
     setLeftFileNames,
+    newMedicalMedication,
+    setNewMedicalMedication,
+    newEyeMedication,
+    setNewEyeMedication,
+    handleAddMedicalMedication,
+    handleRemoveMedicalMedication,
+    handleAddEyeMedication,
+    handleRemoveEyeMedication,
+    medicalMedications,
+    eyeMedications,
+    nextVisitDate,
+    onChangeNextVisitDate,
   ];
 };

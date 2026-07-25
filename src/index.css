@@ -36,8 +36,8 @@
 }
 
 .hero-section {
-  background: url("/home/joe/Eye_Care_FrontEnd/public/Untitled.jpeg") center/cover
-    no-repeat;
+  background: url("/home/joe/Eye_Care_FrontEnd/public/Untitled.jpeg")
+    center/cover no-repeat;
   min-height: 30vh; /* بدل 80vh، خليه أصغر */
   position: relative;
   display: flex;

@@ -552,6 +552,7 @@
   "reportForm": {
     "title": "Bericht für Patienten erstellen",
     "patientInfo": {
+      "nextVisitDate": "Datum des nächsten Besuchs",
       "title": "Patienteninformationen",
       "labels": {
         "name": "Name",
@@ -570,6 +571,12 @@
       "leftEye": "Linkes Auge"
     },
     "medicalHistory": {
+      "medications": {
+        "title": "Systemische Medikamente",
+        "subtitle": "Z.B. Tabletten gegen Diabetes, Bluthochdruck usw.",
+        "placeholder": "Medikamentennamen eingeben",
+        "addButton": "Medikament hinzufügen"
+      },
       "diseases": {
         "diabetes": "Diabetes M.",
         "hypertension": "Hypertonie",
@@ -605,6 +612,12 @@
       }
     },
     "eyeHistory": {
+      "medications": {
+        "title": "Augenmedikamente",
+        "subtitle": "Z.B. Augentropfen, Salben usw.",
+        "placeholder": "Augentropfen oder Medikament eingeben",
+        "addButton": "Augenmedikament hinzufügen"
+      },
       "diseases": {
         "cataract": "Katarakt",
         "glaucoma": "Glaukom",
@@ -625,6 +638,7 @@
     },
     "eyeExamination": {
       "labels": {
+        "amslerTest": "Amsler-Test",
         "uploadDicom": "DICOM-Datei hochladen ({{eye}})",
         "selectedFile": "Ausgewählte Datei: ",
         "visusCC": "Visus (CC)",
@@ -639,7 +653,7 @@
         "intraocularPressure": "Augeninnendruck (mmHg)",
         "cornealThickness": "Hornhautdicke",
         "chamberAngle": "Vorderer Kammerwinkel",
-        "amslerTestAbnormal": "Amsler-Test anormal"
+        "amslerTestAbnormal": "Amsler-Test"
       },
       "placeholders": {
         "visus": "Visus auswählen",
@@ -648,10 +662,15 @@
         "axis": "Achse",
         "intraocularPressure": "Auswählen",
         "chamberAngle": "Option auswählen",
-        "dicomFile": ".dcm Datei auswählen"
+        "dicomFile": ".dcm Datei auswählen",
+        "cornealThickness": "z. B. 356 - 700 µm"
       },
       "dicomNote": "Bitte laden Sie die DICOM-Datei für die erweiterte diagnostische Analyse hoch.",
       "options": {
+        "amslerTest": {
+          "normal": "Normal",
+          "abnormal": "Abnormal"
+        },
         "visus": [
           "2.0 (20/10)",
           "1.6 (20/12)",
@@ -687,7 +706,8 @@
       "imageNote": "Bitte laden Sie hochqualitative Bilder hoch. Unscharfe Bilder können die Diagnose beeinträchtigen.",
       "buttons": {
         "next": "Weiter",
-        "save": "Daten speichern"
+        "save": "Daten speichern",
+        "today": "Heute"
       }
     },
     "notifications": {
@@ -768,6 +788,7 @@
       "wide": "Weit"
     },
     "patientInfo": {
+      "nextVisitDate": "Datum des nächsten Besuchs",
       "header": "Patienteninformationen",
       "name": "Name",
       "salutation": "Anrede",

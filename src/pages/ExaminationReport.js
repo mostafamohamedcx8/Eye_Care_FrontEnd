@@ -204,6 +204,16 @@ const PatientReport = () => {
                     </strong>{" "}
                     {displayDate(Report?.createdAt)}
                   </div>
+                  <div className="mb-2">
+                    <strong>
+                      {t("reportdata.patientInfo.nextVisitDate")}:
+                    </strong>{" "}
+                    {Report?.nextVisitDate ? (
+                      displayDate(Report.nextVisitDate)
+                    ) : (
+                      <span style={{ color: "red" }}>---</span>
+                    )}
+                  </div>
                 </Col>
                 <Col
                   md={4}
@@ -331,6 +341,22 @@ const PatientReport = () => {
                   </ListGroup.Item>
                 ))}
               </ListGroup>
+
+              {/* ✅ عرض قايمة العلاج (medicalMedications) بس لو فيها عناصر */}
+              {Report?.history?.medicalMedications?.length > 0 && (
+                <div className="mt-3">
+                  <strong>
+                    {t("reportdata.medicalHistory.medications", "Medications")}:
+                  </strong>
+                  <ListGroup className="mt-2">
+                    {Report.history.medicalMedications.map((med, idx) => (
+                      <ListGroup.Item key={med._id || idx}>
+                        {med.name}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </div>
+              )}
             </Card.Body>
           </Card>
 
@@ -374,6 +400,20 @@ const PatientReport = () => {
                   </ListGroup.Item>
                 ))}
               </ListGroup>
+              {Report?.history?.eyeMedications?.length > 0 && (
+                <div className="mt-3">
+                  <strong>
+                    {t("reportdata.eyeHistory.medications", "Medications")}:
+                  </strong>
+                  <ListGroup className="mt-2">
+                    {Report.history.eyeMedications.map((med, idx) => (
+                      <ListGroup.Item key={med._id || idx}>
+                        {med.name}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </div>
+              )}
             </Card.Body>
           </Card>
 
@@ -629,13 +669,7 @@ const PatientReport = () => {
                   <strong>
                     {t("reportdata.rightEye.amslerTestAbnormal")}:
                   </strong>{" "}
-                  {t(
-                    `reportdata.commonValues.${
-                      Report?.eyeExamination?.rightEye?.amslerTestAbnormal
-                        ? "Yes"
-                        : "No"
-                    }`,
-                  )}
+                  {Report?.eyeExamination?.rightEye?.amslerTest}
                 </Col>
               </Row>
 
@@ -1023,13 +1057,7 @@ const PatientReport = () => {
                   <strong>
                     {t("reportdata.rightEye.amslerTestAbnormal")}:
                   </strong>{" "}
-                  {t(
-                    `reportdata.commonValues.${
-                      Report?.eyeExamination?.leftEye?.amslerTestAbnormal
-                        ? "Yes"
-                        : "No"
-                    }`,
-                  )}
+                  {Report?.eyeExamination?.leftEye?.amslerTest}
                 </Col>
               </Row>
               {/* تحليل النموذج */}

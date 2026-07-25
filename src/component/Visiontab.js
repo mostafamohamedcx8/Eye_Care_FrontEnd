@@ -44,7 +44,9 @@ const EYE_OPTIONS = [
   { key: "both", labelKey: "visionTab.eyeBoth", fallback: "Both Eyes" },
 ];
 
+// "all" -> عرض التلات ميتركس (Visus / IOP / Images) تحت بعض في نفس الوقت
 const METRIC_OPTIONS = [
+  { key: "all", labelKey: "visionTab.metricAll", fallback: "All" },
   { key: "visus", labelKey: "visionTab.metricVisus", fallback: "Visus (CC)" },
   {
     key: "iop",
@@ -61,6 +63,7 @@ const emptyEyeMetrics = {
   previousVisus: null,
   iop: null,
   images: [],
+  alignedImages: [],
   hasImages: false,
 };
 
@@ -80,6 +83,7 @@ const buildReportPoint = (report) => {
       previousVisus: parseVisus(rightEx.previousValue),
       iop: parseNumeric(rightEx.intraocularPressure),
       images: rightEx.images || [],
+      alignedImages: rightEx.alignedImages || [],
       hasImages: (rightEx.images || []).length > 0,
     },
     left: {
@@ -88,6 +92,7 @@ const buildReportPoint = (report) => {
       previousVisus: parseVisus(leftEx.previousValue),
       iop: parseNumeric(leftEx.intraocularPressure),
       images: leftEx.images || [],
+      alignedImages: leftEx.alignedImages || [],
       hasImages: (leftEx.images || []).length > 0,
     },
   };
@@ -143,14 +148,28 @@ const FilterGroup = ({ value, onChange, options, t }) => (
 
 /* ------------------------------------------------------------------ */
 /* Image preview strip - shown after clicking an image marker         */
+/* بيفضل الصور المحاذاة (alignedImages) لو موجودة عند فتح الـ viewer، */
+/* وبيبعت الصور كـ array (JSON) في اليو آر إل زي شاشة التقرير تمامًا   */
 /* ------------------------------------------------------------------ */
 
-const ImagePreviewStrip = ({ images, eyeLabel, dateLabel, t, onClose }) => {
+const ImagePreviewStrip = ({
+  images,
+  alignedImages,
+  eyeLabel,
+  dateLabel,
+  t,
+  onClose,
+}) => {
   if (!images || images.length === 0) return null;
 
-  const openDicomViewer = (link) => {
+  const imagesForViewer =
+    alignedImages && alignedImages.length > 0 ? alignedImages : images;
+
+  const openViewer = () => {
     window.open(
-      `/view-dicom?dicomUrl=${encodeURIComponent(link)}&type=image`,
+      `/view-dicom?images=${encodeURIComponent(
+        JSON.stringify(imagesForViewer),
+      )}&type=image`,
       "_blank",
     );
   };
@@ -171,10 +190,10 @@ const ImagePreviewStrip = ({ images, eyeLabel, dateLabel, t, onClose }) => {
         </Button>
       </div>
       <div className="d-flex flex-wrap gap-2">
-        {images.map((link, idx) => (
+        {images.map((img, idx) => (
           <img
-            key={idx}
-            src={link}
+            key={img?._id || idx}
+            src={img?.url}
             crossOrigin="anonymous"
             loading="lazy"
             alt={`${eyeLabel} ${idx + 1}`}
@@ -186,7 +205,7 @@ const ImagePreviewStrip = ({ images, eyeLabel, dateLabel, t, onClose }) => {
               border: "1px solid #ccc",
               cursor: "pointer",
             }}
-            onClick={() => openDicomViewer(link)}
+            onClick={openViewer}
           />
         ))}
       </div>
@@ -242,7 +261,7 @@ const ImageMarker = (props) => {
 
 const MetricChart = ({ data, eyeFilter, metric, t }) => {
   const [selectedImagePoint, setSelectedImagePoint] = useState(null);
-  // { dateLabel, eyeKey, images } | null
+  // { dateLabel, eyeKey, images, alignedImages } | null
 
   const showRight = eyeFilter === "right" || eyeFilter === "both";
   const showLeft = eyeFilter === "left" || eyeFilter === "both";
@@ -252,7 +271,7 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
       ? t("visionTab.eyeRight", "Right Eye")
       : t("visionTab.eyeLeft", "Left Eye");
 
-  /* ---------------- Visus or IOP: smooth area + line chart ---------------- */
+  /* ---------------- Visus or IOP: straight-line area chart ---------------- */
   if (metric === "visus" || metric === "iop") {
     const dataKeyRight = metric === "visus" ? "right.visus" : "right.iop";
     const dataKeyLeft = metric === "visus" ? "left.visus" : "left.iop";
@@ -260,6 +279,29 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
       metric === "visus"
         ? t("visionTab.metricVisus", "Visus (CC)")
         : t("visionTab.metricIop", "Intraocular Pressure");
+
+    // id فريد لكل نقطة حتى لو كذا تقرير وقعوا في نفس التاريخ، فبنستخدمه كمحور X
+    // (تباعد متساوي بين النقط بدل التباعد بالوقت الفعلي)، وبنـ"ترجمه" لتاريخ
+    // مقروء في الـ ticks والتولتيب من خلال اللوك أب ده.
+    const idToLabel = Object.fromEntries(data.map((d) => [d.id, d.dateLabel]));
+
+    // بيرجع القيمة الصحيحة الخاصة بالنقطة اللي بيتعمل عليها hover:
+    // Visus -> النص الأصلي زي ما هو (0.2 (20/100)) مش الرقم المُبسّط اللي بيتحسب بيه الرسم.
+    // IOP   -> الرقم زي ما هو مع وحدة mmHg.
+    const tooltipFormatter = (value, name, props) => {
+      const isRight = props?.dataKey?.startsWith("right");
+      const eyeData = isRight ? props?.payload?.right : props?.payload?.left;
+      const noValue = t("visionTab.noValue", "—");
+
+      if (metric === "visus") {
+        return [eyeData?.visusRaw || noValue, name];
+      }
+      const iopVal = eyeData?.iop;
+      return [
+        iopVal !== null && iopVal !== undefined ? `${iopVal} mmHg` : noValue,
+        name,
+      ];
+    };
 
     return (
       <ResponsiveContainer width="100%" height={340}>
@@ -299,7 +341,8 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
             stroke="#e3e6ea"
           />
           <XAxis
-            dataKey="dateLabel"
+            dataKey="id"
+            tickFormatter={(id) => idToLabel[id] || ""}
             tick={{ fontSize: 12, fill: "#5b6470" }}
             axisLine={{ stroke: "#d7dbe0" }}
             tickLine={false}
@@ -319,9 +362,9 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
             }}
           />
           <Tooltip
-            formatter={(value, name) => [value ?? "—", name]}
-            labelFormatter={(label) =>
-              `${t("visionTab.date", "Date")}: ${label}`
+            formatter={tooltipFormatter}
+            labelFormatter={(id) =>
+              `${t("visionTab.date", "Date")}: ${idToLabel[id] || ""}`
             }
             contentStyle={{
               borderRadius: 8,
@@ -332,7 +375,7 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
 
           {showRight && (
             <Area
-              type="monotone"
+              type="linear"
               dataKey={dataKeyRight}
               name={`${eyeLabel("right")}`}
               stroke={EYE_COLORS.right}
@@ -345,7 +388,7 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
           )}
           {showLeft && (
             <Area
-              type="monotone"
+              type="linear"
               dataKey={dataKeyLeft}
               name={`${eyeLabel("left")}`}
               stroke={EYE_COLORS.left}
@@ -373,6 +416,7 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
         row: 1,
         eyeKey: "right",
         images: point.right.images,
+        alignedImages: point.right.alignedImages,
       });
     }
     if (showLeft && point.left.hasImages) {
@@ -382,6 +426,7 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
         row: 0,
         eyeKey: "left",
         images: point.left.images,
+        alignedImages: point.left.alignedImages,
       });
     }
   });
@@ -458,6 +503,7 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
                     dateLabel: props.payload.dateLabel,
                     eyeKey: props.payload.eyeKey,
                     images: props.payload.images,
+                    alignedImages: props.payload.alignedImages,
                   })
                 }
               />
@@ -475,6 +521,7 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
       {selectedImagePoint && (
         <ImagePreviewStrip
           images={selectedImagePoint.images}
+          alignedImages={selectedImagePoint.alignedImages}
           eyeLabel={eyeLabel(selectedImagePoint.eyeKey)}
           dateLabel={selectedImagePoint.dateLabel}
           t={t}
@@ -494,13 +541,38 @@ const MetricChart = ({ data, eyeFilter, metric, t }) => {
 /*               مش صور التقرير اللي قبله)                            */
 /* ------------------------------------------------------------------ */
 
+const METRIC_TITLES = {
+  visus: { labelKey: "visionTab.metricVisus", fallback: "Visus (CC)" },
+  iop: {
+    labelKey: "visionTab.metricIop",
+    fallback: "Intraocular Pressure",
+  },
+  images: { labelKey: "visionTab.metricImages", fallback: "Images" },
+};
+
 const ChartPanel = ({ chartData, imagesData, t, reportLink }) => {
-  const [metric, setMetric] = useState("visus");
+  const [metric, setMetric] = useState("all");
   const [eyeFilter, setEyeFilter] = useState("both");
   const navigate = useNavigate();
 
-  const dataForMetric = metric === "images" ? imagesData : chartData;
-  const noComparisonAvailable = metric !== "images" && chartData.length < 2;
+  const noComparisonAvailable = chartData.length < 2;
+
+  const renderBlock = (m) => (
+    <div className="mb-4" key={m}>
+      <div
+        className="fw-semibold text-muted mb-2"
+        style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: 0.4 }}
+      >
+        {t(METRIC_TITLES[m].labelKey, METRIC_TITLES[m].fallback)}
+      </div>
+      <MetricChart
+        data={m === "images" ? imagesData : chartData}
+        eyeFilter={eyeFilter}
+        metric={m}
+        t={t}
+      />
+    </div>
+  );
 
   return (
     <div>
@@ -519,7 +591,7 @@ const ChartPanel = ({ chartData, imagesData, t, reportLink }) => {
         />
       </div>
 
-      {noComparisonAvailable && (
+      {metric !== "images" && noComparisonAvailable && (
         <div className="text-muted small mb-2">
           {t(
             "visionTab.noPreviousData",
@@ -528,12 +600,20 @@ const ChartPanel = ({ chartData, imagesData, t, reportLink }) => {
         </div>
       )}
 
-      <MetricChart
-        data={dataForMetric}
-        eyeFilter={eyeFilter}
-        metric={metric}
-        t={t}
-      />
+      {metric === "all" ? (
+        <>
+          {renderBlock("visus")}
+          {renderBlock("iop")}
+          {renderBlock("images")}
+        </>
+      ) : (
+        <MetricChart
+          data={metric === "images" ? imagesData : chartData}
+          eyeFilter={eyeFilter}
+          metric={metric}
+          t={t}
+        />
+      )}
 
       {reportLink && (
         <div className="d-flex justify-content-end mt-3">

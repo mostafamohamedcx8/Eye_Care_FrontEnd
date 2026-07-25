@@ -1,4 +1,4 @@
-import MultiImageInput from "react-multiple-image-input";
+import React, { Fragment } from "react";
 import MultiImageInputCustom from "../component/MultiImageInputCustom";
 import Barcode from "react-barcode";
 import {
@@ -51,7 +51,7 @@ const ReportDetails = () => {
     rightIntraocularPressure,
     rightCornealThickness,
     rightChamberAngle,
-    rightAmslerTestAbnormal,
+    rightAmslerTest,
     rightEyeData,
     leftVisusCC,
     leftPreviousValue,
@@ -65,13 +65,13 @@ const ReportDetails = () => {
     leftIntraocularPressure,
     leftCornealThickness,
     leftChamberAngle,
-    leftAmslerTestAbnormal,
+    leftAmslerTest,
     HandelSendingData,
     ispress,
     loading,
     handleAddEyeDisease,
     onChangeMedicalDisease,
-    onChangeLeftAmslerTestAbnormal,
+    onChangeLeftAmslerTest,
     onChangeLeftAxis,
     onChangeLeftChamberAngle,
     onChangeLeftCylinder,
@@ -84,7 +84,7 @@ const ReportDetails = () => {
     onChangeRightIntraocularPressure,
     onChangeLeftCornealThickness,
     onChangeLeftImageCaptureDate,
-    onChangeRightAmslerTestAbnormal,
+    onChangeRightAmslerTest,
     onChangeRightChamberAngle,
     onChangeRightCornealThickness,
     onChangeRightAxis,
@@ -103,7 +103,27 @@ const ReportDetails = () => {
     setRightFileNames,
     leftFileNames,
     setLeftFileNames,
+    newMedicalMedication,
+    setNewMedicalMedication,
+    newEyeMedication,
+    setNewEyeMedication,
+    handleAddMedicalMedication,
+    handleRemoveMedicalMedication,
+    handleAddEyeMedication,
+    handleRemoveEyeMedication,
+    medicalMedications,
+    eyeMedications,
+    nextVisitDate,
+    onChangeNextVisitDate,
   ] = ReportDetails_Hook();
+
+  const getTodayDate = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   return (
     <Container className="mt-5 mb-5">
@@ -205,6 +225,7 @@ const ReportDetails = () => {
             onSelect={handleInnerTabSelect}
             className="mb-3"
           >
+            {/* ================= Medical Tab ================= */}
             <Tab eventKey="medical" title={t("reportForm.tabs.medical")}>
               <Form>
                 {allMedicalDiseases.map((disease, index) => {
@@ -212,8 +233,8 @@ const ReportDetails = () => {
                     historyData.medical.find((item) => item.name === disease) ||
                     {};
                   return (
-                    <>
-                      <Row key={index} className="mb-2 align-items-center">
+                    <React.Fragment key={index}>
+                      <Row className="mb-2 align-items-center">
                         <Col md={4}>
                           <Form.Label>
                             {t(
@@ -269,6 +290,7 @@ const ReportDetails = () => {
                           />
                         </Col>
                       </Row>
+
                       {disease === "Diabetes M." &&
                         existing.hasCondition &&
                         existing.appliesTo === "Self" && (
@@ -293,7 +315,6 @@ const ReportDetails = () => {
                             </Col>
                             <Col md={6}>
                               <Form.Label>
-                                {" "}
                                 {t(
                                   "reportForm.medicalHistory.diabetes.hba1cValue",
                                 )}
@@ -376,9 +397,11 @@ const ReportDetails = () => {
                             </Col>
                           </Row>
                         )}
-                    </>
+                    </React.Fragment>
                   );
                 })}
+
+                {/* إضافة مرض طبى جديد */}
                 <Row className="mt-3">
                   <Col md={6}>
                     <Form.Control
@@ -395,6 +418,57 @@ const ReportDetails = () => {
                     </Button>
                   </Col>
                 </Row>
+
+                <hr className="my-4" />
+
+                {/* 🟢 🟢 قسم العلاجات الطبية العامة (Systemic Medications) 🟢 🟢 */}
+                <div className="mt-3">
+                  <h5>{t("reportForm.medicalHistory.medications.title")}</h5>
+                  <p className="text-muted small">
+                    {t("reportForm.medicalHistory.medications.subtitle")}
+                  </p>
+
+                  {/* قائمة الأدوية المضافة */}
+                  {medicalMedications.map((med, idx) => (
+                    <div
+                      key={idx}
+                      className="d-flex align-items-center mb-2 gap-2"
+                    >
+                      <span className="badge bg-secondary p-2">{med.name}</span>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleRemoveMedicalMedication(idx)}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ))}
+
+                  {/* مدخل إضافة دوا جديد */}
+                  <Row className="mt-2">
+                    <Col md={6}>
+                      <Form.Control
+                        placeholder={t(
+                          "reportForm.medicalHistory.medications.placeholder",
+                        )}
+                        value={newMedicalMedication}
+                        onChange={(e) =>
+                          setNewMedicalMedication(e.target.value)
+                        }
+                      />
+                    </Col>
+                    <Col md={4}>
+                      <Button
+                        variant="outline-primary"
+                        onClick={handleAddMedicalMedication}
+                      >
+                        {t("reportForm.medicalHistory.medications.addButton")}
+                      </Button>
+                    </Col>
+                  </Row>
+                </div>
+
                 <Button
                   variant="primary"
                   className="mt-4"
@@ -410,6 +484,7 @@ const ReportDetails = () => {
               </Form>
             </Tab>
 
+            {/* ================= Eye Tab ================= */}
             <Tab eventKey="eye" title={t("reportForm.tabs.eye")}>
               <Form>
                 {eyeDiseases.map((disease, index) => {
@@ -473,6 +548,7 @@ const ReportDetails = () => {
                   );
                 })}
 
+                {/* إضافة مرض عيون جديد */}
                 <Row className="mt-3">
                   <Col md={6}>
                     <Form.Control
@@ -489,21 +565,69 @@ const ReportDetails = () => {
                     </Button>
                   </Col>
                 </Row>
-              </Form>
 
-              <Button
-                className="mt-4"
-                variant="primary"
-                onClick={() => {
-                  const isValid = validateEyeHistory(historyData);
-                  if (isValid) {
-                    setActiveTab("exam");
-                    setInnerTab("rightEye");
-                  }
-                }}
-              >
-                {t("reportForm.eyeHistory.buttons.next")}
-              </Button>
+                <hr className="my-4" />
+
+                {/* 🟢 🟢 قسم علاجات العيون (Eye Medications) 🟢 🟢 */}
+                <div className="mt-3">
+                  <h5>{t("reportForm.eyeHistory.medications.title")}</h5>
+                  <p className="text-muted small">
+                    {t("reportForm.eyeHistory.medications.subtitle")}
+                  </p>
+
+                  {/* قائمة علاجات العيون المضافة */}
+                  {eyeMedications.map((med, idx) => (
+                    <div
+                      key={idx}
+                      className="d-flex align-items-center mb-2 gap-2"
+                    >
+                      <span className="badge bg-info p-2">{med.name}</span>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleRemoveEyeMedication(idx)}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ))}
+
+                  {/* مدخل إضافة قطرة/علاج عين جديد */}
+                  <Row className="mt-2">
+                    <Col md={6}>
+                      <Form.Control
+                        placeholder={t(
+                          "reportForm.eyeHistory.medications.placeholder",
+                        )}
+                        value={newEyeMedication}
+                        onChange={(e) => setNewEyeMedication(e.target.value)}
+                      />
+                    </Col>
+                    <Col md={4}>
+                      <Button
+                        variant="outline-primary"
+                        onClick={handleAddEyeMedication}
+                      >
+                        {t("reportForm.eyeHistory.medications.addButton")}
+                      </Button>
+                    </Col>
+                  </Row>
+                </div>
+
+                <Button
+                  className="mt-4"
+                  variant="primary"
+                  onClick={() => {
+                    const isValid = validateEyeHistory(historyData);
+                    if (isValid) {
+                      setActiveTab("exam");
+                      setInnerTab("rightEye");
+                    }
+                  }}
+                >
+                  {t("reportForm.eyeHistory.buttons.next")}
+                </Button>
+              </Form>
             </Tab>
           </Tabs>
         </Tab>
@@ -620,6 +744,7 @@ const ReportDetails = () => {
                       </Form.Group>
                     </Col>
                   </Row>
+
                   <Row className="mt-3">
                     <Col md={4}>
                       <Form.Group>
@@ -628,11 +753,25 @@ const ReportDetails = () => {
                             "reportForm.eyeExamination.labels.imageCaptureDate",
                           )}
                         </Form.Label>
-                        <Form.Control
-                          type="date"
-                          value={rightImageCaptureDate}
-                          onChange={onChangeRightImageCaptureDate}
-                        />
+                        <div className="d-flex gap-2">
+                          <Form.Control
+                            type="date"
+                            value={rightImageCaptureDate}
+                            onChange={onChangeRightImageCaptureDate}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline-secondary"
+                            onClick={() => {
+                              const today = getTodayDate();
+                              onChangeRightImageCaptureDate({
+                                target: { value: today },
+                              });
+                            }}
+                          >
+                            {t("reportForm.eyeExamination.buttons.today")}
+                          </Button>
+                        </div>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -719,6 +858,11 @@ const ReportDetails = () => {
                       </Form.Label>
                       <Form.Control
                         type="number"
+                        min="356"
+                        max="700"
+                        placeholder={t(
+                          "reportForm.eyeExamination.placeholders.cornealThickness",
+                        )}
                         value={rightCornealThickness}
                         onChange={onChangeRightCornealThickness}
                       />
@@ -755,15 +899,33 @@ const ReportDetails = () => {
                     </Col>
                   </Row>
 
-                  <Form.Check
-                    className="mt-2"
-                    type="checkbox"
-                    label={t(
-                      "reportForm.eyeExamination.labels.amslerTestAbnormal",
-                    )}
-                    checked={rightAmslerTestAbnormal}
-                    onChange={onChangeRightAmslerTestAbnormal}
-                  />
+                  <div className="mt-2">
+                    <Form.Label className="d-block">
+                      {t("reportForm.eyeExamination.labels.amslerTest")}
+                    </Form.Label>
+                    <Form.Check
+                      inline
+                      type="radio"
+                      name="rightAmslerTest"
+                      label={t(
+                        "reportForm.eyeExamination.options.amslerTest.normal",
+                      )}
+                      value="normal"
+                      checked={rightAmslerTest === "normal"}
+                      onChange={onChangeRightAmslerTest}
+                    />
+                    <Form.Check
+                      inline
+                      type="radio"
+                      name="rightAmslerTest"
+                      label={t(
+                        "reportForm.eyeExamination.options.amslerTest.abnormal",
+                      )}
+                      value="abnormal"
+                      checked={rightAmslerTest === "abnormal"}
+                      onChange={onChangeRightAmslerTest}
+                    />
+                  </div>
                   <Button
                     variant="primary"
                     className="mt-4"
@@ -901,11 +1063,25 @@ const ReportDetails = () => {
                             "reportForm.eyeExamination.labels.imageCaptureDate",
                           )}
                         </Form.Label>
-                        <Form.Control
-                          type="date"
-                          value={leftImageCaptureDate}
-                          onChange={onChangeLeftImageCaptureDate}
-                        />
+                        <div className="d-flex gap-2">
+                          <Form.Control
+                            type="date"
+                            value={leftImageCaptureDate}
+                            onChange={onChangeLeftImageCaptureDate}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline-secondary"
+                            onClick={() => {
+                              const today = getTodayDate();
+                              onChangeLeftImageCaptureDate({
+                                target: { value: today },
+                              });
+                            }}
+                          >
+                            {t("reportForm.eyeExamination.buttons.today")}
+                          </Button>
+                        </div>
                       </Form.Group>
                     </Col>
                   </Row>
@@ -993,6 +1169,11 @@ const ReportDetails = () => {
                       </Form.Label>
                       <Form.Control
                         type="number"
+                        min="356"
+                        max="700"
+                        placeholder={t(
+                          "reportForm.eyeExamination.placeholders.cornealThickness",
+                        )}
                         value={leftCornealThickness}
                         onChange={onChangeLeftCornealThickness}
                       />
@@ -1029,17 +1210,58 @@ const ReportDetails = () => {
                     </Col>
                   </Row>
 
-                  <Form.Check
-                    className="mt-2"
-                    type="checkbox"
-                    label={t(
-                      "reportForm.eyeExamination.labels.amslerTestAbnormal",
-                    )}
-                    checked={leftAmslerTestAbnormal}
-                    onChange={onChangeLeftAmslerTestAbnormal}
-                  />
+                  <div className="mt-2">
+                    <Form.Label className="d-block">
+                      {t("reportForm.eyeExamination.labels.amslerTest")}
+                    </Form.Label>
+                    <Form.Check
+                      inline
+                      type="radio"
+                      name="leftAmslerTest"
+                      label={t(
+                        "reportForm.eyeExamination.options.amslerTest.normal",
+                      )}
+                      value="normal"
+                      checked={leftAmslerTest === "normal"}
+                      onChange={onChangeLeftAmslerTest}
+                    />
+                    <Form.Check
+                      inline
+                      type="radio"
+                      name="leftAmslerTest"
+                      label={t(
+                        "reportForm.eyeExamination.options.amslerTest.abnormal",
+                      )}
+                      value="abnormal"
+                      checked={leftAmslerTest === "abnormal"}
+                      onChange={onChangeLeftAmslerTest}
+                    />
+                  </div>
                 </Card.Body>
               </Card>
+              {/* 🟢 ميعاد الزيارة القادمة - خاص بالتقرير مش بعين معينة */}
+              <Card className="mb-4">
+                <Card.Body>
+                  <h5 className="mb-3">
+                    {t("reportForm.nextVisit.title", "Next Visit")}
+                  </h5>
+                  <Row>
+                    <Col md={4}>
+                      <Form.Group>
+                        <Form.Label>
+                          {t("reportForm.nextVisit.label", "Next visit date")}
+                        </Form.Label>
+                        <Form.Control
+                          type="date"
+                          value={nextVisitDate}
+                          onChange={onChangeNextVisitDate}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+
               <Button
                 variant="primary"
                 className="mt-2"

@@ -571,6 +571,12 @@
       "leftEye": "Left Eye"
     },
     "medicalHistory": {
+      "medications": {
+        "title": "Systemic Medications",
+        "subtitle": "E.g. Tablets for diabetes, hypertension, etc.",
+        "placeholder": "Enter medication name",
+        "addButton": "Add Medication"
+      },
       "diseases": {
         "diabetes": "Diabetes M.",
         "hypertension": "Hypertension",
@@ -606,6 +612,12 @@
       }
     },
     "eyeHistory": {
+      "medications": {
+        "title": "Eye Medications",
+        "subtitle": "E.g. Eye drops, ointments, etc.",
+        "placeholder": "Enter eye drop or medication name",
+        "addButton": "Add Eye Medication"
+      },
       "diseases": {
         "cataract": "Cataract",
         "glaucoma": "Glaucoma",
@@ -626,6 +638,7 @@
     },
     "eyeExamination": {
       "labels": {
+        "amslerTest": "Amsler Test",
         "uploadDicom": "Upload DICOM File ({{eye}})",
         "selectedFile": "Selected file: ",
         "visusCC": "Visus (CC)",
@@ -640,7 +653,7 @@
         "intraocularPressure": "Intraocular Pressure (mmHg)",
         "cornealThickness": "Corneal Thickness",
         "chamberAngle": "Anterior Chamber Angle",
-        "amslerTestAbnormal": "Amsler Test Abnormal"
+        "amslerTestAbnormal": "Amsler Test"
       },
       "placeholders": {
         "visus": "Select Visus",
@@ -649,10 +662,15 @@
         "axis": "Axis",
         "intraocularPressure": "Select",
         "chamberAngle": "Select an option",
-        "dicomFile": "Choose .dcm file"
+        "dicomFile": "Choose .dcm file",
+        "cornealThickness": "e.g. 356 - 700 µm"
       },
       "dicomNote": "Please upload the DICOM file for advanced diagnostic analysis.",
       "options": {
+        "amslerTest": {
+          "normal": "Normal",
+          "abnormal": "Abnormal"
+        },
         "visus": [
           "2.0 (20/10)",
           "1.6 (20/12)",
@@ -688,7 +706,8 @@
       "imageNote": "Please upload high-quality images. Blurry images may affect diagnosis.",
       "buttons": {
         "next": "Next",
-        "save": "Save Data"
+        "save": "Save Data",
+        "today": "Today"
       }
     },
     "notifications": {
@@ -768,6 +787,7 @@
       "Mx": "Mx"
     },
     "patientInfo": {
+      "nextVisitDate": "Next Visit Date",
       "header": "Patient Information",
       "name": "Name",
       "salutation": "Salutation",
@@ -830,7 +850,7 @@
       "intraocularPressure": "Intraocular Pressure",
       "cornealThickness": "Corneal Thickness",
       "chamberAngle": "Chamber Angle",
-      "amslerTestAbnormal": "Amsler Test Abnormal",
+      "amslerTestAbnormal": "Amsler Test",
       "disease": "Disease",
       "confidence": "Confidence (%)",
       "noDiseases": "No detected diseases in the right eye.",
@@ -856,7 +876,7 @@
       "intraocularPressure": "Intraocular Pressure",
       "cornealThickness": "Corneal Thickness",
       "chamberAngle": "Chamber Angle",
-      "amslerTestAbnormal": "Amsler Test Abnormal",
+      "amslerTestAbnormal": "Amsler Test",
       "disease": "Disease",
       "confidence": "Confidence (%)",
       "badImageQuality": "Bad image quality - can be due to: Media Opacity due to: Corneal opacity, Cataract, vitreous opacities, vitreous hemorrhage/inflammation, tear film issues, etc. OR Optics misalignment (or insufficient pupillary dilation, focus)"

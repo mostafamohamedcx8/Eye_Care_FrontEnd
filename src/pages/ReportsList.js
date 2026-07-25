@@ -96,7 +96,7 @@ const ReportsList = () => {
             {/* ---------------------------------------------------- */}
             {/* Vision tab: charts (summary + per-report)             */}
             {/* ---------------------------------------------------- */}
-            <Tab eventKey="vision" title={t("vision.tabTitle", "Vision")}>
+            <Tab eventKey="vision" title={t("vision.tabTitle", "Progression")}>
               <div className="mt-3">
                 <VisionTab reports={Report?.reports || []} patientId={id} />
               </div>
